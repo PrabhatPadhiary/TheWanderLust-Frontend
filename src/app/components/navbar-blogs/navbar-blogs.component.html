@@ -1,0 +1,48 @@
+<nav class="blog-navbar">
+    <!-- Left Section: Trending -->
+    <div class="left">
+        <button class="trending-btn">Trending</button>
+    </div>
+
+    <!-- Center Section: Search Bar -->
+    <div class="center">
+        <input type="text" placeholder="Search blogs or people..." class="search-input" [(ngModel)]="searchQuery"
+            (input)="onSearch()">
+        <button class="search-btn" (click)="search()">🔍</button>
+
+        <div class="search-dropdown" *ngIf="searchResults.length">
+            <ul>
+                <li *ngFor="let item of searchResults" (click)="selectItem(item)">
+                    <img *ngIf="item.type === 'blog'" [src]="item.image" class="search-thumbnail" alt="Blog">
+                    <img *ngIf="item.type === 'user'" [src]="item.profilePic" class="search-thumbnail" alt="User">
+                    <div class="blog-div" *ngIf="item.type === 'blog'">
+                        <span class="head">{{ item.name }}</span>
+                        <span class="sub-head"># {{ item.tagline }}</span>
+                    </div>
+                    <div class="user-div" *ngIf="item.type === 'user'">
+                        <span class="head">{{ item.name }}</span>
+                        <span class="sub-head">{{ item.username }}</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Right Section: Write Blog & Profile -->
+    <div class="right">
+        <button class="write-btn">Write Blog</button>
+
+        <!-- Profile Dropdown -->
+        <div class="profile-dropdown">
+            <div class="profile-info" (click)="toggleDropdown()">
+                <img class="profile-btn" src="{{userDetails.profilePicUrl}}" alt="">
+                <span class="name">{{userDetails.firstName}}</span>
+            </div>
+            <div class="dropdown-menu" *ngIf="dropdownOpen">
+                <a href="/my-blogs">My Blogs</a>
+                <a href="/saved-blogs">Saved Blogs</a>
+                <a href="/logout">Logout</a>
+            </div>
+        </div>
+    </div>
+</nav>

@@ -1,0 +1,22 @@
+<div class="writers-section">
+    <h2>Featured Blog Writers</h2>
+    <p>Behind every great journey is a storyteller who brings it to life. Our featured writers are passionate travelers who capture the essence of exploration through their words. From bustling cityscapes to serene hidden gems, they take you on unforgettable journeys, sharing personal experiences, travel tips, and cultural insights.
+        Whether you're looking for inspiration for your next trip or simply want to immerse yourself in the magic of travel, dive into their stories and embark on an adventure—one blog at a time.</p>
+    <div class="writers-grid">
+        <div class="writer-card" *ngFor="let writer of featuredWriters">
+            <div class="profile-pic">
+                <img [src]="writer.profilePicUrl" [alt]="writer.username" />
+            </div>
+            <h3 class="writer-name">{{ writer.firstName }} {{ writer.lastName }}</h3>
+            <span class="writer-username">{{ writer.username }}</span>
+            <div class="card-content">
+                <span class="writer-email"><i class="fa fa-envelope"></i><br>{{ writer.email }}</span>
+                <span class="writer-blogcount">Blogs: {{ writer.blogCount }}</span>
+            </div>
+            <div class="card-actions">
+                <button class="follow-btn">Follow</button>
+                <button class="read-more-btn">Read More</button>
+            </div>
+        </div>
+    </div>
+</div>

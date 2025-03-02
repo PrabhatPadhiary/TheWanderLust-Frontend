@@ -1,0 +1,282 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  border-radius: 0;
+}
+
+.feed-container{
+  width: 60%;
+  margin-top: 70px;
+  background: linear-gradient(to right, #0f172a, #334155);
+}
+
+.poster-info{
+  padding: 5px 10px;
+}
+
+.blog-info{
+  padding: 5px 10px;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(3px);
+  z-index: 10;
+}
+
+.content{
+  color: white;
+  padding-left: 15px;
+  font-weight: 300;
+  font-size: 0.9rem;
+}
+
+.likes span{
+  color: white;
+  font-size: 1rem;
+}
+
+.slide-title{
+  font-size: 2rem;
+  color: rgb(238, 233, 233);
+}
+
+.slide-subtitle{
+  color: rgb(165, 165, 165);
+  font-size: 1rem;
+  font-style: italic;
+}
+
+.location-info{
+  margin-top: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 5px;
+}
+
+.comment-info{
+  color: white;
+  padding: 10px 15px;
+  font-size: 1rem;
+  cursor: pointer;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+.latest-comment{
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+#author{
+  color: wheat;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+#comment{
+  color: white;
+  font-size: 0.8rem;
+}
+
+.location-info i{
+  font-family: FontAwesome !important;
+  color: wheat;
+}
+
+.location{
+  font-size: 1rem;
+  color: wheat;
+}
+
+.wrapper{
+  padding: 30px;
+}
+
+.blog-container{
+  border-bottom: 10px solid rgb(255, 255, 255);
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.create-new-blog{
+  padding: 30px;
+  width: 95%;
+  margin: auto;
+  border-radius: 20px;
+  color: wheat;
+  background: linear-gradient(to right, #223560, #3b4b61);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 12px 12px rgba(0, 0, 0, 0.7);
+}
+
+textarea[formControlName="commentText"] {
+  color: white;
+  height: 40px;
+  background-color: transparent;
+  border: 1px solid white;
+  border-radius: 30px;
+  outline: none;
+  width: 50%;
+  padding: 10px;
+  font-size: 0.8rem;
+  resize: vertical;
+}
+
+textarea[formControlName="commentText"]::placeholder{
+  color: rgb(180, 180, 180);
+}
+
+.comment-details{
+  margin-top: 20px;
+  margin-left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.comment-details i{
+  margin-left: 5px;
+  font-family: FontAwesome !important;
+}
+
+.comment-details i.inactive {
+  color: rgb(140, 140, 140);
+}
+
+.comment-details i.active {
+  color: wheat;
+  cursor: pointer;
+}
+
+.profile-pic{
+  border-radius: 50%;
+  padding: 3px;
+}
+
+.posted-by{
+  color: wheat;
+  font-size: 1rem
+}
+
+.create-new-blog .click-btn{
+  margin-top: 20px;
+  border: none;
+  border-radius: 10px;
+  height: 40px;
+}
+
+.user-details{
+  color: wheat;
+}
+
+.slider-wrapper{
+  position: relative;
+  max-width: 100%;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.slider{
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+.slides{
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+  height: 100%;
+}
+
+.slides img{
+  width: 100%;
+  height: 100%;
+  flex-shrink: 0;
+  object-fit: cover;
+}
+
+.slider-btn {
+  height: 30px;
+  width: 30px;
+  position: absolute;
+  top: 45%;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 50%;
+  z-index: 10;
+}
+
+.slider-btn.left {
+  left: 10px;
+}
+
+.slider-btn.right {
+  right: 10px;
+}
+
+.slider-indicator {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  font-size: 10px;
+}
+
+button{
+  text-align: center;
+}
+
+.like-ele{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.likes{
+  font-size: 0.8rem;
+  padding: 5px 15px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 20px;
+}
+
+.like-ele i{
+  cursor: pointer;
+  font-family: FontAwesome !important;
+  color: wheat;
+}
+
+.fa-heart, .fa-heart-o {
+  transition: color 0.3s ease;
+}
+
+.like-ele i.liked {
+  color: red;
+}
+
+.likecount{
+  padding-left: 20px;
+  color: wheat;
+}

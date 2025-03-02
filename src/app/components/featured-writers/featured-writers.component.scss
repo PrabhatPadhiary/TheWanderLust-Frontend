@@ -1,0 +1,158 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+.writers-section {
+    padding: 2rem;
+    background: linear-gradient(to bottom, #292828 10%, #003329 80%);
+    text-align: center;
+}
+
+.writers-section h2 {
+    color: white;
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+}
+
+.writers-section p {
+    margin: auto;
+    color: rgb(186, 186, 186);
+    font-size: 14px;
+    margin-bottom: 1.5rem;
+    font-family: 'Poppins', sans-serif;
+    display: block;
+    max-width: 1100px;
+    line-height: 20px;
+    letter-spacing: 0.5px;
+}
+
+.writers-grid {
+    padding: 30px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.7rem;
+    margin: 0 auto;
+    justify-content: center;
+    max-width: 1200px;
+}
+
+.writer-card {
+    color: white;
+    background-color: #011713;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.4s ease-in-out;
+    // filter: grayscale(100%);
+}
+
+.writer-card:hover {
+    transform: scale(1.02);
+    filter: grayscale(0%);
+    color: white;
+}
+
+.writer-card:hover .profile-pic img {
+    border: 2px solid white;
+}
+
+.writer-card:hover .writer-username {
+    color: white;
+}
+
+.writer-card:hover .writer-email {
+    color: white;
+}
+
+.writer-card:hover .writer-blogcount {
+    color: white;
+}
+
+.writer-username {
+    color: rgb(255, 255, 255);
+    font-size: 15px;
+    margin-bottom: 20px;
+}
+
+.profile-pic img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 1rem;
+}
+
+.card-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.card-content i {
+    font-family: FontAwesome !important;
+    padding: 4px;
+}
+
+.writer-name {
+    font-size: 1.4rem;
+    font-weight: 600;
+    font-family: 'Poppins', sans-serif;
+}
+
+.writer-email {
+    font-size: 0.9rem;
+    color: #ffffff;
+    margin: 0.25rem 0;
+}
+
+.writer-blogcount {
+    font-size: 0.9rem;
+    color: #ffffff;
+    margin: 0.5rem 0 1rem 0;
+}
+
+.card-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+.follow-btn,
+.read-more-btn {
+    border: none;
+    outline: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.follow-btn {
+    background-color: #08604f;
+    color: #fff;
+}
+
+.follow-btn:hover{
+    background-color: white;
+    color: black;
+}
+
+.read-more-btn {
+    background-color: #f0f0f0;
+    color: #333;
+}
+
+.read-more-btn:hover{
+    background-color: #08604f;
+    color: white;
+}
+

@@ -1,0 +1,23 @@
+<section class="blogs-test">
+    <h2 class="head1">Featured Blogs Of The Month</h2>
+    <p id="sub">This month’s top reads take you on a journey of discovery, inspiration, and insight. From breathtaking landscapes that offer a peaceful retreat to thought-provoking ideas that challenge the way we see the world, these blogs capture the essence of exploration and growth. Dive into stories that spark creativity, tips that enhance daily life, and experiences that transport you to new places. Whether you're looking for motivation, knowledge, or simply an engaging read, these handpicked blogs are sure to leave a lasting impression.</p>
+    <div class="slider-container" #swiperContainer>
+        <div class="slider-wrapper swiper-wrapper">
+            <div class="slider-item swiper-slide" *ngFor="let blog of blogs">
+                <div class="slider-card" *ngFor="let url of blog.imageUrls; let j = index"
+                    [ngStyle]="{'background-image': 'url(' + url + ')'}">
+                    <div class="slide-content">
+                        <h2 class="slide-title">{{blog.heading}}</h2>
+                        <h5 class="slide-subtitle">#{{blog.tagline}}</h5>
+                        <p class="slide-desc">{{blog.content}}</p>
+                        <a class="slide-button" routerLink="/blog">Read More</a>
+                    </div>
+                    <div class="user-details">
+                        <p><i class="fas fa-envelope"></i>{{ blog.userEmail }}</p>
+                        <p><i class="fas fa-calendar"></i>{{ blog.createdAtFormatted }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,51 @@
+<div class="outer background-image">
+    <div class="panel">
+        <div class="panel-heading">
+            <h2>Excited to Write Your <br>First Blog?</h2>
+        </div>
+        <div class="panel-sub">
+            <p>Login and start leafing through your favorite literature today!</p>
+        </div>
+        <div class="panel-body p-3">
+            <form [formGroup]="loginForm">
+                <div class="form-group pt-3">
+                    <div class="input-field" [class.error]="loginForm.controls['username'].dirty && loginForm.hasError('required','username')">
+                        <span class="fa fa-user p-2"></span>
+                        <input formControlName="username" type="text" placeholder="Username">
+                    </div>
+                </div>
+                <small *ngIf="loginForm.controls['username'].dirty && loginForm.hasError('required','username')" class="text-danger">*Username is required</small>
+                <div class="form-group pt-3">
+                    <div class="input-field" [class.error]="loginForm.controls['password'].dirty && loginForm.hasError('required','password')">
+                        <span class="fa fa-lock p-2"></span>
+                        <input formControlName="password" [type]="type" placeholder="Password">
+                        <span (click)="hideShowPass()" class="fa {{passClass}}"></span>
+                    </div>
+                </div>
+                <small *ngIf="loginForm.controls['password'].dirty && loginForm.hasError('required','password')" class="text-danger">*Password is required</small>
+                <div class="form-inline fr mt-4">
+                    <a id="forget" class="font-weight-bold">Forgot Password</a>
+                </div>
+                <button (click)="onLogin()" type="submit" class="btn btn-primary btn-block mt-4 w-100">Login</button>
+                <div class="text-center pt-4 text-muted">Don't have an account? <a id="forget" routerLink="/signup">Sign
+                        Up</a></div>
+            </form>
+        </div>
+        <div>
+            <div class="text-center">
+                <div class="separator">
+                    <p>-------------- Or Sign Up with --------------</p>
+                </div>
+                <a href="https://www.facebook.com" target="_blank" class="px-2"><img
+                        src="https://www.freepnglogos.com/uploads/facebook-logo-icon/facebook-logo-icon-file-facebook-icon-svg-wikimedia-commons-4.png"
+                        alt=""></a>
+                <a href="https://www.google.com" target="_blank" class="px-2"><img
+                        src="https://www.freepnglogos.com/uploads/google-logo-png/google-logo-png-suite-everything-you-need-know-about-google-newest-0.png"
+                        alt=""></a>
+                <a href="https://www.github.com" target="_blank" class="px-2"><img
+                        src="https://www.freepnglogos.com/uploads/512x512-logo-png/512x512-logo-github-icon-35.png"
+                        alt=""></a>
+            </div>
+        </div>
+    </div>
+</div>

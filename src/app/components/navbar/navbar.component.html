@@ -1,0 +1,17 @@
+<header>
+    <h2 class="logo">Logo</h2>
+    <nav class="navigation">
+        <a routerLink="" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Home</a>
+        <a routerLink="/about" routerLinkActive="active">About</a>
+        <a routerLink="/blog" routerLinkActive="active">Blogs</a>
+        <a routerLink="/contact" routerLinkActive="active">Contact</a>
+    </nav>
+    <nav *ngIf="!currentUser" class="login">
+        <a routerLink="/login" id="login-btn">Login</a>
+        <a routerLink="/signup" id="signup-btn" href="">Sign Up</a>
+    </nav>
+    <nav *ngIf="currentUser" class="user">
+        <span id="wel-msg">Hello, {{currentUser.firstname || "Guest"}}</span>
+        <div (click)="logout()" class="logout-btn"><span class="fa fa-sign-out p-2"></span>Logout</div>
+    </nav>
+</header>

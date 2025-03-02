@@ -1,0 +1,113 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+header {
+    height: 70px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease-in-out;
+}
+
+.logo {
+    font-size: 2em;
+    color: #359381;
+    pointer-events: none;
+    margin-right: 200px;
+}
+
+.navigation a {
+    text-decoration: none;
+    color: #359381;
+    padding: 6px 15px;
+    border-radius: 20px;
+    margin: 0 10px;
+    font-weight: 600;
+    font-size: 1.2em;
+    transition: all 0.3s ease;
+}
+
+.fa{
+    font-size: 20px;
+    display: inline-block !important;
+    font-family: FontAwesome !important;
+    font-style: normal;
+    font-weight: normal;
+    text-decoration: inherit;
+    color: #000;
+}
+
+.user{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.login a {
+    text-decoration: none;
+    color: #fff;
+    padding: 6px 15px;
+    border-radius: 20px;
+    margin: 0 10px;
+    font-weight: 700;
+    font-size: 1.2em;
+    background-color: #359381;
+    transition: all 0.3s ease;
+}
+
+#wel-msg{
+    color: #000000;
+    font-size: 1.4em;
+    font-weight: 600;
+}
+
+.logout-btn{
+    font-size: 1.2em;
+    font-weight: 600;
+    border-radius: 20px;
+    width: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #000;
+    transition: all 0.3s ease;
+}
+
+.logout-btn:hover{
+    background-color: #359381;
+    cursor: pointer;
+}
+
+.login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navigation a:hover,
+.navigation a.active {
+    background: #359381;
+    color: #fff;
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.login a:hover {
+    background: #fff;
+    color: #359381;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}

@@ -1,0 +1,69 @@
+<div class="modal-overlay" *ngIf="isVisible" (click)="close()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="body">
+            <form [formGroup]="blogForm" (ngSubmit)="onSubmit()">
+                <div class="from-group-new pt-3">
+                    <div class="input-field-new"
+                        [class.error]="blogForm.controls['heading'].dirty && blogForm.hasError('required','heading')">
+                        <input formControlName="heading" type="text" placeholder="Give your blog a title">
+                    </div>
+                </div>
+                <small *ngIf="blogForm.controls['heading'].dirty && blogForm.hasError('required','heading')"
+                    class="text-danger">*Title is required</small>
+
+                <div class="from-group-new pt-3">
+                    <div class="input-field-new"
+                        [class.error]="blogForm.controls['tagline'].dirty && blogForm.hasError('required','tagline')">
+                        <input formControlName="tagline" type="text" placeholder="Give your blog a Tagline">
+                    </div>
+                </div>
+                <small *ngIf="blogForm.controls['tagline'].dirty && blogForm.hasError('required','tagline')"
+                    class="text-danger">*Tagline is required</small>
+
+                <div class="from-group-new pt-3">
+                    <div class="input-field-new"
+                        [class.error]="blogForm.controls['content'].dirty && blogForm.hasError('required','content')">
+                        <textarea formControlName="content" type="text"
+                            placeholder="Tell Us More about your Experience"></textarea>
+                    </div>
+                </div>
+                <small *ngIf="blogForm.controls['content'].dirty && blogForm.hasError('required','content')"
+                    class="text-danger">*About is required</small>
+
+                <div class="from-group-new pt-3">
+                    <div class="input-field-new"
+                        [class.error]="blogForm.controls['location'].dirty && blogForm.hasError('required','location')">
+                        <input formControlName="location" type="text" placeholder="Location">
+                    </div>
+                </div>
+                <small *ngIf="blogForm.controls['location'].dirty && blogForm.hasError('required','location')"
+                    class="text-danger">*Location is required</small>
+
+                <input #fileInput type="file" (change)="onFileChange($event)" multiple accept="image/*" hidden />
+
+                <div class="add-section">
+                    <span class="sub-hed">Add to your blog post</span>
+                    <div>
+                        <span matTooltip="Photo/Video" aria-label="Info" (click)="triggerFileInput()"
+                            class="fa fa-picture-o p-2 icon"></span>
+                        <span matTooltip="Location" aria-label="Info" class="fa fa-map-marker p-2 icon"></span>
+                    </div>
+                </div>
+
+                <div *ngIf="imagePreviews.length > 0">
+                    <p>Image Previews:</p>
+                    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
+                        <div *ngFor="let preview of imagePreviews; let i = index" style="position: relative;">
+                            <img [src]="preview" alt="Image Preview" />
+
+                            <button type="button" (click)="removeImage(i)">X</button>
+                        </div>
+                    </div>
+                </div>
+
+
+                <button type="submit" [disabled]="blogForm.invalid">Post</button>
+            </form>
+        </div>
+    </div>
+</div>

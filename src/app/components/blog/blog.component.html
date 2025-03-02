@@ -1,0 +1,84 @@
+<app-navbar-blogs></app-navbar-blogs>
+<app-blog-post-modal #blogPostModal></app-blog-post-modal>
+<div class="overlay" *ngIf="isModalOpen"></div>
+<div class="feed-container" infiniteScroll [infiniteScrollDistance]="2" [infiniteScrollThrottle]="150"
+    (scrolled)="onScroll()">
+
+    <div class="wrapper">
+        <div class="create-new-blog">
+            <h3>What's On Your Mind. <br> Start By Writing Your First Blog.</h3>
+            <button class="click-btn" (click)="blogPostModal.open()">Write Your Blog</button>
+        </div>
+    </div>
+
+    <div class="blog-container" *ngFor="let blog of blogs; trackBy: trackByBlogId">
+        <div class="blog-info">
+            <h4 class="slide-title">{{blog.heading}}</h4>
+            <h5 class="slide-subtitle">#{{blog.tagline}}</h5>
+            <span class="location-info">
+                <i class="fa fa-globe"></i>
+                <h5 class="location">{{blog.location}}</h5>
+            </span>
+        </div>
+
+        <div class="container">
+            <div class="slider-wrapper">
+                <button class="slider-btn left" (click)="prevSlide(blog)">&#10094;</button>
+                <div class="slider">
+                    <div class="slides" [ngStyle]="{'transform': 'translateX(-' + (blog.currentIndex * 100) + '%)'}">
+                        <img *ngFor="let image of blog.imagesMetaData" [src]="image.url" alt="">
+                    </div>
+                </div>
+                <button class="slider-btn right" (click)="nextSlide(blog)">&#10095;</button>
+
+
+                <!-- Image Count Indicator -->
+                <div class="slider-indicator">
+                    {{ ((blog?.currentIndex ?? 0) + 1) }}/{{ blog?.imagesMetaData?.length || 0 }}
+                </div>
+            </div>
+            <div class="poster-info">
+                <h5 class="posted-by"><img class="profile-pic" [src]="blog.profilePicUrl" [alt]="blog.username" />Posted
+                    by {{blog.username}} on {{blog.createdAtFormatted}}</h5>
+            </div>
+        </div>
+        <div class="likes">
+            <div class="like-ele" (click)="toggleLike(blog)">
+                <i class="fa fa-heart-o fa-2x heart"
+                    [ngClass]="{'liked': blog.isLiked, 'fa-heart-o': !blog.isLiked, 'fa-heart': blog.isLiked}"
+                    aria-hidden="true"></i>
+                <span>Like</span>
+            </div>
+            <div class="like-ele" (click)="openCommentModal(blog)">
+                <i class="fa fa-comment-o fa-2x" aria-hidden="true"></i>
+                <span>Comment</span>
+            </div>
+            <div class="like-ele">
+                <i class="fa fa-share-square-o fa-2x" aria-hidden="true"></i>
+                <span>Share</span>
+            </div>
+        </div>
+        <span class="likecount">{{ blog.likeCount }} Likes</span>
+        <div class="content">{{blog.content}}</div>
+        <div class="comment-section">
+            <form *ngIf="blog.commentForm" [formGroup]="blog.commentForm">
+                <div class="comment-details">
+                    <img class="profile-pic" [src]="userDetails.profilePicUrl" [alt]="blog.username" />
+                    <textarea #commentInput formControlName="commentText" placeholder="Comment as {{user.username}}"
+                        required></textarea>
+                    <i [ngClass]="{'active': blog.commentForm.get('commentText')?.value, 'inactive': !blog.commentForm.get('commentText')?.value}"
+                        class="fa fa-paper-plane" aria-hidden="true" (click)="onSubmit(blog, commentInput)"></i>
+                </div>
+            </form>
+            <div class="latest-comment" *ngIf="blog.latestComment">
+                <span id="author">{{ blog.latestComment.author }}:</span>
+                <span id="comment">{{ blog.latestComment.content }}</span>
+            </div>
+            <button (click)="openCommentModal(blog)" class="comment-info"
+                *ngIf="blog.latestComment && blog.commentCount > 1">See all {{blog.commentCount}} Comments</button>
+        </div>
+    </div>
+    <div *ngIf="loading" class="loading-indicator">
+        Loading more posts...
+    </div>
+</div>

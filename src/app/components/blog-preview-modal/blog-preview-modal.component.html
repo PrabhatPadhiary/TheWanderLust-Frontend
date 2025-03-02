@@ -1,0 +1,66 @@
+<div class="comment-modal">
+    <div class="left">
+        <h4>{{this.data.blog.heading}}</h4>
+        <div class="slider-wrapper">
+            <button class="slider-btn left" (click)="prevSlide(this.data.blog)">&#10094;</button>
+            <div class="slider">
+                <div class="slides"
+                    [ngStyle]="{'transform': 'translateX(-' + (this.data.blog.currentIndex * 100) + '%)'}">
+                    <img *ngFor="let url of data.blog.imageUrls" [src]="url" alt="">
+                </div>
+            </div>
+            <button class="slider-btn right" (click)="nextSlide(this.data.blog)">&#10095;</button>
+            <div class="slider-indicator">
+                {{ ((this.data.blog?.currentIndex ?? 0) + 1) }}/{{ this.data.blog?.imagesMetaData?.length || 0 }}
+            </div>
+        </div>
+        <h5># {{this.data.blog.tagline}}</h5>
+        <p>{{this.data.blog.content}}</p>
+        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Recusandae itaque quibusdam ipsum nesciunt rem
+            laudantium sit vel sequi aspernatur, facilis praesentium provident. Aliquid facere dolores nisi aperiam
+            quidem maxime dolorem hic officiis. Nesciunt, hic omnis saepe atque sed fugit corrupti ut architecto facilis
+            repellendus quisquam qui voluptatibus quo amet, illo molestias vitae tempora? Dolore ea iste eaque totam
+            tenetur, consequuntur harum officia alias quis consectetur ducimus doloremque ab qui provident reprehenderit
+            neque, in quas quae dolor voluptatem. Deserunt rem provident sint sed minima unde reiciendis eligendi hic.
+            Id fugiat fugit, quis modi repellat nam quae, magni voluptatem cum inventore quo maiores sint saepe
+            recusandae? Perspiciatis eveniet corrupti similique maxime, ipsa impedit voluptas exercitationem fugit
+            laudantium quas eum nemo error quaerat esse obcaecati numquam eaque quam totam iste. Veritatis cum tempore
+            quis earum odit nesciunt asperiores voluptate, aliquid ea nemo delectus velit ex numquam. Assumenda,
+            dolores? Hic qui optio harum cum! Debitis voluptas, commodi veritatis sed reprehenderit consequuntur culpa
+            tenetur fugit laborum non porro dicta facilis odio quod, vero totam. Aliquid deleniti sint est? Ullam
+            exercitationem commodi dolorum consequatur autem vitae delectus aspernatur, doloribus id et odit unde
+            ratione? Cum quae iste, deleniti omnis tempora commodi itaque cumque id assumenda aliquam, alias aliquid
+            quas voluptas error inventore magni eligendi numquam voluptates earum? Deserunt quae ab nam quis nihil
+            labore, et eius laborum ipsum velit! Tenetur fuga vero dolor iste? In, neque fugit deleniti, eius impedit,
+            magni atque ut quidem sunt hic blanditiis? Fuga est deleniti voluptates dolores commodi inventore amet
+            facilis aperiam, ipsa eius ipsum nobis eaque veniam illum officia fugit sit tenetur nam tempora delectus
+            provident hic ab aliquid aliquam! Expedita accusantium, veniam harum perferendis assumenda enim excepturi
+            molestias? Porro ipsam, quas beatae magni praesentium itaque quibusdam exercitationem non suscipit id
+            facilis. Maiores fugiat alias perferendis cum dolor? Suscipit omnis, quaerat, eius architecto officia ipsa
+            nemo at esse neque molestiae dignissimos? A sapiente beatae cum nam eum natus praesentium. Ullam harum natus
+            in voluptas pariatur cum quidem magni ipsa ad non. Blanditiis, accusamus libero. Facere similique placeat
+            atque alias ipsam molestiae expedita repellat rerum a consectetur. Dolorum quod labore perspiciatis quasi,
+            repellat dicta laudantium natus animi deserunt ipsum delectus maxime dolore dolor unde sed tenetur tempora
+            accusamus id libero itaque fugit doloribus possimus omnis! Sed quo temporibus aliquid, explicabo dicta illo
+            provident velit non harum? Culpa, cumque minus. Laudantium nostrum enim omnis dolorem totam perferendis
+            consectetur minus saepe quos culpa.</p>
+    </div>
+
+    <div class="right">
+        <div class="comment-sec">
+            <div class="post-info">
+                <h3>Posted by {{this.data.blog.username}}</h3>
+            </div>
+            <div *ngFor="let comment of comments" class="comment">
+                <span id="author">{{ comment.author }}:</span>
+                <span id="comment-content">{{ comment.content }}</span>
+            </div>
+        </div>
+
+        <form class="form-grp" [formGroup]="commentForm" (ngSubmit)="onSubmit()">
+            <textarea formControlName="commentText" placeholder="Add a comment..."></textarea>
+            <button type="submit" [disabled]="commentForm.invalid">Post</button>
+        </form>
+    </div>
+    <i class="fa fa-times-circle close-btn" aria-hidden="true" (click)="closeModal()"></i>
+</div>

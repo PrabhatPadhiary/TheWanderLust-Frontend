@@ -1,0 +1,63 @@
+<app-navbar></app-navbar>
+<section class="parallax">
+    <img #hill1 src="assets/images/parallax/hill1.png">
+    <img src="assets/images/parallax/hill2.png">
+    <img src="assets/images/parallax/hill3.png">
+    <img #hill4 src="assets/images/parallax/hill4.png">
+    <img #hill5 src="assets/images/parallax/hill5.png">
+    <img src="assets/images/parallax/tree.png">
+    <div #box class="txt-content">
+        <h2 id="text">The Wander Lust</h2>
+        <h4 id="p-text">"Sharing Stories, Building Connections"</h4>
+        <button routerLink="/blog" class="btn">
+            <span class="btn-txt">Explore Blogs</span>
+            <span class="arrow">&#10140;</span>
+        </button>
+    </div>
+    <img #leaf id="leaf" src="assets/images/parallax/leaf.png">
+    <img src="assets/images/parallax/plant.png">
+</section>
+
+<app-featured-blogs></app-featured-blogs>
+
+<div class="cta-container">
+    <button class="write-btn" (click)="onWriteBlogClick()">Start By Writing Your First Story</button>
+    <p class="cta-tagline">Your words can inspire the world.</p>
+</div>
+
+<app-featured-writers></app-featured-writers>
+
+<section class="why-choose-us">
+    <div class="container">
+        <h2>Why <del>Not</del> Choose Us?</h2>
+        <p>Join our vibrant community of travel enthusiasts, bloggers, and adventurers.</p>
+        <div class="benefits">
+            <div class="benefit-item">
+                <i class="fa fa-compass fa-3x" aria-hidden="true" ></i>
+                <h3>Discover Hidden Gems</h3>
+                <p>Explore offbeat destinations and real traveler experiences that go beyond the usual tourist trails.
+                </p>
+            </div>
+            <div class="benefit-item">
+                <i class="fa fa-pencil fa-3x" aria-hidden="true"></i>
+                <h3>Share Your Adventures</h3>
+                <p>Publish your travel stories, tips, and itineraries to inspire others around the globe.</p>
+            </div>
+            <div class="benefit-item">
+                <i class="fa fa-users fa-3x" aria-hidden="true"></i>
+                <h3>Engage & Connect</h3>
+                <p>Join discussions, exchange tips, and connect with a community that loves to travel as much as you do.
+                </p>
+            </div>
+        </div>
+        <a href="/signup" class="cta-button">Join Our Community</a>
+    </div>
+</section>
+
+<!-- Login Form Modal -->
+<div *ngIf="isLoginModalOpen" class="modal">
+    <div class="modal-content">
+        <span class="close" (click)="closeModal()">&times;</span>
+        <app-login (loginSuccess)="redirectBlog()"></app-login>
+    </div>
+</div>
