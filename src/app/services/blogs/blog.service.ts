@@ -47,6 +47,12 @@ export class BlogService {
     })
   }
 
+  getBlogById(blogId: number): Observable<any>{
+    return this.http.get<any>(`${this.baseUrl}getBlogById`, {
+      params: {blogId}
+    })
+  }
+
   searchBlogs(query: string): Observable<{blogs: any[], users: any[]}> {
     if (!query.trim()) return new Observable(observer => observer.next({ blogs: [], users: [] })); // Avoid empty searches
     return this.http.get<{ blogs: any[], users: any[] }>(`${this.baseUrl}search`, {

@@ -3,6 +3,9 @@ import { FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { BlogService } from '../../services/blogs/blog.service';
 import { SharedService } from '../../services/shared/shared.service';
+import { BlogPreviewModalComponent } from '../blog-preview-modal/blog-preview-modal.component';
+import TokenDecode from '../../helpers/Token/tokenDecoder';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-navbar-blogs',
@@ -19,10 +22,15 @@ export class NavbarBlogsComponent implements OnInit{
   blogs: any[] = [];
   userDetails: any;
   baseUrl: string = "http://localhost:5273";
+  user: any;
+  isModalOpen = false;
+  selectedBlog: any;
 
   constructor(
     private blogService: BlogService,
-    private sharedService: SharedService
+    private sharedService: SharedService,
+    private dialog: MatDialog,
+    private tokenDecoder: TokenDecode,
   ){}
 
   ngOnInit(): void {
@@ -81,12 +89,39 @@ export class NavbarBlogsComponent implements OnInit{
     this.updateImagePaths();
   }
 
+    openCommentModal(blog: any) {
+      this.user = this.tokenDecoder.decodePayloadFromToken();
+      this.isModalOpen = true;
+      const dialogRef = this.dialog.open(BlogPreviewModalComponent, {
+        data: {
+          blog: blog,
+          user: this.user,
+          userDetails: this.userDetails
+        }
+      });
+      dialogRef.afterClosed().subscribe(() => {
+        this.isModalOpen = false;
+      });
+    }
+
   selectItem(item: any) {
-    if (item.heading) {
-      // It's a blog post, open modal
-      this.openBlogModal(item);
-    } else if (item.username) {
-      // It's a user, navigate to profile
+    if (item.id) {
+      const existingBlog = this.blogs.find(blog => blog.id === item.id);
+      if(existingBlog){
+        this.openCommentModal(existingBlog);
+      }
+      else
+      {
+        this.blogService.getBlogById(item.id).subscribe((resp) => {
+          this.selectedBlog = resp;
+
+          this.selectedBlog.imageUrls = this.selectedBlog.imageUrls.map((url: string) => this.baseUrl + url);
+
+          this.openCommentModal(resp);
+        })
+      }
+    } 
+    else if (item.username) {
       window.location.href = `/profile/${item.username}`;
     }
   }

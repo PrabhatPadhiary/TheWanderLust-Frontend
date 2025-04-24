@@ -98,7 +98,7 @@ export class BlogComponent implements OnInit {
           blog.commentForm = this.fb.group({
             commentText: ['', Validators.required]
           });
-          blog.latestComment = blog.latestComment || null;
+          blog.latestComment = blog.latestComment || {};
         });
 
         this.blogs = this.blogs.concat(response.blogDetails);
@@ -111,6 +111,15 @@ export class BlogComponent implements OnInit {
         console.error("Error fetching Blogs");
       }
     );
+  }
+
+  getShortContent(content: string, wordLimit: number): string {
+    let words = content.split(/\s+/); // Split content into words
+    return words.length > wordLimit ? words.slice(0, wordLimit).join(' ') + '...' : content;
+  }
+
+  isContentLong(content: string): boolean{
+    return content.split(/\s+/).length > 100;
   }
 
   getImageClass(image: any): string {

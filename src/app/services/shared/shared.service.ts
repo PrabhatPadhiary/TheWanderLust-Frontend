@@ -13,6 +13,12 @@ export class SharedService {
   private userDataSource = new BehaviorSubject<any[]>([]);
   userData$ = this.userDataSource.asObservable();
 
+  private isUploadedSource = new BehaviorSubject<boolean>(false);
+  isUploaded$ = this.isUploadedSource.asObservable();
+
+  setIsUploaded(value: boolean) {
+    this.isUploadedSource.next
+  }
 
   setBlogs(blogs: any[]) {
     this.blogDataSource.next(blogs);

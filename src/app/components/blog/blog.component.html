@@ -6,11 +6,10 @@
 
     <div class="wrapper">
         <div class="create-new-blog">
-            <h3>What's On Your Mind. <br> Start By Writing Your First Blog.</h3>
-            <button class="click-btn" (click)="blogPostModal.open()">Write Your Blog</button>
+            <h3>What's On Your Mind. <br> Start By Sharing Your Experience.</h3>
+            <button class="click-btn" (click)="blogPostModal.open()">Create Your Blog</button>
         </div>
     </div>
-
     <div class="blog-container" *ngFor="let blog of blogs; trackBy: trackByBlogId">
         <div class="blog-info">
             <h4 class="slide-title">{{blog.heading}}</h4>
@@ -59,7 +58,8 @@
             </div>
         </div>
         <span class="likecount">{{ blog.likeCount }} Likes</span>
-        <div class="content">{{blog.content}}</div>
+        <div class="content">{{ getShortContent(blog.content, 100) }}</div>
+        <button class="read-more" *ngIf="isContentLong(blog.content)" (click)="openCommentModal(blog)" >Read Complete Blog</button>
         <div class="comment-section">
             <form *ngIf="blog.commentForm" [formGroup]="blog.commentForm">
                 <div class="comment-details">
@@ -70,7 +70,7 @@
                         class="fa fa-paper-plane" aria-hidden="true" (click)="onSubmit(blog, commentInput)"></i>
                 </div>
             </form>
-            <div class="latest-comment" *ngIf="blog.latestComment">
+            <div class="latest-comment" *ngIf="blog.commentCount >= 1">
                 <span id="author">{{ blog.latestComment.author }}:</span>
                 <span id="comment">{{ blog.latestComment.content }}</span>
             </div>

@@ -51,18 +51,17 @@
                 </div>
 
                 <div *ngIf="imagePreviews.length > 0">
-                    <p>Image Previews:</p>
                     <div style="display: flex; flex-wrap: wrap; gap: 20px;">
                         <div *ngFor="let preview of imagePreviews; let i = index" style="position: relative;">
                             <img [src]="preview" alt="Image Preview" />
-
-                            <button type="button" (click)="removeImage(i)">X</button>
+                            <i class="fa fa-times-circle fa-lg close-btn" (click)="removeImage(i)"
+                                aria-hidden="true"></i>
                         </div>
                     </div>
                 </div>
-
-
-                <button type="submit" [disabled]="blogForm.invalid">Post</button>
+                <div class="btn-wrap">
+                    <button type="submit" [disabled]="blogForm.invalid">POST</button>
+                </div>
             </form>
         </div>
     </div>

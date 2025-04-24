@@ -4,6 +4,7 @@ import { BlogService } from '../../services/blogs/blog.service';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
 import TokenDecode from '../../helpers/Token/tokenDecoder';
+import { SharedService } from '../../services/shared/shared.service';
 
 interface ImageData {
   file: File;
@@ -25,6 +26,8 @@ export class BlogPostModalComponent implements OnInit {
   uploadedImages: ImageData[] = [];
   uploadedFileNames: Set<string> = new Set();
   isVisible = false;
+  isUploading = false;
+  progress = 0;
 
   @ViewChild('fileInput') fileInput!: ElementRef;
 
@@ -33,7 +36,8 @@ export class BlogPostModalComponent implements OnInit {
     private blogService: BlogService,
     private router: Router,
     private toastr: ToastrService,
-    private tokenDecoder: TokenDecode
+    private tokenDecoder: TokenDecode,
+    private sharedService: SharedService
   ) { }
 
   ngOnInit(): void {
@@ -137,6 +141,14 @@ export class BlogPostModalComponent implements OnInit {
   }
 
   onSubmit() {
+    this.isUploading = true;
+    this.progress = 0;
+    let interval = setInterval(() => {
+      if (this.progress < 90) { 
+        this.progress += 10;
+      }
+    }, 300);
+
     if (this.blogForm.invalid) {
       this.toastr.warning("Validation Error", "Validation", {
         closeButton: true,
@@ -164,12 +176,21 @@ export class BlogPostModalComponent implements OnInit {
 
     this.blogService.postBlog(formdata).subscribe(
       (response) => {
-        this.toastr.success('Blog posted successfully!', 'Success', {
-          closeButton: true,
-          progressBar: true,
-        });
+        clearInterval(interval);
+        this.progress = 100;
+
+        setTimeout(() => {
+          this.isUploading = false;
+          this.toastr.success('Blog posted successfully!', 'Success', {
+            closeButton: true,
+            progressBar: true,
+          });
+          this.close();
+        }, 500);
       },
       () => {
+        clearInterval(interval);
+        this.isUploading = false;
         this.toastr.error('Error Posting Blog!', 'Error', {
           closeButton: true,
           progressBar: true,

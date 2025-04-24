@@ -16,17 +16,15 @@ header {
     justify-content: space-between;
     align-items: center;
     z-index: 100;
-    background-color: rgba(255, 255, 255, 0.7);
+    background-color: rgba(255, 255, 255);
     backdrop-filter: blur(1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease-in-out;
 }
 
-.logo {
-    font-size: 2em;
-    color: #359381;
-    pointer-events: none;
-    margin-right: 200px;
+img{
+    height: 50px;
+    width: 50px;
 }
 
 .navigation a {

@@ -6,10 +6,56 @@
   border-radius: 0;
 }
 
+.create-new-blog{
+  padding: 30px;
+  margin: auto;
+  border-radius: 20px;
+  color: wheat;
+  background: linear-gradient(90deg, #223560, #031836, #0b3d91, #031836, #223560);
+  background-size: 400% 100%;
+  display: flex;
+  flex-direction: column;
+  transition: background-position 0.3s ease-in-out;
+}
+
+.read-more{
+  background: none;
+  color: wheat;
+  border: none;
+  outline: none;
+  padding: 5px;
+  margin-left: 10px;
+  font-size: 0.9rem;
+}
+
+.create-new-blog:hover{
+  animation: gradientMove 1.5s ease-in-out;
+}
+
+@keyframes gradientMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+.wrapper{
+  border-bottom: 10px solid white;
+  border-radius: 20px;
+}
+
+.blog-container{
+  border-bottom: 10px solid rgb(255, 255, 255);
+  padding-top: 20px;
+  padding-bottom: 20px;
+  background: linear-gradient(to right, #000000, #282828);
+}
+
 .feed-container{
   width: 60%;
-  margin-top: 70px;
-  background: linear-gradient(to right, #0f172a, #334155);
+  margin: 70px auto;
 }
 
 .poster-info{
@@ -101,28 +147,6 @@
   color: wheat;
 }
 
-.wrapper{
-  padding: 30px;
-}
-
-.blog-container{
-  border-bottom: 10px solid rgb(255, 255, 255);
-  padding-top: 20px;
-  padding-bottom: 20px;
-}
-
-.create-new-blog{
-  padding: 30px;
-  width: 95%;
-  margin: auto;
-  border-radius: 20px;
-  color: wheat;
-  background: linear-gradient(to right, #223560, #3b4b61);
-  display: flex;
-  flex-direction: column;
-  box-shadow: 12px 12px rgba(0, 0, 0, 0.7);
-}
-
 textarea[formControlName="commentText"] {
   color: white;
   height: 40px;
@@ -173,10 +197,20 @@ textarea[formControlName="commentText"]::placeholder{
 }
 
 .create-new-blog .click-btn{
+  font-size: 1.2rem;
+  font-weight: 500;
+  font-family: 'Poppins', sans-serif;
+  background: beige;
   margin-top: 20px;
   border: none;
   border-radius: 10px;
-  height: 40px;
+  height: 50px;
+  width: 30%;
+  transition: all 0.2s ease-in-out;
+}
+
+.create-new-blog .click-btn:hover{
+  transform: scale(1.05);
 }
 
 .user-details{
