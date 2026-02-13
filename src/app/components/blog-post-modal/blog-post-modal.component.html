@@ -60,7 +60,9 @@
                     </div>
                 </div>
                 <div class="btn-wrap">
-                    <button type="submit" [disabled]="blogForm.invalid">POST</button>
+                    <button type="submit" [disabled]="blogForm.invalid || isUploading">
+                        {{isUploading ? 'Posting...' : 'POST'}}
+                    </button>
                 </div>
             </form>
         </div>

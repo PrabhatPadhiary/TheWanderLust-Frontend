@@ -20,7 +20,7 @@ interface ImageData {
   styleUrl: './blog-post-modal.component.scss'
 })
 export class BlogPostModalComponent implements OnInit {
-  
+
   blogForm!: FormGroup
   imagePreviews: string[] = [];
   uploadedImages: ImageData[] = [];
@@ -103,7 +103,7 @@ export class BlogPostModalComponent implements OnInit {
         });
         return;
       }
-      
+
       this.uploadedFileNames.add(file.name);
       this.extractImageData(file).then(imageData => {
         const reader = new FileReader();
@@ -141,13 +141,8 @@ export class BlogPostModalComponent implements OnInit {
   }
 
   onSubmit() {
-    this.isUploading = true;
-    this.progress = 0;
-    let interval = setInterval(() => {
-      if (this.progress < 90) { 
-        this.progress += 10;
-      }
-    }, 300);
+
+    if (this.isUploading) return;
 
     if (this.blogForm.invalid) {
       this.toastr.warning("Validation Error", "Validation", {
@@ -157,6 +152,15 @@ export class BlogPostModalComponent implements OnInit {
       return;
     }
 
+    this.isUploading = true;
+    this.progress = 0;
+
+    let interval = setInterval(() => {
+      if (this.progress < 90) {
+        this.progress += 10;
+      }
+    }, 300);
+
     const formdata = new FormData();
     formdata.append('Heading', this.blogForm.value.heading);
     formdata.append('Tagline', this.blogForm.value.tagline);
@@ -164,7 +168,7 @@ export class BlogPostModalComponent implements OnInit {
     formdata.append('Location', this.blogForm.value.location);
 
     const user = this.tokenDecoder.decodePayloadFromToken();
-    if (user && user.email) {
+    if (user?.email) {
       formdata.append('UserEmail', user.email);
     }
 
@@ -175,7 +179,7 @@ export class BlogPostModalComponent implements OnInit {
     });
 
     this.blogService.postBlog(formdata).subscribe(
-      (response) => {
+      () => {
         clearInterval(interval);
         this.progress = 100;
 
