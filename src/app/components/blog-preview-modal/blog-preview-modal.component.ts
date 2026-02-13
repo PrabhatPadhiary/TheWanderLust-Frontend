@@ -57,7 +57,7 @@ export class BlogPreviewModalComponent{
     const newComment = {
       blogId: this.data.blog.id,
       content: this.commentForm.value.commentText,
-      author: this.data.user.username
+      author: this.data.userDetails.username
     };
 
     this.blogService.blogComment(newComment).subscribe((res: any) => {

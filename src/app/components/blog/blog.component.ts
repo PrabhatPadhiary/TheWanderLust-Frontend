@@ -167,7 +167,7 @@ export class BlogComponent implements OnInit {
     var commentDetails = {
       blogId: blog.id,
       content: commentValue,
-      author: this.user.username
+      author: this.userDetails.username
     }
     this.blogService.blogComment(commentDetails).subscribe({
       next: (response: any) => {

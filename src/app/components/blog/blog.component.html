@@ -64,7 +64,7 @@
             <form *ngIf="blog.commentForm" [formGroup]="blog.commentForm">
                 <div class="comment-details">
                     <img class="profile-pic" [src]="userDetails.profilePicUrl" [alt]="blog.username" />
-                    <textarea #commentInput formControlName="commentText" placeholder="Comment as {{user.username}}"
+                    <textarea #commentInput formControlName="commentText" placeholder="Comment as {{userDetails.username}}"
                         required></textarea>
                     <i [ngClass]="{'active': blog.commentForm.get('commentText')?.value, 'inactive': !blog.commentForm.get('commentText')?.value}"
                         class="fa fa-paper-plane" aria-hidden="true" (click)="onSubmit(blog, commentInput)"></i>
