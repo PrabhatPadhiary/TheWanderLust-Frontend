@@ -11,27 +11,28 @@ import { ToastrService } from 'ngx-toastr';
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss'
 })
-export class SignupComponent implements OnInit{
+export class SignupComponent implements OnInit {
 
   type: string = "password";
   passClass: string = "fa fa-eye-slash"
   signupForm!: FormGroup;
   selectedFile: File | null = null;
   imagePreview: string | ArrayBuffer | null = null;
+  isSubmitting = false;
 
   constructor(
-    private fb: FormBuilder, 
-    private auth: AuthService, 
+    private fb: FormBuilder,
+    private auth: AuthService,
     private router: Router,
     private toastr: ToastrService
   ) { }
   ngOnInit(): void {
     this.signupForm = this.fb.group({
-        firstname: ['', [Validators.required, ValidateForm.noSpaceValidator]],
-        lastname: ['', [Validators.required, ValidateForm.noSpaceValidator]],
-        email: ['', [Validators.required, Validators.email]],
-        username: ['', Validators.required],
-        password: ['', Validators.required]
+      firstname: ['', [Validators.required, ValidateForm.noSpaceValidator]],
+      lastname: ['', [Validators.required, ValidateForm.noSpaceValidator]],
+      email: ['', [Validators.required, Validators.email]],
+      username: ['', Validators.required],
+      password: ['', Validators.required]
     })
   }
 
@@ -55,7 +56,20 @@ export class SignupComponent implements OnInit{
     fileInput.click();
   }
 
-  onSignup(){
+  onSignup() {
+
+    if (this.isSubmitting) return;
+
+    if (this.signupForm.invalid) {
+      ValidateForm.validateAllFormFields(this.signupForm);
+      this.toastr.error("Please fill all the details", "", {
+        closeButton: true,
+        progressBar: true
+      });
+      return;
+    }
+
+    this.isSubmitting = true;
 
     const formData = new FormData();
     formData.append('firstname', this.signupForm.value.firstname);
@@ -68,41 +82,27 @@ export class SignupComponent implements OnInit{
       formData.append('profilePicture', this.selectedFile);
     }
 
-    if(this.signupForm.valid){
-      this.auth.signUp(formData)
-      .subscribe({
-        next: (res => {
-          this.toastr.success(res.message, '', {
-            closeButton: true,
-            progressBar: true,
-          });
-          this.signupForm.reset();
-          this.router.navigate(['login']);
-        }),
-        error: (err => {
-          console.log(err);
-          this.toastr.error(err?.error ?? err?.error.message ?? "An unexpexted error occured", '',{
-            closeButton: true,
-            progressBar: true,
-          });
-        }) 
-      })
-    }
-    else{
-      ValidateForm.validateAllFormFields(this.signupForm);
-      this.toastr.error("Please fill all the details", "", {
-        closeButton: true,
-        progressBar: true
-      });
-    }
+    this.auth.signUp(formData).subscribe({
+      next: (res) => {
+        this.isSubmitting = false;
+        this.toastr.success(res.message);
+        this.signupForm.reset();
+        this.router.navigate(['login']);
+      },
+      error: (err) => {
+        this.isSubmitting = false;
+        this.toastr.error(err?.error?.message ?? "Unexpected error");
+      }
+    });
   }
 
+
   hideShowPass() {
-    if(this.type == "password"){
+    if (this.type == "password") {
       this.type = "text"
       this.passClass = "fa-eye"
     }
-    else{
+    else {
       this.type = "password"
       this.passClass = "fa-eye-slash"
     }

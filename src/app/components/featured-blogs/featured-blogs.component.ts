@@ -14,7 +14,6 @@ export class FeaturedBlogsComponent implements OnInit, AfterViewInit {
 
   @ViewChild('swiperContainer', { static: false }) swiperContainer!: ElementRef;
   blogs: any[] = [];
-  baseUrl: string = "http://localhost:5273";
   private swiperInstance: Swiper | null = null;
 
   constructor(
@@ -27,7 +26,6 @@ export class FeaturedBlogsComponent implements OnInit, AfterViewInit {
       (data) => {
         this.blogs = data;
         this.blogs.forEach(blog => {
-          blog.imageUrls = blog.imageUrls.map((url: string) => this.baseUrl + url);
           blog.createdAtFormatted = this.datePipe.transform(blog.createdAt, 'fullDate');
         });
       },

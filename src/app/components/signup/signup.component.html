@@ -7,7 +7,7 @@
             <p>SignUp and start with your first blog.</p>
         </div>
         <div class="panel-body p-3">
-            <form [formGroup]="signupForm">
+            <form [formGroup]="signupForm" (ngSubmit)="onSignup()">
 
                 <div class="profile-container">
                     <!-- Circular Profile Picture Preview -->
@@ -94,7 +94,7 @@
                 <small class="text-danger"
                     *ngIf="signupForm.controls['password'].dirty && signupForm.hasError('required','password')">*Password
                     is a required field</small>
-                <button type="submit" class="btn btn-primary btn-block mt-4 w-100" (click)="onSignup()">Sign Up</button>
+                <button type="submit" class="btn btn-primary btn-block mt-4 w-100" [disabled]="isSubmitting">Sign Up</button>
                 <div class="text-center pt-4 text-muted">Already have an account? <a id="forget"
                         routerLink="/login">Login</a></div>
 

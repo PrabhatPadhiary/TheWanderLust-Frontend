@@ -18,7 +18,6 @@ import { SharedService } from '../../services/shared/shared.service';
 export class BlogComponent implements OnInit {
 
   blogs: any[] = [];
-  baseUrl: string = "http://localhost:5273";
   user: any;
   currentPage: number = 1;
   totalPages: number = 0;
@@ -47,7 +46,6 @@ export class BlogComponent implements OnInit {
     this.userService.getUserDetails(this.user.email).subscribe(
       (response) => {
         this.userDetails = response;
-        this.userDetails.profilePicUrl = this.baseUrl + this.userDetails.profilePicUrl;
         this.sharedService.setUserDetails(this.userDetails);
       },
       (error) => {
@@ -84,14 +82,8 @@ export class BlogComponent implements OnInit {
     this.blogService.getAllBlogs(this.currentPage, this.pageSize).subscribe(
       (response) => {
         response.blogDetails.forEach(blog => {
-          blog.imageUrls = blog.imageUrls.map((url: string) => this.baseUrl + url);
           blog.createdAtFormatted = this.datePipe.transform(blog.createdAt, 'fullDate');
           blog.isLiked = blog.likes?.some((like: any) => like.userEmail == this.user.email) || false;
-          blog.profilePicUrl = this.baseUrl + blog.profilePicUrl
-          blog.imagesMetaData = blog.imagesMetaData.map((img: any) => ({
-            ...img,
-            url: this.baseUrl + img.url
-          }));
           if (blog.currentIndex === undefined || blog.currentIndex === null) {
             blog.currentIndex = 0;
           }
