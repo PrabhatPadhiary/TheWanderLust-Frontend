@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { UsersService } from '../users/users.service';
 import { TokenApiModel } from '../../models/token-api.model';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 export interface User{
   firstname: string,
@@ -16,7 +17,7 @@ export interface User{
 })
 export class AuthService {
 
-  private baseUrl: string = "http://localhost:5273/api/User/"
+  private readonly baseUrl: string = `${environment.apiUrl}/User/`
   
   constructor(
     private http : HttpClient,

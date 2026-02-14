@@ -21,7 +21,6 @@ export class NavbarBlogsComponent implements OnInit{
   dropdownOpen = false;
   blogs: any[] = [];
   userDetails: any;
-  baseUrl: string = "http://localhost:5273";
   user: any;
   isModalOpen = false;
   selectedBlog: any;
@@ -53,16 +52,7 @@ export class NavbarBlogsComponent implements OnInit{
         ...response.blogs.map(b => ({ ...b, type: 'blog' })), 
         ...response.users.map(u => ({ ...u, type: 'user' }))
       ];
-      this.updateImagePaths();
     });
-  }
-
-  updateImagePaths(){
-    this.searchResults = this.searchResults.map(item => ({
-      ...item,
-      ...(item.type === "blog" && { image: this.baseUrl + item.image }),
-      ...(item.type === "user" && { profilePic: this.baseUrl + item.profilePic })
-    }));
   }
 
   toggleDropdown() {
@@ -85,8 +75,6 @@ export class NavbarBlogsComponent implements OnInit{
         ...response.users.map(u => ({ ...u, type: 'user' }))
       ];
     });
-
-    this.updateImagePaths();
   }
 
     openCommentModal(blog: any) {
@@ -114,9 +102,6 @@ export class NavbarBlogsComponent implements OnInit{
       {
         this.blogService.getBlogById(item.id).subscribe((resp) => {
           this.selectedBlog = resp;
-
-          this.selectedBlog.imageUrls = this.selectedBlog.imageUrls.map((url: string) => this.baseUrl + url);
-
           this.openCommentModal(resp);
         })
       }

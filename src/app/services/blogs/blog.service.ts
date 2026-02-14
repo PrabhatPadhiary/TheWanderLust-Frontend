@@ -1,12 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BlogService {
-  private baseUrl: string = "http://localhost:5273/api/Blog/"
+  private readonly baseUrl: string = `${environment.apiUrl}/Blog/`
   constructor(private http: HttpClient) { }
 
   postBlog(blogData: FormData){
