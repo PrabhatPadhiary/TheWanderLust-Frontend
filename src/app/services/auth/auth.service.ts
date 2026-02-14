@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { UsersService } from '../users/users.service';
 import { TokenApiModel } from '../../models/token-api.model';
 import { Router } from '@angular/router';
@@ -19,11 +19,9 @@ export class AuthService {
 
   private readonly baseUrl: string = `${environment.apiUrl}/User/`
   
-  constructor(
-    private http : HttpClient,
-    private userService: UsersService,
-    private router: Router
-  ) { }
+  private http = inject(HttpClient)
+  private userService = inject(UsersService)
+  private router = inject(Router)
 
   setToken(tokenValue: string){
     localStorage.setItem('token', tokenValue);

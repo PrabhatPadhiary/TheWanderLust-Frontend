@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
@@ -8,7 +8,7 @@ import { environment } from '../../../environments/environment';
 })
 export class BlogService {
   private readonly baseUrl: string = `${environment.apiUrl}/Blog/`
-  constructor(private http: HttpClient) { }
+  private http = inject(HttpClient)
 
   postBlog(blogData: FormData){
     return this.http.post(`${this.baseUrl}postblog`,blogData)

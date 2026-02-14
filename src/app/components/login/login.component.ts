@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import ValidateForm from '../../helpers/Validators/fromvaidation';
 import { AuthService, User } from '../../services/auth/auth.service';
@@ -20,14 +20,12 @@ export class LoginComponent implements OnInit {
   passClass: string = "fa fa-eye-slash";
   loginForm!: FormGroup;
 
-  constructor(
-    private fb: FormBuilder,
-    private auth: AuthService,
-    private router: Router,
-    private toastr: ToastrService,
-    private userService: UsersService,
-    private tokenDecoder: TokenDecode
-  ) { }
+  private fb = inject(FormBuilder)
+  private auth = inject(AuthService)
+  private router = inject(Router)
+  private toastr = inject(ToastrService)
+  private userService = inject(UsersService)
+  private tokenDecoder = inject(TokenDecode)
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { UsersService } from '../../services/users/users.service';
 
 @Component({
@@ -10,12 +10,8 @@ import { UsersService } from '../../services/users/users.service';
 export class FeaturedWritersComponent implements OnInit{
   
   featuredWriters: any[] = [];
-
-  constructor(
-    private userService: UsersService
-  ){
-
-  }
+  private userService = inject(UsersService)
+  
   ngOnInit(): void {
     this.fetchFeaturedWriters();
   }

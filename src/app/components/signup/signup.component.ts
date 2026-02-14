@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import ValidateForm from '../../helpers/Validators/fromvaidation';
 import { AuthService } from '../../services/auth/auth.service';
@@ -20,12 +20,11 @@ export class SignupComponent implements OnInit {
   imagePreview: string | ArrayBuffer | null = null;
   isSubmitting = false;
 
-  constructor(
-    private fb: FormBuilder,
-    private auth: AuthService,
-    private router: Router,
-    private toastr: ToastrService
-  ) { }
+  private fb = inject(FormBuilder)
+  private auth = inject(AuthService)
+  private router = inject(Router)
+  private toastr = inject(ToastrService)
+  
   ngOnInit(): void {
     this.signupForm = this.fb.group({
       firstname: ['', [Validators.required, ValidateForm.noSpaceValidator]],

@@ -5,7 +5,6 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root'
 })
 export class SharedService {
-  constructor() { }
 
   private blogDataSource = new BehaviorSubject<any[]>([]);
   blogs$ = this.blogDataSource.asObservable();

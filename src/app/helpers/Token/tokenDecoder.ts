@@ -7,8 +7,6 @@ import { JwtHelperService } from '@auth0/angular-jwt';
     providedIn: 'root'   // This makes it available app-wide
 })
 export default class TokenDecode {
-    constructor(
-    ) { }
 
     decodePayloadFromToken() {
         const token = localStorage.getItem('token')

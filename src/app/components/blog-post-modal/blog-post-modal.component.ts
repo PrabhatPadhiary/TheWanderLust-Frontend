@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BlogService } from '../../services/blogs/blog.service';
 import { Router } from '@angular/router';
@@ -30,15 +30,12 @@ export class BlogPostModalComponent implements OnInit {
   progress = 0;
 
   @ViewChild('fileInput') fileInput!: ElementRef;
-
-  constructor(
-    private fb: FormBuilder,
-    private blogService: BlogService,
-    private router: Router,
-    private toastr: ToastrService,
-    private tokenDecoder: TokenDecode,
-    private sharedService: SharedService
-  ) { }
+  private fb = inject(FormBuilder);
+  private blogService = inject(BlogService);
+  private router = inject(Router);
+  private toastr = inject(ToastrService);
+  private tokenDecoder = inject(TokenDecode);
+  private sharedService = inject(SharedService);
 
   ngOnInit(): void {
     this.blogForm = this.fb.group({

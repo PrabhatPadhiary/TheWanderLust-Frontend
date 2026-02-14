@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { User } from '../auth/auth.service';
 import { environment } from '../../../environments/environment';
@@ -14,10 +14,10 @@ export class UsersService {
   public currentUser$: Observable<User | null> = this.currentUserSubject.asObservable();
 
   private readonly baseUrl: string = `${environment.apiUrl}/User/`
-  constructor(
-    private http: HttpClient,
-    private tokenDecoder: TokenDecode
-  ){
+
+  private http = inject(HttpClient)
+  private tokenDecoder = inject(TokenDecode)
+  constructor(){
     const user = this.tokenDecoder.decodePayloadFromToken();
     this.currentUserSubject.next(user);
   }

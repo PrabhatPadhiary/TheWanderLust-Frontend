@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { AuthService, User } from '../../services/auth/auth.service';
 import { Router } from '@angular/router';
 import { ToastrService } from 'ngx-toastr';
@@ -14,12 +14,11 @@ export class NavbarComponent implements OnInit{
 
   currentUser: User|null = null;
 
-  constructor(
-    private auth: AuthService,
-    private router: Router,
-    private toaster: ToastrService,
-    private userService: UsersService
-  ) {}
+    private auth = inject(AuthService);
+    private router = inject(Router);
+    private toaster = inject(ToastrService);
+    private userService = inject(UsersService);
+    
   ngOnInit(): void {
     
     this.userService.currentUser$.subscribe(user => {

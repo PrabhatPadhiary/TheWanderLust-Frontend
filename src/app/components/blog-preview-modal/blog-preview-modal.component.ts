@@ -1,4 +1,4 @@
-import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BlogService } from '../../services/blogs/blog.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -14,13 +14,13 @@ export class BlogPreviewModalComponent{
   commentForm: FormGroup;
   comments: any[] = [];
 
-  constructor(
-    private fb: FormBuilder,
-    private toastrService: ToastrService,
-    private blogService: BlogService,
-    public dialogRef: MatDialogRef<BlogPreviewModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
-  ) {
+  private fb = inject(FormBuilder);
+  private toastrService = inject(ToastrService);
+  private blogService = inject(BlogService);
+  public dialogRef = inject(MatDialogRef<BlogPreviewModalComponent>);
+  public data = inject(MAT_DIALOG_DATA);
+
+  constructor() {
     console.log(this.data);
     this.commentForm = this.fb.group({
       commentText: ['', Validators.required]

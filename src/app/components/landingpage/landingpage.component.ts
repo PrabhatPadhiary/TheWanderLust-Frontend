@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, Renderer2, ViewChild } from '@angular/core';
 import 'swiper/css';
 import 'swiper/css/effect-fade';
 import 'swiper/css/pagination';
@@ -26,14 +26,11 @@ export class LandingpageComponent implements OnInit {
 
   isLoginModalOpen = false;
 
-
-  constructor(
-    private renderer: Renderer2,
-    private auth: AuthService,
-    private router: Router,
-    private userService: UsersService,
-    private toastr: ToastrService
-  ) { }
+  private renderer = inject(Renderer2)
+  private auth = inject(AuthService)
+  private router = inject(Router)
+  private userService = inject(UsersService)
+  private toastr = inject(ToastrService)
 
   ngOnInit(): void {
     window.addEventListener('scroll', this.onScroll.bind(this));

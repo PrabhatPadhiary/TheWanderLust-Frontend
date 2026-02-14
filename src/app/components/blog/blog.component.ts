@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { BlogService } from '../../services/blogs/blog.service';
 import { DatePipe } from '@angular/common';
 import TokenDecode from '../../helpers/Token/tokenDecoder';
@@ -28,18 +28,14 @@ export class BlogComponent implements OnInit {
   userDetails: any;
   isModalOpen = false;
 
-  constructor(
-    private blogService: BlogService,
-    private datePipe: DatePipe,
-    private tokenDecoder: TokenDecode,
-    private fb: FormBuilder,
-    private toastrService: ToastrService,
-    private userService: UsersService,
-    private dialog: MatDialog,
-    private sharedService: SharedService
-
-    
-  ) { }
+  private blogService = inject(BlogService);
+  private datePipe = inject(DatePipe);
+  private tokenDecoder = inject(TokenDecode);
+  private fb = inject(FormBuilder);
+  private toastrService = inject(ToastrService);
+  private userService = inject(UsersService);
+  private dialog = inject(MatDialog);
+  private sharedService = inject(SharedService);
 
   ngOnInit(): void {
     this.user = this.tokenDecoder.decodePayloadFromToken();

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs';
 import { BlogService } from '../../services/blogs/blog.service';
@@ -25,12 +25,10 @@ export class NavbarBlogsComponent implements OnInit{
   isModalOpen = false;
   selectedBlog: any;
 
-  constructor(
-    private blogService: BlogService,
-    private sharedService: SharedService,
-    private dialog: MatDialog,
-    private tokenDecoder: TokenDecode,
-  ){}
+  private blogService = inject(BlogService)
+  private sharedService = inject(SharedService)
+  private dialog = inject(MatDialog)
+  private tokenDecoder = inject(TokenDecode)
 
   ngOnInit(): void {
     this.sharedService.blogs$.subscribe(blogs => {

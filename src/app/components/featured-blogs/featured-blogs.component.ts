@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { BlogService } from '../../services/blogs/blog.service';
 import { DatePipe } from '@angular/common';
 import Swiper from 'swiper';
@@ -16,10 +16,8 @@ export class FeaturedBlogsComponent implements OnInit, AfterViewInit {
   blogs: any[] = [];
   private swiperInstance: Swiper | null = null;
 
-  constructor(
-    private blogService: BlogService,
-    private datePipe: DatePipe,
-  ){}
+  private blogService = inject(BlogService);
+  private datePipe = inject(DatePipe)
 
   ngOnInit(): void {
     this.blogService.getFeaturedBlogs().subscribe(
