@@ -1,63 +1,86 @@
-<app-navbar></app-navbar>
-<section class="parallax">
-    <img #hill1 src="assets/images/parallax/hill1.png">
-    <img src="assets/images/parallax/hill2.png">
-    <img src="assets/images/parallax/hill3.png">
-    <img #hill4 src="assets/images/parallax/hill4.png">
-    <img #hill5 src="assets/images/parallax/hill5.png">
-    <img src="assets/images/parallax/tree.png">
-    <div #box class="txt-content">
-        <h2 id="text">The Wander Lust</h2>
-        <h4 id="p-text">"Sharing Stories, Building Connections"</h4>
-        <button routerLink="/blog" class="btn">
-            <span class="btn-txt">Explore Blogs</span>
-            <span class="arrow">&#10140;</span>
-        </button>
-    </div>
-    <img #leaf id="leaf" src="assets/images/parallax/leaf.png">
-    <img src="assets/images/parallax/plant.png">
-</section>
-
-<app-featured-blogs></app-featured-blogs>
-
-<div class="cta-container">
-    <button class="write-btn" (click)="onWriteBlogClick()">Start By Writing Your First Story</button>
-    <p class="cta-tagline">Your words can inspire the world.</p>
+<div class="hero">
+    <div class="banner">
+        <div class="video-container">
+            <video #bgVideo autoplay muted loop playsinline>
+                <source src="assets/video/optimized-hero-1.mp4" type="video/mp4">
+            </video>
+            <h2 class="masked-text">
+                <span class="word-left">WANDER</span>
+                <span class="word-right">LUST</span>
+            </h2>
+        </div>
+        <div class="tagline-container">
+  <svg class="tagline-svg" viewBox="0 0 1000 200">
+    <g class="zoom-group">
+      <text
+        x="50%"
+        y="50%"
+        text-anchor="middle"
+        class="portal-text"
+      >
+        <tspan>The only place y</tspan><tspan #zoomTarget class="target-o">o</tspan><tspan>u will ever need for your curated Journeys</tspan>
+      </text>
+    </g>
+  </svg>
 </div>
 
-<app-featured-writers></app-featured-writers>
-
-<section class="why-choose-us">
-    <div class="container">
-        <h2>Why <del>Not</del> Choose Us?</h2>
-        <p>Join our vibrant community of travel enthusiasts, bloggers, and adventurers.</p>
-        <div class="benefits">
-            <div class="benefit-item">
-                <i class="fa fa-compass fa-3x" aria-hidden="true" ></i>
-                <h3>Discover Hidden Gems</h3>
-                <p>Explore offbeat destinations and real traveler experiences that go beyond the usual tourist trails.
-                </p>
-            </div>
-            <div class="benefit-item">
-                <i class="fa fa-pencil fa-3x" aria-hidden="true"></i>
-                <h3>Share Your Adventures</h3>
-                <p>Publish your travel stories, tips, and itineraries to inspire others around the globe.</p>
-            </div>
-            <div class="benefit-item">
-                <i class="fa fa-users fa-3x" aria-hidden="true"></i>
-                <h3>Engage & Connect</h3>
-                <p>Join discussions, exchange tips, and connect with a community that loves to travel as much as you do.
-                </p>
-            </div>
-        </div>
-        <a href="/signup" class="cta-button">Join Our Community</a>
     </div>
-</section>
+</div>
+<div class="search-hub">
+    <div class="glass-search-bar">
+        <span class="search-icon">
+            <svg viewBox="0 0 24 24" width="20" fill="none" stroke="currentColor" stroke-width="2.5">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="M21 21l-4.35-4.35"></path>
+            </svg>
+        </span>
+        <input type="text" placeholder="Where do you want to go?">
+        <button class="go-btn">Explore</button>
+    </div>
+</div>
+<div #scrollIndicator class="scroll-indicator">
+    <div class="scroll-pill">
+        <span class="scroll-dot"></span>
+    </div>
+</div>
 
-<!-- Login Form Modal -->
-<div *ngIf="isLoginModalOpen" class="modal">
-    <div class="modal-content">
-        <span class="close" (click)="closeModal()">&times;</span>
-        <app-login (loginSuccess)="redirectBlog()"></app-login>
+<div class="main-trigger" #mainTrigger>
+    <div class="moving-container" #movingContainer>
+        <svg viewBox="0 0 1190 4988" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path #travelPath id="travel-path"
+                d="M590.908 0.489014C590.908 0.489014 225.048 75.6368 116.909 255.989C-80.4603 585.157 1215.91 527.489 1116.91 419.989C1017.91 312.489 519.738 162.025 472.908 434.489C450.908 562.489 743.528 532.637 865.408 683.989C1062.48 928.719 86.4084 1190.49 58.9085 855.989C39.4718 619.568 839.917 921.022 672.908 1089.49C604.221 1158.78 407.073 1100.35 444.408 1190.49C466.693 1244.29 530.419 1226.64 572.408 1266.99C739.074 1427.15 -63.0916 1628.99 13.9084 1462.99C90.9084 1296.99 314.409 1089.49 314.409 1089.49C314.409 1089.49 387.189 1524.99 530.049 1462.99C672.908 1400.99 745.689 1089.49 745.689 1089.49L961.33 1462.99C899.25 1501.49 444.408 1462.99 116.909 1620.49C-210.591 1777.99 1196.31 1734.13 1046.41 2117.49C952.2 2358.41 723.835 2386.09 472.908 2448.99C337.422 2482.95 -244.092 2117.49 116.909 2483.49C477.909 2849.49 949.413 2290.16 1003.91 2637.49C1061.25 3002.95 146.409 2540.99 58.9085 2702.99C-28.5916 2864.99 815.488 3025.99 888.409 2841.49C961.33 2656.99 29.4084 3357.99 472.908 3411.99C916.408 3465.99 768.908 4027.99 549.409 3665.99C329.909 3303.99 735.418 3687.13 803.409 3769.99C928.85 3922.87 795.909 4567.49 614.909 4239.99C433.908 3912.49 283.842 4289.73 140.909 4428.49C-155.898 4716.63 1181 4168.9 1188.91 4582.49C1196.73 4991.45 -139.104 4567.32 171.908 4832.99C311.174 4951.95 614.909 4986.99 614.909 4986.99" />
+        </svg>
+        <div class="sections-wrapper">
+            <section class="travel-section catalog">
+                <div class="text-block">
+                    <span class="step-num">01</span>
+                    <h2>The Curated Catalog</h2>
+                    <p>Hand-picked destinations that redefine luxury and privacy.</p>
+                </div>
+                <div class="card-grid">
+                    <div class="travel-card">
+                        <img src="assets/images/nordic.jpg" alt="Nordic">
+                        <div class="card-info">
+                            <h3>Nordic Solitude</h3>
+                        </div>
+                    </div>
+                    <div class="travel-card">
+                        <img src="assets/images/desert.jpg" alt="Desert">
+                        <div class="card-info">
+                            <h3>Desert Mirage</h3>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="travel-section narrative">
+                <div class="split-content">
+                    <div class="side-text">
+                        <h2>Travel with <br> Intention</h2>
+                        <p>We don't just find hotels; we find homes for your soul.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
     </div>
 </div>

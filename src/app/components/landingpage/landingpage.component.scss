@@ -1,296 +1,349 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+:host {
+    display: block;
+    background: #fff;
     font-family: 'Poppins', sans-serif;
-}
-
-body {
-    background: #f9f9f9;
-    height: 100%;
-    overflow-y: auto;
     overflow-x: hidden;
 }
 
-.parallax {
+.main-trigger {
     position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    min-height: 100vh;
-}
-
-.txt-content {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.parallax img {
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
-    height: 100vh;
-    pointer-events: none;
-    border-radius: 0;
-    object-fit: cover;
-}
-
-.btn {
-    margin-top: 170px;
-    position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 30px;
-    background-color: #fff;
-    color: #359381;
-    font-size: 20px;
-    font-weight: 600;
-    text-transform: uppercase;
-    text-decoration: none;
-    border: none;
-    border-radius: 50px;
-    overflow: hidden;
-    // transition: all 0.4s ease;
-    cursor: pointer;
-    gap: 10px;
-    width: 280px;
-}
-
-.btn:hover {
-    color: #fff;
-    background-color: black;
-    box-shadow: 0 0 20px rgba(53, 147, 129, 0.7);
-    // transform: scale(1.05);
-    text-align: center;
-}
-
-.arrow {
-    display: inline-block;
-    transition: transform 1s ease;
-    font-size: 30px;
-}
-
-.btn:hover .arrow {
-    transform: translateX(100px);
-}
-
-.btn-txt {
-    transition: all 0.4s ease;
-}
-
-.btn:hover .btn-txt {
-    transform: translateX(18px);
-}
-
-.btn::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(120deg, transparent, rgba(53, 147, 129, 0.7), transparent);
-    transition: all 0.8s ease;
-    z-index: -1;
-}
-
-.btn:hover::before {
-    left: 100%;
-}
-
-#leaf {
-    z-index: 1;
-}
-
-#text {
-    margin-bottom: 150px;
-    position: absolute;
-    font-size: 6em;
-    color: #fff;
-    font-weight: 600;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.4);
-}
-
-#p-text {
-    position: absolute;
-    font-weight: 600;
-    color: #28261b;
-    font-size: 2em;
-}
-
-.cta-container {
-    text-align: center;
-    margin-top: 30px;
-    background-color: #292828;
-    margin: auto;
-}
-
-.write-btn {
-    font-family: 'Poppins', sans-serif !important;
-    margin-top: 80px;
-    background: linear-gradient(45deg, #ff7e5f, #feb47b);
-    border: none;
-    width: 50%;
-    padding: 12px 25px;
-    font-size: 1.6rem;
-    font-weight: bold;
-    color: white;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: all 0.3s ease-in-out;
-    box-shadow: 0 4px 10px rgba(217, 215, 215, 0.2);
-    position: relative;
-    overflow: hidden;
-}
-
-.write-btn::before {
-    content: "";
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 300%;
-    height: 300%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 10%, transparent 50%);
-    transition: all 0.6s ease-out;
-    transform: translate(-50%, -50%) scale(0);
-}
-
-.write-btn:hover::before {
-    transform: translate(-50%, -50%) scale(1);
-}
-
-.write-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 20px rgba(255, 126, 95, 0.5);
-}
-
-.cta-tagline {
-    font-size: 1.3rem;
-    margin-top: 10px;
-    color: #bdb9b9;
-    font-style: italic;
-}
-
-.modal {
-    display: flex;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    height: 900px;
-    background: white;
-    padding: 20px;
-    border-radius: 20px;
-    position: relative;
-    max-width: 900px;
-}
-
-.close {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 20px;
-    cursor: pointer;
+    z-index: 5;
+    background: #fff;
     color: black;
 }
 
-///
-
-.why-choose-us {
-    background-color: #502c0b;
-    padding: 60px 20px;
-    text-align: center;
+.moving-container {
+    position: relative;
+    top: 0;
+    width: 100%;
 }
 
-.why-choose-us .container {
-    max-width: 1200px;
-    margin: 0 auto;
+svg {
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
-.why-choose-us h2 {
-    color: white;
-    font-family: 'Poppins', sans-serif;
-    font-weight: 700;
-    font-size: 3rem;
-    margin-bottom: 10px;
+path {
+    fill: none;
+    stroke: #0f2c02;
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
-.why-choose-us p {
-    font-size: 1.1rem;
-    margin-bottom: 40px;
-    color: #c4c4c4;
+.hero {
+  position: relative;
+  height: 100vh;
+  overflow: hidden;
 }
 
-.benefits {
+.banner {
+  height: 100%;
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+}
+
+.search-wrapper {
+  height: 90px; // reserve space so layout doesn't jump
+  display: flex;
+  justify-content: center;
+}
+
+.search-hub {
+  position: fixed;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 50;
+}
+
+.tagline {
+  position: fixed;
+  top: 40%;
+  width: 100%;
+  text-align: center;
+  font-family: "Playwrite US Trad", cursive;
+  font-weight: 600;
+  font-size: clamp(2rem, 2vw, 3rem);
+  color: black;
+  transform-origin: center center;
+  letter-spacing: 1px;
+  opacity: 0.9;
+}
+
+.tagline-container {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    z-index: 100;
+    pointer-events: none;
+    will-change: transform;
+    backface-visibility: hidden;
+    transform-origin: center center;
+}
+
+.tagline-svg {
+    width: 100%;
+    overflow: visible;
+    will-change: transform;
+    shape-rendering: geometricPrecision;
+    text-rendering: geometricPrecision;
+    image-rendering: optimizeQuality;
+    backface-visibility: hidden;
+    transform: translateZ(0); // Force GPU acceleration
+}
+
+    .zoom-group {
+        transform-origin: center center;
+        will-change: transform;
+        backface-visibility: hidden;
+        transform: translateZ(0); // Force GPU acceleration
+    }
+    
+    .portal-text {
+        font-family: "Playwrite US Trad", cursive;
+        font-size: 24px;
+        fill: #1a1a1a;
+        font-weight: 400;
+        text-rendering: optimizeLegibility;
+        backface-visibility: hidden;
+        paint-order: stroke fill;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        
+        .target-o {
+            letter-spacing: 0;
+        }
+    }
+
+
+.video-container {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 50vh;
+    overflow: hidden;
     display: flex;
-    flex-wrap: wrap;
+    align-items: center;
     justify-content: center;
-    gap: 30px;
-    margin-bottom: 40px;
-}
+    flex-direction: column;
 
-.benefit-item {
-    background: #f9f9f9;
-    border-radius: 10px;
-    padding: 20px;
-    width: 300px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
+    video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 
-.benefit-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.benefit-item i{
-    font-family: FontAwesome !important;
-    padding: 20px;
-}
-
-.benefit-item h3 {
-    padding: 10px;
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-}
-
-.benefit-item p {
-    padding: 10px;
-    font-size: 1rem;
-    color: #555;
-}
-
-/* Call to Action Button */
-.cta-button {
-    display: inline-block;
-    padding: 12px 30px;
-    background-color: #007BFF;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 25px;
-    font-size: 1.1rem;
-    transition: background-color 0.3s ease;
-}
-
-.cta-button:hover {
-    background-color: #0056b3;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .benefits {
-        flex-direction: column;
+    .masked-text {  
+        position: absolute;
+        font-size: clamp(6rem, 18vw, 12rem);
+        font-weight: 900;
+        margin: 0;
+        background: white;
+        color: black;
+        width: 100%;
+        height: 100%;
+        display: flex;
         align-items: center;
+        justify-content: center;
+        mix-blend-mode: screen; 
+        pointer-events: none;
+    }
+}
+
+.glass-search-bar {
+    display: flex;
+    align-items: center;
+    width: 90%;
+    max-width: 550px;
+    
+    // Glass Effect
+    background: rgba(71, 69, 69, 0); // Semi-transparent white
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 100px; // Pill shape for a modern travel feel
+    padding: 8px 10px 8px 25px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+
+    &:focus-within {
+        background: rgba(255, 255, 255, 0.7);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .search-icon {
+        color: #2d5a27; // Forest green icon
+        display: flex;
+        align-items: center;
+        opacity: 0.7;
+    }
+
+    input {
+        flex: 1;
+        background: transparent;
+        border: none;
+        padding: 12px 15px;
+        font-size: 1.1rem;
+        color: #1a1a1a;
+        outline: none;
+        font-family: 'Poppins', sans-serif;
+
+        &::placeholder {
+            color: rgba(0, 0, 0, 0.4);
+            font-weight: 400;
+        }
+    }
+
+    .go-btn {
+        background: #2d5a27; // Deep forest green
+        color: white;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 100px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+
+        &:hover {
+            background: #1e3d1a;
+        }
+    }
+    
+}
+.scroll-indicator {
+  position: fixed;
+  bottom: 30px;             /* distance from bottom of hero */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+.scroll-pill {
+  width: 30px;
+  height: 50px;
+  border: 2px solid #2d5a27;      /* pill border */
+  border-radius: 25px;             /* makes it fully rounded */
+  display: flex;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.scroll-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #2d5a27;       /* dot color */
+  border-radius: 50%;
+  position: absolute;
+  top: 8px;                        /* start position */
+  animation: scrollBounce 1.5s infinite;
+}
+
+@keyframes scrollBounce {
+  0% {
+    top: 8px;
+    opacity: 1;
+  }
+  50% {
+    top: 32px;  /* move to bottom of pill */
+    opacity: 0.4;
+  }
+  100% {
+    top: 8px;
+    opacity: 1;
+  }
+}
+
+.sections-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; // Allows interaction with elements but not the container
+}
+
+.travel-section {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    pointer-events: all;
+    padding: 0 10%;
+
+    &.catalog { top: 500px; } // Adjust these based on where your line curves
+    &.narrative { top: 1500px; }
+
+    .text-block {
+        max-width: 400px;
+        .step-num { font-weight: bold; color: #ff4d4d; }
+        h2 { font-size: 3rem; margin: 10px 0; }
+    }
+}
+
+.card-grid {
+    display: flex;
+    gap: 30px;
+}
+
+.travel-card {
+    width: 280px;
+    height: 400px;
+    background: #f9f9f9;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+
+    &:hover { transform: translateY(-10px); }
+    img { width: 100%; height: 100%; object-fit: cover; }
+}
+
+
+
+.portal-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    background: white; // The color of the "sheet"
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    
+    // This creates the initial mask. 
+    // 50% 50% ensures it is perfectly centered on the screen.
+    clip-path: circle(20px at 50% 50%); 
+    will-change: clip-path;
+}
+
+.tagline-wrapper {
+    text-align: center;
+    width: 100%;
+}
+
+.tagline-text {
+    font-family: "Playwrite US Trad", cursive;
+    font-size: clamp(1.5rem, 2vw, 2.5rem);
+    color: #1a1a1a;
+    margin: 0;
+    
+    .hole {
+        color: transparent; // Makes the 'o' a window to the video below
+        display: inline-block;
+        width: 0.8em; // Adjust slightly to match your font's 'o' width
     }
 }

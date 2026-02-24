@@ -1,85 +1,114 @@
-import { Component, ElementRef, inject, OnInit, Renderer2, ViewChild } from '@angular/core';
-import 'swiper/css';
-import 'swiper/css/effect-fade';
-import 'swiper/css/pagination';
-import 'swiper/css/navigation';
-import { AuthService } from '../../services/auth/auth.service';
-import { Router } from '@angular/router';
-import { DatePipe } from '@angular/common';
-import { UsersService } from '../../services/users/users.service';
-import { ToastrService } from 'ngx-toastr';
+import { AfterViewInit, Component, ElementRef, ViewChild, OnDestroy } from '@angular/core';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 
 @Component({
   selector: 'app-landingpage',
-  standalone: false,
   templateUrl: './landingpage.component.html',
-  styleUrl: './landingpage.component.scss',
-  providers: [DatePipe]
+  styleUrls: ['./landingpage.component.scss'],
+  standalone: false
 })
-export class LandingpageComponent implements OnInit {
-  @ViewChild('box') boxRef!: ElementRef;
-  @ViewChild('leaf') leafRef!: ElementRef;
-  @ViewChild('hill1') hill1Ref!: ElementRef;
-  @ViewChild('hill4') hill4Ref!: ElementRef;
-  @ViewChild('hill5') hill5Ref!: ElementRef;
+export class LandingpageComponent implements AfterViewInit, OnDestroy {
+  @ViewChild('travelPath') travelPath!: ElementRef<SVGPathElement>;
+  @ViewChild('movingContainer') movingContainer!: ElementRef<HTMLDivElement>;
+  @ViewChild('mainTrigger') mainTrigger!: ElementRef<HTMLDivElement>;
+  @ViewChild('scrollIndicator') scrollIndicator!: ElementRef<HTMLDivElement>;
+  @ViewChild('zoomTarget') zoomTarget!: ElementRef<SVGTSpanElement>;
 
+  ngAfterViewInit(): void {
+    
+    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
-  isLoginModalOpen = false;
+    const scrollIndicatorEl = this.scrollIndicator.nativeElement;
 
-  private renderer = inject(Renderer2)
-  private auth = inject(AuthService)
-  private router = inject(Router)
-  private userService = inject(UsersService)
-  private toastr = inject(ToastrService)
+    // 1. Hero split animation timeline - simple and clean
+    const splitTl = gsap.timeline({
+      scrollTrigger: {
+        trigger: ".hero",
+        start: "top top",
+        end: "+=1500", // Increased for more comfortable pacing
+        pin: true,
+        scrub: 1,
+      }
+    });
 
-  ngOnInit(): void {
-    window.addEventListener('scroll', this.onScroll.bind(this));
+    splitTl
+      .to(".word-left", { x: -window.innerWidth }, 0)
+      .to(".word-right", { x: window.innerWidth }, 0)
+      .to(".tagline-svg", {
+        opacity: 0,
+        y: -50,
+        duration: 0.5
+      }, 0.3)
+      .to(".search-hub", { 
+        scale: 0.85, 
+        ease: "power2.inOut", 
+        top: 50
+      }, 0.5);
+
+    // 2. Scroll indicator fade + slide
+    gsap.to(scrollIndicatorEl, {
+      scrollTrigger: {
+        trigger: ".hero",
+        start: "top top",        // start fading as soon as hero hits top
+        end: "bottom center",    // fade out when hero is halfway off screen
+        scrub: true,
+      },
+      y: 20,
+      opacity: 0,
+      scale: 0.8,
+      ease: "power1.out",
+    });
+
+    // 3. Click scroll
+    scrollIndicatorEl.addEventListener("click", () => {
+      gsap.to(window, {
+        scrollTo: window.innerHeight + 100, // scroll slightly past hero
+        duration: 1.2,
+        ease: "power2.inOut"
+      });
+    });
+
+    this.initJourneyTimeline();
+  }
+
+  private initJourneyTimeline(): void {
+    const path = this.travelPath.nativeElement;
+    const container = this.mainTrigger.nativeElement;
+    const moving = this.movingContainer.nativeElement;
+
+    const pathLength = path.getTotalLength();
+    gsap.set(path, {
+      strokeDasharray: pathLength,
+      strokeDashoffset: pathLength
+    });
+
+    const scrollDistance = moving.offsetHeight - window.innerHeight;
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: container,
+        start: "top bottom",
+        end: () => "+=" + scrollDistance, // Keep it synchronized
+        scrub: 8, // Increased from 5 for slower, smoother animation
+        pin: true,
+        anticipatePin: 1
+      }
+    });
+
+    tl.to(path, { strokeDashoffset: 0, ease: "none" }, 0);
+    tl.to(moving, { y: -scrollDistance, ease: "none" }, 0);
+
+    tl.from(".travel-card", {
+      y: 100,
+      opacity: 0,
+      stagger: 0.2,
+      duration: 1
+    }, 0.1);
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('scroll', this.onScroll.bind(this));
-  }
-
-  onScroll(): void {
-    const value = Math.min(window.scrollY, 500);
-
-    // Use Renderer2 to safely manipulate DOM elements
-    if (this.boxRef) {
-      this.renderer.setStyle(this.boxRef.nativeElement, 'marginTop', Math.min(value * 2.5, 1200) + 'px');
-    }
-    if (this.leafRef) {
-      this.renderer.setStyle(this.leafRef.nativeElement, 'top', Math.max(value * -1.5, -500) + 'px');
-      this.renderer.setStyle(this.leafRef.nativeElement, 'left', Math.min(value * 1.5, 600) + 'px');
-    }
-    if (this.hill5Ref) {
-      this.renderer.setStyle(this.hill5Ref.nativeElement, 'left', Math.min(value * 1.5, 600) + 'px');
-    }
-    if (this.hill4Ref) {
-      this.renderer.setStyle(this.hill4Ref.nativeElement, 'left', Math.max(value * -1.5, -600) + 'px');
-    }
-    if (this.hill1Ref) {
-      this.renderer.setStyle(this.hill1Ref.nativeElement, 'top', Math.min(value * 1, 400) + 'px');
-    }
-  }
-
-  onWriteBlogClick() {
-    if (this.auth.isLoggedIn()) {
-      this.router.navigate(['/blog'])
-    }
-    else {
-      this.isLoginModalOpen = true;
-    }
-  }
-
-  closeModal() {
-    this.isLoginModalOpen = false;
-  }
-
-  logout() {
-    this.auth.logout();
-  }
-
-  redirectBlog() {
-    this.router.navigate(['/blog'])
+    ScrollTrigger.getAll().forEach(trigger => trigger.kill());
   }
 }
