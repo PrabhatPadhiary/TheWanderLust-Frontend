@@ -2,6 +2,10 @@ import { AfterViewInit, Component, ElementRef, ViewChild, OnDestroy } from '@ang
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
+
+declare var google: any;
 
 @Component({
   selector: 'app-landingpage',
@@ -10,32 +14,45 @@ import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
   standalone: false
 })
 export class LandingpageComponent implements AfterViewInit, OnDestroy {
-  @ViewChild('travelPath') travelPath!: ElementRef<SVGPathElement>;
-  @ViewChild('movingContainer') movingContainer!: ElementRef<HTMLDivElement>;
-  @ViewChild('mainTrigger') mainTrigger!: ElementRef<HTMLDivElement>;
   @ViewChild('scrollIndicator') scrollIndicator!: ElementRef<HTMLDivElement>;
   @ViewChild('zoomTarget') zoomTarget!: ElementRef<SVGTSpanElement>;
+  @ViewChild('bgVideo') bgVideo!: ElementRef<HTMLVideoElement>;
+  @ViewChild('catalogSection') catalogSection!: ElementRef<HTMLElement>;
+  @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
+
+  predictions: any[] = [];
+  showDropdown = false;
+  selectedPlace: any = null;
+
+  private searchSubject = new Subject<string>();
+  private autocompleteService: any;
+  private blurTimeout: any;
 
   ngAfterViewInit(): void {
     
+    // Ensure video plays (some browsers need programmatic trigger)
+    const video = this.bgVideo.nativeElement;
+    video.muted = true;
+    video.play().catch(() => {});
+
     gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
     const scrollIndicatorEl = this.scrollIndicator.nativeElement;
 
-    // 1. Hero split animation timeline - simple and clean
+    // 1. Hero split animation timeline
     const splitTl = gsap.timeline({
       scrollTrigger: {
         trigger: ".hero",
         start: "top top",
-        end: "+=1500", // Increased for more comfortable pacing
+        end: "+=1200",
         pin: true,
-        scrub: 1,
+        scrub: 2,
       }
     });
 
     splitTl
-      .to(".word-left", { x: -window.innerWidth }, 0)
-      .to(".word-right", { x: window.innerWidth }, 0)
+      .to(".word-left", { x: -window.innerWidth, ease: "power2.inOut" }, 0)
+      .to(".word-right", { x: window.innerWidth, ease: "power2.inOut" }, 0)
       .to(".tagline-svg", {
         opacity: 0,
         y: -50,
@@ -45,14 +62,31 @@ export class LandingpageComponent implements AfterViewInit, OnDestroy {
         scale: 0.85, 
         ease: "power2.inOut", 
         top: 50
-      }, 0.5);
+      }, 0.4)
+      .fromTo(".catalog-section", {
+        y: "100%",
+        opacity: 0,
+      }, {
+        y: 0,
+        opacity: 1,
+        ease: "power2.out",
+      }, 0.5)
+      .fromTo(".travel-card", {
+        x: 300,
+        opacity: 0,
+      }, {
+        x: 0,
+        opacity: 1,
+        stagger: 0.15,
+        ease: "power2.out",
+      }, 0.7);
 
     // 2. Scroll indicator fade + slide
     gsap.to(scrollIndicatorEl, {
       scrollTrigger: {
         trigger: ".hero",
-        start: "top top",        // start fading as soon as hero hits top
-        end: "bottom center",    // fade out when hero is halfway off screen
+        start: "top top",
+        end: "bottom center",
         scrub: true,
       },
       y: 20,
@@ -64,48 +98,97 @@ export class LandingpageComponent implements AfterViewInit, OnDestroy {
     // 3. Click scroll
     scrollIndicatorEl.addEventListener("click", () => {
       gsap.to(window, {
-        scrollTo: window.innerHeight + 100, // scroll slightly past hero
+        scrollTo: window.innerHeight + 100,
         duration: 1.2,
         ease: "power2.inOut"
       });
     });
 
-    this.initJourneyTimeline();
+    this.initCatalogAnimation();
+    this.initPlacesAutocomplete();
   }
 
-  private initJourneyTimeline(): void {
-    const path = this.travelPath.nativeElement;
-    const container = this.mainTrigger.nativeElement;
-    const moving = this.movingContainer.nativeElement;
+  private initPlacesAutocomplete(): void {
+    this.autocompleteService = new google.maps.places.AutocompleteService();
 
-    const pathLength = path.getTotalLength();
-    gsap.set(path, {
-      strokeDasharray: pathLength,
-      strokeDashoffset: pathLength
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      filter(value => value.length >= 2)
+    ).subscribe(value => {
+      this.autocompleteService.getPlacePredictions(
+        { input: value },
+        (predictions: any[], status: string) => {
+          if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+            const allowedTypes = [
+              'locality',
+              'administrative_area_level_1',
+              'country'
+            ];
+
+            this.predictions = predictions
+              .filter(pred => pred.types?.some((type: string) => allowedTypes.includes(type)))
+              .sort((a, b) => {
+                const priority = (types: string[]) => {
+                  if (types.includes('locality')) return 1;
+                  if (types.includes('administrative_area_level_1')) return 2;
+                  if (types.includes('country')) return 3;
+                  return 4;
+                };
+                return priority(a.types) - priority(b.types);
+              });
+
+            this.showDropdown = this.predictions.length > 0;
+          } else {
+            this.predictions = [];
+            this.showDropdown = false;
+          }
+        }
+      );
     });
+  }
 
-    const scrollDistance = moving.offsetHeight - window.innerHeight;
+  getPlaceLabel(prediction: any): string {
+    if (prediction.types?.includes('locality')) return 'City';
+    if (prediction.types?.includes('administrative_area_level_1')) return 'State';
+    if (prediction.types?.includes('country')) return 'Country';
+    return '';
+  }
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: container,
-        start: "top bottom",
-        end: () => "+=" + scrollDistance, // Keep it synchronized
-        scrub: 8, // Increased from 5 for slower, smoother animation
-        pin: true,
-        anticipatePin: 1
-      }
-    });
+  onSearchInput(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    if (value.length < 2) {
+      this.predictions = [];
+      this.showDropdown = false;
+      return;
+    }
+    this.searchSubject.next(value);
+  }
 
-    tl.to(path, { strokeDashoffset: 0, ease: "none" }, 0);
-    tl.to(moving, { y: -scrollDistance, ease: "none" }, 0);
+  selectPlace(prediction: any): void {
+    this.selectedPlace = prediction;
+    this.searchInput.nativeElement.value = prediction.structured_formatting.main_text;
+    this.predictions = [];
+    this.showDropdown = false;
+    console.log('Selected:', prediction.description, prediction.place_id);
+    // TODO: Navigate to destination page
+  }
 
-    tl.from(".travel-card", {
-      y: 100,
-      opacity: 0,
-      stagger: 0.2,
-      duration: 1
-    }, 0.1);
+  onExplore(): void {
+    if (this.selectedPlace) {
+      console.log('Exploring:', this.selectedPlace.description);
+      // TODO: Navigate to destination page
+    }
+  }
+
+  onBlur(): void {
+    this.blurTimeout = setTimeout(() => {
+      this.showDropdown = false;
+    }, 200);
+  }
+
+  private initCatalogAnimation(): void {
+    // Catalog animates as part of the hero timeline now
   }
 
   ngOnDestroy(): void {

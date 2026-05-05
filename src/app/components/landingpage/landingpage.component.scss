@@ -5,38 +5,11 @@
     overflow-x: hidden;
 }
 
-.main-trigger {
-    position: relative;
-    width: 100%;
-    z-index: 5;
-    background: #fff;
-    color: black;
-}
-
-.moving-container {
-    position: relative;
-    top: 0;
-    width: 100%;
-}
-
-svg {
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-path {
-    fill: none;
-    stroke: #0f2c02;
-    stroke-width: 5;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-
 .hero {
   position: relative;
   height: 100vh;
   overflow: hidden;
+  background: #fff;
 }
 
 .banner {
@@ -58,6 +31,9 @@ path {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 50;
+  width: 100%;
+  display: flex;
+  justify-content: center;
 }
 
 .tagline {
@@ -76,7 +52,7 @@ path {
 
 .tagline-container {
     position: absolute;
-    top: 40%;
+    top: 45%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 90%;
@@ -126,7 +102,7 @@ path {
     position: absolute;
     inset: 0;
     width: 100%;
-    height: 50vh;
+    height: 100%;
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -141,6 +117,8 @@ path {
 
     .masked-text {  
         position: absolute;
+        top: 0;
+        left: 0;
         font-size: clamp(6rem, 18vw, 12rem);
         font-weight: 900;
         margin: 0;
@@ -149,8 +127,9 @@ path {
         width: 100%;
         height: 100%;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
+        padding-top: 15vh;
         mix-blend-mode: screen; 
         pointer-events: none;
     }
@@ -159,15 +138,12 @@ path {
 .glass-search-bar {
     display: flex;
     align-items: center;
-    width: 90%;
-    max-width: 550px;
-    
+    width: "fix-content";
     // Glass Effect
     background: rgba(71, 69, 69, 0); // Semi-transparent white
     backdrop-filter: blur(12px) saturate(180%);
     -webkit-backdrop-filter: blur(12px) saturate(180%);
-    
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0);
     border-radius: 100px; // Pill shape for a modern travel feel
     padding: 8px 10px 8px 25px;
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
@@ -180,14 +156,16 @@ path {
     }
 
     .search-icon {
-        color: #2d5a27; // Forest green icon
+        color: #2d5a27;
         display: flex;
         align-items: center;
         opacity: 0.7;
     }
 
     input {
-        flex: 1;
+        flex: 0 0 auto;
+        width: 24em;
+        min-width: 0;
         background: transparent;
         border: none;
         padding: 12px 15px;
@@ -203,21 +181,89 @@ path {
     }
 
     .go-btn {
-        background: #2d5a27; // Deep forest green
+        background: #2d5a27;
         color: white;
         border: none;
-        padding: 12px 28px;
         border-radius: 100px;
+        padding: 12px 28px;
         font-weight: 600;
         cursor: pointer;
         transition: background 0.2s;
-
+        white-space: nowrap;
+        flex-shrink: 0;
         &:hover {
             background: #1e3d1a;
         }
     }
-    
 }
+
+.search-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 500px;
+    margin-top: 8px;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    z-index: 100;
+
+    .dropdown-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 20px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+
+        &:hover {
+            background: rgba(45, 90, 39, 0.08);
+        }
+
+        .dropdown-text {
+            display: flex;
+            flex-direction: column;
+
+            .dropdown-main {
+                font-size: 0.95rem;
+                font-weight: 600;
+                color: #1a1a1a;
+            }
+
+            .dropdown-secondary {
+                font-size: 0.8rem;
+                color: #777;
+                margin-top: 2px;
+            }
+        }
+
+        .dropdown-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #2d5a27;
+            background: rgba(45, 90, 39, 0.1);
+            padding: 3px 8px;
+            border-radius: 10px;
+            flex-shrink: 0;
+        }
+    }
+
+    .dropdown-attribution {
+        padding: 8px 20px;
+        font-size: 0.7rem;
+        color: #aaa;
+        text-align: right;
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+    }
+}
+
 .scroll-indicator {
   position: fixed;
   bottom: 30px;             /* distance from bottom of hero */
@@ -266,53 +312,119 @@ path {
   }
 }
 
-.sections-wrapper {
+.catalog-section {
     position: absolute;
-    top: 0;
+    bottom: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none; // Allows interaction with elements but not the container
-}
-
-.travel-section {
-    position: absolute;
-    width: 100%;
+    right: 0;
+    z-index: 10;
+    background: #fff;
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     align-items: center;
-    pointer-events: all;
-    padding: 0 10%;
-
-    &.catalog { top: 500px; } // Adjust these based on where your line curves
-    &.narrative { top: 1500px; }
+    gap: 50px;
+    height: 100%;
+    border: none;
+    outline: none;
+    opacity: 0;
+    overflow: visible;
+    padding: 0 5%;
 
     .text-block {
-        max-width: 400px;
+        max-width: 300px;
+        flex-shrink: 0;
         .step-num { font-weight: bold; color: #ff4d4d; }
-        h2 { font-size: 3rem; margin: 10px 0; }
+        h2 { font-size: 2.5rem; margin: 10px 0; }
+        p { font-size: 1.1rem; color: #555; line-height: 1.6; }
     }
 }
 
 .card-grid {
     display: flex;
-    gap: 30px;
+    gap: 35px;
 }
 
 .travel-card {
+    min-width: 280px;
     width: 280px;
     height: 400px;
     background: #f9f9f9;
     border-radius: 15px;
     overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.05);
-    transition: transform 0.3s ease;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    position: relative;
+    flex-shrink: 0;
 
-    &:hover { transform: translateY(-10px); }
-    img { width: 100%; height: 100%; object-fit: cover; }
+    &:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+
+        img {
+            transform: scale(1.05);
+        }
+    }
+
+    .rating-badge {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(6px);
+        color: #fff;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        z-index: 2;
+    }
+
+    img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        border-radius: 0;
+        transition: transform 0.4s ease;
+    }
+
+    .card-info {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 20px;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+        h3 {
+            color: #fff;
+            margin: 0 0 10px;
+            font-size: 1.1rem;
+        }
+
+        .know-more-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 0.3px;
+
+            &:hover {
+                background: #fff;
+                color: #1a1a1a;
+                border-color: #fff;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 15px rgba(255, 255, 255, 0.3);
+            }
+        }
+    }
+
 }
-
-
 
 .portal-overlay {
     position: absolute;
