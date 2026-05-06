@@ -1,0 +1,85 @@
+<div class="destination-page" *ngIf="!loading && destination">
+    <!-- Hero Section -->
+    <div class="dest-hero">
+        <div class="dest-hero-overlay"></div>
+        <div class="dest-hero-content">
+            <h1>{{ destination.name }}</h1>
+            <p class="dest-address">{{ destination.formattedAddress }}</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="dest-content">
+        <!-- Stays Section -->
+        <section class="dest-section" *ngIf="destination.lodging.length > 0">
+            <div class="section-header">
+                <span class="section-icon">🏨</span>
+                <h2>Where to Stay</h2>
+            </div>
+            <div class="places-grid">
+                <div class="place-card" *ngFor="let place of destination.lodging">
+                    <div class="place-card-img">
+                        <div class="place-card-placeholder">🏨</div>
+                    </div>
+                    <div class="place-card-body">
+                        <h3>{{ place.name }}</h3>
+                        <p class="place-vicinity">{{ place.vicinity }}</p>
+                        <span class="place-rating" *ngIf="place.rating">⭐ {{ place.rating }}</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Restaurants Section -->
+        <section class="dest-section" *ngIf="destination.restaurants.length > 0">
+            <div class="section-header">
+                <span class="section-icon">🍽️</span>
+                <h2>Where to Eat</h2>
+            </div>
+            <div class="places-grid">
+                <div class="place-card" *ngFor="let place of destination.restaurants">
+                    <div class="place-card-img">
+                        <div class="place-card-placeholder">🍽️</div>
+                    </div>
+                    <div class="place-card-body">
+                        <h3>{{ place.name }}</h3>
+                        <p class="place-vicinity">{{ place.vicinity }}</p>
+                        <span class="place-rating" *ngIf="place.rating">⭐ {{ place.rating }}</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Attractions Section -->
+        <section class="dest-section" *ngIf="destination.touristAttractions.length > 0">
+            <div class="section-header">
+                <span class="section-icon">📍</span>
+                <h2>Things to Do</h2>
+            </div>
+            <div class="places-grid">
+                <div class="place-card" *ngFor="let place of destination.touristAttractions">
+                    <div class="place-card-img">
+                        <div class="place-card-placeholder">📍</div>
+                    </div>
+                    <div class="place-card-body">
+                        <h3>{{ place.name }}</h3>
+                        <p class="place-vicinity">{{ place.vicinity }}</p>
+                        <span class="place-rating" *ngIf="place.rating">⭐ {{ place.rating }}</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- Loading State -->
+<div class="dest-loading" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Discovering {{ placeId ? 'this destination' : '...' }}</p>
+</div>
+
+<!-- Error State -->
+<div class="dest-error" *ngIf="error">
+    <p>{{ error }}</p>
+    <button (click)="loadDestination()">Try Again</button>
+</div>

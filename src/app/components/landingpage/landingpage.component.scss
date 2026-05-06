@@ -177,7 +177,17 @@
         &::placeholder {
             color: rgba(0, 0, 0, 0.4);
             font-weight: 400;
+            transition: color 0.3s ease;
         }
+    }
+
+    &.dark-mode input::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    &.dark-mode:focus-within {
+        background: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
     }
 
     .go-btn {
@@ -330,12 +340,162 @@
     overflow: visible;
     padding: 0 5%;
 
-    .text-block {
+    .text-wrapper {
+        position: relative;
         max-width: 300px;
         flex-shrink: 0;
+    }
+
+    .text-block {
         .step-num { font-weight: bold; color: #ff4d4d; }
         h2 { font-size: 2.5rem; margin: 10px 0; }
         p { font-size: 1.1rem; color: #555; line-height: 1.6; }
+    }
+
+    .showcase-text {
+        position: absolute;
+        top: 0;
+        left: 0;
+        opacity: 0;
+
+        h2 {
+            font-size: 2.5rem;
+            margin: 10px 0;
+            color: #fff;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin: 0;
+            line-height: 1.6;
+        }
+    }
+
+    .showcase-cta {
+        position: absolute;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.4);
+        letter-spacing: 0.3px;
+        opacity: 0;
+        white-space: nowrap;
+    }
+
+    .showcase-panel {
+        position: absolute;
+        right: 10%;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 380px;
+        background: rgba(255, 255, 255, 0.06);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 24px;
+        padding: 0;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        overflow: hidden;
+
+        .panel-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 28px;
+            opacity: 0;
+
+            &:first-child {
+                position: relative;
+            }
+        }
+
+        .panel-header {
+            margin-bottom: 20px;
+
+            h3 {
+                font-size: 1.3rem;
+                margin: 0 0 8px;
+                color: #fff;
+                font-weight: 700;
+            }
+
+            .panel-rating-row {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+
+                .panel-stars {
+                    font-size: 0.85rem;
+                    color: #fff;
+                }
+
+                .panel-reviews {
+                    font-size: 0.8rem;
+                    color: rgba(255, 255, 255, 0.5);
+                }
+            }
+        }
+
+        .panel-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+
+        .panel-card {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 14px 16px;
+
+            .panel-card-icon {
+                font-size: 1rem;
+                margin-right: 6px;
+            }
+
+            h4 {
+                display: inline;
+                font-size: 0.82rem;
+                font-weight: 600;
+                color: rgba(255, 255, 255, 0.9);
+                margin: 0;
+            }
+
+            ul {
+                list-style: none;
+                padding: 0;
+                margin: 8px 0 0;
+
+                li {
+                    font-size: 0.78rem;
+                    color: rgba(255, 255, 255, 0.65);
+                    padding: 3px 0;
+                }
+            }
+        }
+
+        .panel-quote {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 14px;
+
+            p {
+                font-size: 0.82rem;
+                font-style: italic;
+                color: rgba(255, 255, 255, 0.7);
+                line-height: 1.5;
+                margin: 0 0 6px;
+            }
+
+            span {
+                font-size: 0.72rem;
+                color: rgba(255, 255, 255, 0.4);
+            }
+        }
     }
 }
 
@@ -425,6 +585,8 @@
     }
 
 }
+
+// Showcase panel styles are now inside .catalog-section
 
 .portal-overlay {
     position: absolute;

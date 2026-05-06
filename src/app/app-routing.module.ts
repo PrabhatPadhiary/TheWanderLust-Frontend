@@ -6,6 +6,7 @@ import { LandingpageComponent } from './components/landingpage/landingpage.compo
 import { BlogComponent } from './components/blog/blog.component';
 import { ContactComponent } from './components/contact/contact.component';
 import { AboutComponent } from './components/about/about.component';
+import { DestinationComponent } from './components/destination/destination.component';
 import { authGuard } from './guards/auth.guard';
 
 const routes: Routes = [
@@ -13,6 +14,7 @@ const routes: Routes = [
   { path: "signup", component: SignupComponent},
   { path: "", component: LandingpageComponent},
   { path: "home", component: LandingpageComponent},
+  { path: "destination/:placeId", component: DestinationComponent},
   { path: "blog", component: BlogComponent, canActivate: [authGuard]},
   { path: "contact", component: ContactComponent},
   { path: "about", component: AboutComponent},

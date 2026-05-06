@@ -10,29 +10,29 @@
             </h2>
         </div>
         <div class="tagline-container">
-  <svg class="tagline-svg" viewBox="0 0 1000 200">
-    <g class="zoom-group">
-      <text
-        x="50%"
-        y="50%"
-        text-anchor="middle"
-        class="portal-text"
-      >
-        <tspan>The only place y</tspan><tspan #zoomTarget class="target-o">o</tspan><tspan>u will ever need for your curated Journeys</tspan>
-      </text>
-    </g>
-  </svg>
-</div>
-
+            <svg class="tagline-svg" viewBox="0 0 1000 200">
+                <g class="zoom-group">
+                    <text x="50%" y="50%" text-anchor="middle" class="portal-text">
+                        <tspan>The only place y</tspan><tspan #zoomTarget class="target-o">o</tspan><tspan>u will ever need for your curated Journeys</tspan>
+                    </text>
+                </g>
+            </svg>
+        </div>
     </div>
     <section class="catalog-section" #catalogSection>
-        <div class="text-block">
-            <span class="step-num">01</span>
-            <h2>Plan your next trip, faster</h2>
-            <p>Find places, food, and stays — all in one search.</p>
+        <div class="text-wrapper">
+            <div class="text-block">
+                <span class="step-num">01</span>
+                <h2>Discover Amazing Places</h2>
+                <p>Explore destinations like these.</p>
+            </div>
+            <div class="showcase-text">
+                <h2>Plan your next trip, faster</h2>
+                <p>Find places, food, and stays — all in one search.</p>
+            </div>
         </div>
         <div class="card-grid">
-            <div class="travel-card">
+            <div class="travel-card" data-card="left">
                 <img src="assets/images/background/card-bg1.jpg" alt="Lofoten, Norway" loading="lazy">
                 <span class="rating-badge">⭐ 4.8</span>
                 <div class="card-info">
@@ -40,7 +40,7 @@
                     <button class="know-more-btn">View Destination</button>
                 </div>
             </div>
-            <div class="travel-card">
+            <div class="travel-card" data-card="center">
                 <img src="assets/images/background/card-bg2.jpg" alt="Santorini, Greece" loading="lazy">
                 <span class="rating-badge">⭐ 4.7</span>
                 <div class="card-info">
@@ -48,7 +48,7 @@
                     <button class="know-more-btn">View Destination</button>
                 </div>
             </div>
-            <div class="travel-card">
+            <div class="travel-card" data-card="right">
                 <img src="assets/images/background/card-bg3.jpg" alt="Bali, Indonesia" loading="lazy">
                 <span class="rating-badge">⭐ 4.6</span>
                 <div class="card-info">
@@ -57,6 +57,136 @@
                 </div>
             </div>
         </div>
+        <!-- Single panel with cross-fading content -->
+        <div class="showcase-panel">
+            <div class="panel-content" data-panel="left">
+                <div class="panel-header">
+                    <h3>Lofoten, Norway</h3>
+                    <div class="panel-rating-row">
+                        <span class="panel-stars">⭐ 4.8</span>
+                        <span class="panel-reviews">2,340 reviews</span>
+                    </div>
+                </div>
+                <div class="panel-grid">
+                    <div class="panel-card">
+                        <span class="panel-card-icon">🏨</span>
+                        <h4>Top Stays</h4>
+                        <ul>
+                            <li>Nusfjord Arctic Resort</li>
+                            <li>Hattvika Lodge</li>
+                            <li>Eliassen Rorbuer</li>
+                        </ul>
+                    </div>
+                    <div class="panel-card">
+                        <span class="panel-card-icon">🍽️</span>
+                        <h4>Must-Try Food</h4>
+                        <ul>
+                            <li>Børsen Spiseri</li>
+                            <li>Anitas Sjømat</li>
+                            <li>Maren Anna</li>
+                        </ul>
+                    </div>
+                    <div class="panel-card">
+                        <span class="panel-card-icon">📍</span>
+                        <h4>Attractions</h4>
+                        <ul>
+                            <li>Reinebringen Hike</li>
+                            <li>Haukland Beach</li>
+                            <li>Northern Lights Safari</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-quote">
+                    <p>"Breathtaking fjords and northern lights — a once in a lifetime trip."</p>
+                    <span>— Erik S.</span>
+                </div>
+            </div>
+            <div class="panel-content" data-panel="center">
+                <div class="panel-header">
+                    <h3>Santorini, Greece</h3>
+                    <div class="panel-rating-row">
+                        <span class="panel-stars">⭐ 4.7</span>
+                        <span class="panel-reviews">5,120 reviews</span>
+                    </div>
+                </div>
+                <div class="panel-grid">
+                    <div class="panel-card">
+                        <span class="panel-card-icon">🏨</span>
+                        <h4>Top Stays</h4>
+                        <ul>
+                            <li>Canaves Oia Suites</li>
+                            <li>Grace Hotel Santorini</li>
+                            <li>Katikies Hotel</li>
+                        </ul>
+                    </div>
+                    <div class="panel-card">
+                        <span class="panel-card-icon">🍽️</span>
+                        <h4>Must-Try Food</h4>
+                        <ul>
+                            <li>Ammoudi Fish Tavern</li>
+                            <li>Selene Restaurant</li>
+                            <li>Metaxy Mas</li>
+                        </ul>
+                    </div>
+                    <div class="panel-card">
+                        <span class="panel-card-icon">📍</span>
+                        <h4>Attractions</h4>
+                        <ul>
+                            <li>Oia Sunset Point</li>
+                            <li>Red Beach</li>
+                            <li>Akrotiri Archaeological Site</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-quote">
+                    <p>"The sunsets in Oia are unlike anything else. Every corner is a postcard."</p>
+                    <span>— Maria T.</span>
+                </div>
+            </div>
+            <div class="panel-content" data-panel="right">
+                <div class="panel-header">
+                    <h3>Bali, Indonesia</h3>
+                    <div class="panel-rating-row">
+                        <span class="panel-stars">⭐ 4.6</span>
+                        <span class="panel-reviews">8,750 reviews</span>
+                    </div>
+                </div>
+                <div class="panel-grid">
+                    <div class="panel-card">
+                        <span class="panel-card-icon">🏨</span>
+                        <h4>Top Stays</h4>
+                        <ul>
+                            <li>Four Seasons Sayan</li>
+                            <li>Viceroy Bali</li>
+                            <li>Bambu Indah</li>
+                        </ul>
+                    </div>
+                    <div class="panel-card">
+                        <span class="panel-card-icon">🍽️</span>
+                        <h4>Must-Try Food</h4>
+                        <ul>
+                            <li>Locavore Restaurant</li>
+                            <li>Warung Babi Guling</li>
+                            <li>Mozaic Restaurant</li>
+                        </ul>
+                    </div>
+                    <div class="panel-card">
+                        <span class="panel-card-icon">📍</span>
+                        <h4>Attractions</h4>
+                        <ul>
+                            <li>Tegallalang Rice Terraces</li>
+                            <li>Uluwatu Temple</li>
+                            <li>Mount Batur Sunrise Trek</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="panel-quote">
+                    <p>"Perfect blend of culture, beaches, and rice terraces. So peaceful."</p>
+                    <span>— James L.</span>
+                </div>
+            </div>
+        </div>
+        <p class="showcase-cta">Search a destination to explore full details →</p>
     </section>
 </div>
 <div class="search-hub">

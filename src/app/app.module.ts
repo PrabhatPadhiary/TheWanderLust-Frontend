@@ -26,6 +26,7 @@ import { InfiniteScrollModule } from 'ngx-infinite-scroll';
 import { NgxMasonryModule } from 'ngx-masonry';
 import { BlogPreviewModalComponent } from './components/blog-preview-modal/blog-preview-modal.component';
 import { NavbarBlogsComponent } from './components/navbar-blogs/navbar-blogs.component';
+import { DestinationComponent } from './components/destination/destination.component';
 
 @NgModule({
   declarations: [
@@ -42,6 +43,7 @@ import { NavbarBlogsComponent } from './components/navbar-blogs/navbar-blogs.com
     FeaturedWritersComponent,
     BlogPreviewModalComponent,
     NavbarBlogsComponent,
+    DestinationComponent,
   ],
   imports: [
     FormsModule,
