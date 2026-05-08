@@ -3,16 +3,17 @@ export interface PlaceCategoriesResponse {
   name: string;
   formattedAddress: string;
   geometry: Geometry;
-  restaurants: NearbyPlace[];
-  lodging: NearbyPlace[];
-  touristAttractions: NearbyPlace[];
+  restaurants: PlaceDto[];
+  lodging: PlaceDto[];
+  touristAttractions: PlaceDto[];
 }
 
-export interface NearbyPlace {
+export interface PlaceDto {
   placeId: string;
   name: string;
   vicinity: string;
   rating: number | null;
+  userRatingsTotal: number | null;
   geometry: Geometry;
   photos: PlacePhoto[];
   types: string[];
@@ -24,7 +25,5 @@ export interface Geometry {
 }
 
 export interface PlacePhoto {
-  photoReference: string;
-  width: number;
-  height: number;
+  url: string;
 }

@@ -1,81 +1,202 @@
 <div class="destination-page" *ngIf="!loading && destination">
-    <!-- Hero Section -->
-    <div class="dest-hero">
-        <div class="dest-hero-overlay"></div>
-        <div class="dest-hero-content">
-            <h1>{{ destination.name }}</h1>
-            <p class="dest-address">{{ destination.formattedAddress }}</p>
+    <!-- First viewport wrapper -->
+    <div class="first-viewport">
+        <!-- Hero Section -->
+        <section class="dest-hero">
+            <div class="dest-hero-content">
+                <h1>{{ destination.name }}</h1>
+                <p class="dest-address">{{ destination.formattedAddress }}</p>
+            </div>
+            <div class="dest-nav-tabs">
+                <button class="nav-tab" (click)="scrollToSection('stays')">Stays</button>
+                <button class="nav-tab" (click)="scrollToSection('food')">Food</button>
+                <button class="nav-tab" (click)="scrollToSection('attractions')">Attractions</button>
+            </div>
+            <div class="dest-carousel" *ngIf="heroImages.length > 0">
+                <div class="carousel-track">
+                    <img *ngFor="let img of heroImages; let i = index"
+                         [src]="img"
+                         [class.active]="i === currentSlide"
+                         [alt]="destination.name">
+                </div>
+                <div class="carousel-dots">
+                    <span *ngFor="let img of heroImages; let i = index"
+                          class="dot"
+                          [class.active]="i === currentSlide"
+                          (click)="currentSlide = i"></span>
+                </div>
+            </div>
+            <button class="plan-trip-btn">Plan your trip to <strong>{{ destination.name }}</strong></button>
+        </section>
+    </div>
+
+    <!-- Sticky Split Search Bar -->
+    <div class="dest-sticky-search">
+        <div class="split-search-bar">
+            <div class="search-left">
+                <span class="search-pin">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                        <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                </span>
+                <input type="text"
+                       [value]="!leftSearchActive ? destination.name : ''"
+                       [placeholder]="destination.name"
+                       (input)="onDestSearchInput($event)"
+                       (focus)="leftSearchActive = true; showDestDropdown = destPredictions.length > 0"
+                       (blur)="onDestBlur(); leftSearchActive = false">
+            </div>
+            <div class="search-divider"></div>
+            <div class="search-right">
+                <span class="search-icon-small">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="M21 21l-4.35-4.35"></path>
+                    </svg>
+                </span>
+                <input type="text"
+                       placeholder="Search stays, food, attractions..."
+                       (input)="onLocalSearch($event)">
+            </div>
+        </div>
+        <div class="dest-search-dropdown" *ngIf="showDestDropdown && destPredictions.length > 0">
+            <div class="dest-dropdown-item"
+                 *ngFor="let prediction of destPredictions"
+                 (mousedown)="selectDestPlace(prediction)">
+                <span class="dest-dropdown-main">{{ prediction.structured_formatting.main_text }}</span>
+                <span class="dest-dropdown-secondary">{{ prediction.structured_formatting.secondary_text }}</span>
+            </div>
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="dest-content">
-        <!-- Stays Section -->
-        <section class="dest-section" *ngIf="destination.lodging.length > 0">
+    <!-- Stays Section -->
+    <section class="dest-section snap-section" id="stays">
+        <div class="section-inner">
             <div class="section-header">
-                <span class="section-icon">🏨</span>
+                <span class="section-icon">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                </span>
                 <h2>Where to Stay</h2>
             </div>
-            <div class="places-grid">
+            <div class="chip-row">
+                <button class="chip"
+                        *ngFor="let chip of staysChips"
+                        [class.active]="activeStaysChip === chip"
+                        (click)="onStaysChipClick(chip)">
+                    {{ chip }}
+                </button>
+            </div>
+            <div class="section-loading" *ngIf="staysLoading">
+                <div class="loading-spinner small"></div>
+            </div>
+            <div class="places-grid" *ngIf="!staysLoading && destination.lodging.length > 0">
                 <div class="place-card" *ngFor="let place of destination.lodging">
                     <div class="place-card-img">
-                        <div class="place-card-placeholder">🏨</div>
+                        <img *ngIf="place.photos.length > 0" [src]="place.photos[0].url" [alt]="place.name">
+                        <div *ngIf="place.photos.length === 0" class="place-card-placeholder">🏨</div>
                     </div>
                     <div class="place-card-body">
                         <h3>{{ place.name }}</h3>
                         <p class="place-vicinity">{{ place.vicinity }}</p>
-                        <span class="place-rating" *ngIf="place.rating">⭐ {{ place.rating }}</span>
+                        <span class="place-rating" *ngIf="place.rating">⭐ {{ place.rating }}<span class="rating-count" *ngIf="place.userRatingsTotal"> · {{ place.userRatingsTotal }} reviews</span></span>
                     </div>
                 </div>
             </div>
-        </section>
+            <p class="no-results" *ngIf="!staysLoading && destination.lodging.length === 0">No results found for "{{ activeStaysChip }}". Try another filter.</p>
+        </div>
+    </section>
 
-        <!-- Restaurants Section -->
-        <section class="dest-section" *ngIf="destination.restaurants.length > 0">
+    <!-- Restaurants Section -->
+    <section class="dest-section snap-section" id="food">
+        <div class="section-inner">
             <div class="section-header">
-                <span class="section-icon">🍽️</span>
+                <span class="section-icon">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+                        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+                        <line x1="6" y1="1" x2="6" y2="4"></line>
+                        <line x1="10" y1="1" x2="10" y2="4"></line>
+                        <line x1="14" y1="1" x2="14" y2="4"></line>
+                    </svg>
+                </span>
                 <h2>Where to Eat</h2>
             </div>
-            <div class="places-grid">
+            <div class="chip-row">
+                <button class="chip"
+                        *ngFor="let chip of foodChips"
+                        [class.active]="activeFoodChip === chip"
+                        (click)="onFoodChipClick(chip)">
+                    {{ chip }}
+                </button>
+            </div>
+            <div class="section-loading" *ngIf="foodLoading">
+                <div class="loading-spinner small"></div>
+            </div>
+            <div class="places-grid" *ngIf="!foodLoading && destination.restaurants.length > 0">
                 <div class="place-card" *ngFor="let place of destination.restaurants">
                     <div class="place-card-img">
-                        <div class="place-card-placeholder">🍽️</div>
+                        <img *ngIf="place.photos.length > 0" [src]="place.photos[0].url" [alt]="place.name">
+                        <div *ngIf="place.photos.length === 0" class="place-card-placeholder">🍽️</div>
                     </div>
                     <div class="place-card-body">
                         <h3>{{ place.name }}</h3>
                         <p class="place-vicinity">{{ place.vicinity }}</p>
-                        <span class="place-rating" *ngIf="place.rating">⭐ {{ place.rating }}</span>
+                        <span class="place-rating" *ngIf="place.rating">⭐ {{ place.rating }}<span class="rating-count" *ngIf="place.userRatingsTotal"> · {{ place.userRatingsTotal }} reviews</span></span>
                     </div>
                 </div>
             </div>
-        </section>
+            <p class="no-results" *ngIf="!foodLoading && destination.restaurants.length === 0">No results found for "{{ activeFoodChip }}". Try another filter.</p>
+        </div>
+    </section>
 
-        <!-- Attractions Section -->
-        <section class="dest-section" *ngIf="destination.touristAttractions.length > 0">
+    <!-- Attractions Section -->
+    <section class="dest-section snap-section" id="attractions">
+        <div class="section-inner">
             <div class="section-header">
-                <span class="section-icon">📍</span>
+                <span class="section-icon">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8">
+                        <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+                    </svg>
+                </span>
                 <h2>Things to Do</h2>
             </div>
-            <div class="places-grid">
+            <div class="chip-row">
+                <button class="chip"
+                        *ngFor="let chip of tourismChips"
+                        [class.active]="activeTourismChip === chip"
+                        (click)="onTourismChipClick(chip)">
+                    {{ chip }}
+                </button>
+            </div>
+            <div class="section-loading" *ngIf="tourismLoading">
+                <div class="loading-spinner small"></div>
+            </div>
+            <div class="places-grid" *ngIf="!tourismLoading && destination.touristAttractions.length > 0">
                 <div class="place-card" *ngFor="let place of destination.touristAttractions">
                     <div class="place-card-img">
-                        <div class="place-card-placeholder">📍</div>
+                        <img *ngIf="place.photos.length > 0" [src]="place.photos[0].url" [alt]="place.name">
+                        <div *ngIf="place.photos.length === 0" class="place-card-placeholder">📍</div>
                     </div>
                     <div class="place-card-body">
                         <h3>{{ place.name }}</h3>
                         <p class="place-vicinity">{{ place.vicinity }}</p>
-                        <span class="place-rating" *ngIf="place.rating">⭐ {{ place.rating }}</span>
+                        <span class="place-rating" *ngIf="place.rating">⭐ {{ place.rating }}<span class="rating-count" *ngIf="place.userRatingsTotal"> · {{ place.userRatingsTotal }} reviews</span></span>
                     </div>
                 </div>
             </div>
-        </section>
-    </div>
+            <p class="no-results" *ngIf="!tourismLoading && destination.touristAttractions.length === 0">No results found for "{{ activeTourismChip }}". Try another filter.</p>
+        </div>
+    </section>
 </div>
 
 <!-- Loading State -->
 <div class="dest-loading" *ngIf="loading">
     <div class="loading-spinner"></div>
-    <p>Discovering {{ placeId ? 'this destination' : '...' }}</p>
+    <p>Discovering this destination...</p>
 </div>
 
 <!-- Error State -->
