@@ -1,7 +1,9 @@
 import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { DestinationService } from '../../services/destination.service';
 import { PlaceCategoriesResponse, PlaceDto } from '../../models/destination.model';
+import { AuthGateModalComponent } from '../auth-gate-modal/auth-gate-modal.component';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Subject } from 'rxjs';
@@ -43,6 +45,9 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
   destPredictions: any[] = [];
   showDestDropdown = false;
   leftSearchActive = false;
+  favourites = new Set<string>();
+  selectedPlace: PlaceDto | null = null;
+  panelOpen = false;
   private destSearchSubject = new Subject<string>();
   private destAutocompleteService: any;
   private destBlurTimeout: any;
@@ -50,7 +55,8 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private destinationService: DestinationService
+    private destinationService: DestinationService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -241,6 +247,86 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
     } else if (value.includes('attract') || value.includes('tour') || value.includes('thing')) {
       this.scrollToSection('attractions');
     }
+  }
+
+  toggleFavourite(placeId: string): void {
+    if (this.favourites.has(placeId)) {
+      this.favourites.delete(placeId);
+    } else {
+      this.favourites.add(placeId);
+    }
+  }
+
+  openPanel(place: PlaceDto): void {
+    this.selectedPlace = place;
+    this.panelOpen = true;
+  }
+
+  closePanel(): void {
+    this.panelOpen = false;
+  }
+
+  onAddToItinerary(place: PlaceDto): void {
+    // TODO: Add to itinerary logic
+    console.log('Added to itinerary:', place.name);
+  }
+
+  openPlanTripModal(): void {
+    const dialogRef = this.dialog.open(AuthGateModalComponent, {
+      data: { destination: this.destination?.name || '' },
+      panelClass: 'auth-gate-dialog',
+      maxWidth: '600px',
+      width: '550px'
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result?.type === 'authenticated') {
+        this.router.navigate(['/trip-planner'], {
+          state: { user: result.user, destination: this.destination?.name || '' }
+        });
+      } else if (result?.type === 'guest') {
+        this.router.navigate(['/trip-planner'], {
+          state: { isGuest: true, destination: this.destination?.name || '' }
+        });
+      }
+    });
+  }
+
+  getPriceLevel(level: number | null): string {
+    if (!level) return '';
+    return '$'.repeat(level);
+  }
+
+  getStayChips(types: string[], rating?: number | null, reviewCount?: number | null): string[] {
+    // Type-based chips first (from Google)
+    const chipMap: { [key: string]: string } = {
+      'spa': 'Spa',
+      'restaurant': 'Restaurant',
+      'cafe': 'Café',
+      'bar': 'Bar',
+      'gym': 'Gym',
+      'swimming_pool': 'Pool',
+      'health': 'Wellness',
+      'art_gallery': 'Art',
+      'store': 'Shop'
+    };
+    const chips: string[] = types
+      .filter(t => chipMap[t])
+      .map(t => chipMap[t]);
+
+    // Only add smart chips if we have less than 3 from Google
+    if (chips.length < 3) {
+      if (rating && rating >= 4.6) {
+        chips.push('Highly Rated');
+      }
+    }
+    if (chips.length < 3) {
+      if (reviewCount && reviewCount >= 5000) {
+        chips.push('Popular');
+      }
+    }
+
+    return chips.slice(0, 3);
   }
 
   scrollToSection(sectionId: string): void {

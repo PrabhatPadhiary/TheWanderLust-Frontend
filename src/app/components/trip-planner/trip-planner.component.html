@@ -1,0 +1,25 @@
+<div class="trip-planner">
+  <h1>Trip Planner</h1>
+  <p class="destination-label" *ngIf="destination">Planning trip to <strong>{{ destination }}</strong></p>
+
+  <!-- Guest mode -->
+  <div class="user-info guest" *ngIf="isGuest">
+    <p>Continuing as <strong>Guest</strong></p>
+  </div>
+
+  <!-- Authenticated user details -->
+  <div class="user-info" *ngIf="user">
+    <h3>Logged in as:</h3>
+    <table>
+      <tr><td>Name</td><td>{{ user.name }}</td></tr>
+      <tr><td>Email</td><td>{{ user.email }}</td></tr>
+      <tr><td>Role</td><td>{{ user.role }}</td></tr>
+      <tr><td>User ID</td><td>{{ user.id }}</td></tr>
+      <tr><td>Firebase ID</td><td>{{ user.firebaseId }}</td></tr>
+      <tr><td>Created At</td><td>{{ user.createdAt }}</td></tr>
+      <tr><td>Active</td><td>{{ user.isActive }}</td></tr>
+    </table>
+  </div>
+
+  <p class="placeholder">Trip planning features coming soon...</p>
+</div>

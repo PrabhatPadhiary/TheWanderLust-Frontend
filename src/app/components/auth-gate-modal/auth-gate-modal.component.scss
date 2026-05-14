@@ -1,0 +1,94 @@
+.auth-gate {
+    position: relative;
+    padding: 40px;
+    font-family: 'Poppins', sans-serif;
+}
+
+.modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    padding: 4px;
+    border-radius: 50%;
+    transition: background 0.2s;
+
+    &:hover {
+        background: #f0f0f0;
+    }
+}
+
+.options-view {
+    text-align: center;
+
+    h2 {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #1a1a1a;
+        margin: 0 0 8px;
+
+        strong {
+            color: #2d5a27;
+        }
+    }
+
+    .subtitle {
+        font-size: 0.9rem;
+        color: #777;
+        margin: 0 0 32px;
+    }
+}
+
+.auth-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+
+    .auth-btn {
+        padding: 14px 24px;
+        border-radius: 30px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        font-family: 'Poppins', sans-serif;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+
+        &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        &.google-btn {
+            background: #fff;
+            color: #3c4043;
+            border: 2px solid #dadce0;
+
+            &:hover:not(:disabled) {
+                background: #f8f9fa;
+                border-color: #c6c9cc;
+            }
+
+            .google-icon {
+                flex-shrink: 0;
+            }
+        }
+
+        &.guest-btn {
+            background: transparent;
+            color: #666;
+            border: 1px solid #ddd;
+
+            &:hover:not(:disabled) {
+                border-color: #999;
+                color: #333;
+            }
+        }
+    }
+}

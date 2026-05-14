@@ -371,11 +371,12 @@
     border: 1px solid rgba(0, 0, 0, 0.04);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     will-change: transform, opacity;
+    display: flex;
+    flex-direction: column;
 
     &:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
-        border-color: rgba(0, 0, 0, 0.08);
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.2);
+        border-color: rgba(0, 0, 0, 0.12);
     }
 
     .place-card-img {
@@ -385,6 +386,7 @@
         align-items: center;
         justify-content: center;
         overflow: hidden;
+        position: relative;
 
         img {
             width: 100%;
@@ -398,10 +400,46 @@
             font-size: 2.5rem;
             opacity: 0.5;
         }
+
+        .fav-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            svg {
+                fill: rgba(0, 0, 0, 0.6);
+                stroke: #fff;
+                stroke-width: 1.5;
+                width: 22px;
+                height: 22px;
+                transition: all 0.2s ease;
+            }
+
+            &:hover {
+                transform: scale(1.15);
+            }
+
+            &.active svg {
+                fill: #e53935;
+                stroke: #e53935;
+            }
+        }
     }
 
     .place-card-body {
-        padding: 18px 20px;
+        padding: 20px 20px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        gap: 8px;
 
         h3 {
             font-size: 1rem;
@@ -413,8 +451,27 @@
         .place-vicinity {
             font-size: 0.82rem;
             color: #777;
-            margin: 0 0 10px;
+            margin: 0;
             line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .place-type-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+
+            .type-chip {
+                font-size: 0.7rem;
+                padding: 3px 10px;
+                border-radius: 12px;
+                background: rgba(45, 90, 39, 0.08);
+                color: #2d5a27;
+                font-weight: 500;
+            }
         }
 
         .place-rating {
@@ -425,6 +482,64 @@
             .rating-count {
                 color: #999;
                 font-weight: 400;
+            }
+        }
+
+        .place-price {
+            font-size: 0.82rem;
+            color: #2d5a27;
+            font-weight: 600;
+            margin-left: auto;
+        }
+
+        .itinerary-btn {
+            display: inline-block;
+            margin-top: auto;
+            padding-top: 12px;
+            background: transparent;
+            border: 1px solid #2d5a27;
+            color: #2d5a27;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s ease;
+            align-self: flex-start;
+
+            &:hover {
+                background: #2d5a27;
+                color: #fff;
+            }
+        }
+
+        .card-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: auto;
+            padding-top: 12px;
+        }
+
+        .maps-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: #888;
+            padding: 4px;
+            transition: all 0.2s ease;
+
+            svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            &:hover {
+                color: #1a1a1a;
             }
         }
     }

@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { PlaceCategoriesResponse, PlaceDto } from '../models/destination.model';
+import { PlaceCategoriesResponse, PlaceDto, PlaceDetailsResponse } from '../models/destination.model';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +28,12 @@ export class DestinationService {
   filter(placeId: string, filterName: string): Observable<PlaceDto[]> {
     return this.http.get<PlaceDto[]>(`${this.baseUrl}/filter`, {
       params: { placeId, filter: filterName }
+    });
+  }
+
+  getDetails(placeId: string): Observable<PlaceDetailsResponse> {
+    return this.http.get<PlaceDetailsResponse>(`${this.baseUrl}/details`, {
+      params: { placeId }
     });
   }
 }

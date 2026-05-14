@@ -1,0 +1,127 @@
+<!-- Backdrop -->
+<div class="panel-backdrop" [class.open]="isOpen" (click)="onClose()"></div>
+
+<!-- Panel -->
+<div class="panel" [class.open]="isOpen">
+    <!-- Loading -->
+    <div class="panel-loading" *ngIf="loading">
+        <div class="loading-spinner small"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="panel-body" *ngIf="details && !loading">
+        <!-- Photo Carousel -->
+        <div class="panel-photos" *ngIf="details.photos.length > 0">
+            <img *ngFor="let photo of details.photos; let i = index"
+                 [src]="photo.url"
+                 [alt]="details.name"
+                 [class.active]="i === currentPhoto">
+            <button class="close-btn" (click)="onClose()">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <button class="photo-nav prev" *ngIf="details.photos.length > 1" (click)="prevPhoto()">‹</button>
+            <button class="photo-nav next" *ngIf="details.photos.length > 1" (click)="nextPhoto()">›</button>
+            <div class="photo-counter" *ngIf="details.photos.length > 1">
+                {{ currentPhoto + 1 }} / {{ details.photos.length }}
+            </div>
+        </div>
+
+        <div class="panel-content">
+            <h2>{{ details.name }}</h2>
+            <p class="panel-address">{{ details.formattedAddress }}</p>
+
+            <!-- Stats row -->
+            <div class="panel-stats">
+                <span class="panel-rating" *ngIf="details.rating">
+                    ⭐ {{ details.rating }}
+                    <span *ngIf="details.userRatingsTotal"> · {{ details.userRatingsTotal }} reviews</span>
+                </span>
+                <span class="panel-price" *ngIf="details.priceLevel">{{ getPriceLevel() }}</span>
+                <span class="panel-status" *ngIf="details.openingHours?.openNow !== null"
+                      [class.open]="details.openingHours?.openNow"
+                      [class.closed]="!details.openingHours?.openNow">
+                    {{ details.openingHours?.openNow ? 'Open Now' : 'Closed' }}
+                </span>
+            </div>
+
+            <!-- Contact info -->
+            <div class="panel-contact" *ngIf="details.formattedPhoneNumber || details.website">
+                <a *ngIf="details.formattedPhoneNumber" [href]="'tel:' + details.formattedPhoneNumber" class="contact-item">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                    </svg>
+                    {{ details.formattedPhoneNumber }}
+                </a>
+                <a *ngIf="details.website" [href]="details.website" target="_blank" class="contact-item">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    Visit Website
+                </a>
+            </div>
+
+            <!-- Opening Hours -->
+            <div class="panel-hours" *ngIf="details.openingHours?.weekdayText?.length">
+                <button class="hours-toggle" (click)="showHours = !showHours">
+                    {{ showHours ? 'Hide' : 'Show' }} Opening Hours
+                    <span [class.rotated]="showHours">▾</span>
+                </button>
+                <ul *ngIf="showHours">
+                    <li *ngFor="let day of details.openingHours!.weekdayText">{{ day }}</li>
+                </ul>
+            </div>
+
+            <!-- Actions -->
+            <div class="panel-actions">
+                <button class="action-btn primary" (click)="onAddToItinerary()">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Add to Itinerary
+                </button>
+                <a class="action-btn secondary" [href]="getDirectionsUrl()" target="_blank">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="3 11 22 2 13 21 11 13 3 11"></polygon>
+                    </svg>
+                    Get Directions
+                </a>
+                <button class="action-btn secondary" (click)="onToggleFav()">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                    Favourite
+                </button>
+            </div>
+
+            <!-- Reviews -->
+            <div class="panel-reviews" *ngIf="details.reviews.length > 0">
+                <h3>Reviews</h3>
+                <div class="review" *ngFor="let review of details.reviews">
+                    <div class="review-header">
+                        <div class="review-avatar-wrapper">
+                            <img *ngIf="review.profilePhotoUrl" [src]="review.profilePhotoUrl" [alt]="review.authorName" class="review-avatar" (error)="onImgError($event)">
+                            <span class="review-avatar-fallback">{{ review.authorName.charAt(0) }}</span>
+                        </div>
+                        <div class="review-meta">
+                            <span class="review-author">{{ review.authorName }}</span>
+                            <span class="review-time">{{ review.relativeTimeDescription }}</span>
+                        </div>
+                        <span class="review-rating">⭐ {{ review.rating }}</span>
+                    </div>
+                    <p class="review-text">{{ review.text }}</p>
+                </div>
+            </div>
+
+            <!-- Map -->
+            <div class="panel-map">
+                <iframe [src]="getMapsEmbedUrl() | safe" frameborder="0" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+</div>

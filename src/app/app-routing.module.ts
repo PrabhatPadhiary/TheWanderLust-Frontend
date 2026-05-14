@@ -1,23 +1,14 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { LoginComponent } from './components/login/login.component';
-import { SignupComponent } from './components/signup/signup.component';
 import { LandingpageComponent } from './components/landingpage/landingpage.component';
-import { BlogComponent } from './components/blog/blog.component';
-import { ContactComponent } from './components/contact/contact.component';
-import { AboutComponent } from './components/about/about.component';
 import { DestinationComponent } from './components/destination/destination.component';
-import { authGuard } from './guards/auth.guard';
+import { TripPlannerComponent } from './components/trip-planner/trip-planner.component';
 
 const routes: Routes = [
-  { path: "login", component: LoginComponent},
-  { path: "signup", component: SignupComponent},
-  { path: "", component: LandingpageComponent},
-  { path: "home", component: LandingpageComponent},
-  { path: "destination/:placeId", component: DestinationComponent},
-  { path: "blog", component: BlogComponent, canActivate: [authGuard]},
-  { path: "contact", component: ContactComponent},
-  { path: "about", component: AboutComponent},
+  { path: '', component: LandingpageComponent },
+  { path: 'home', component: LandingpageComponent },
+  { path: 'destination/:placeId', component: DestinationComponent },
+  { path: 'trip-planner', component: TripPlannerComponent },
 ];
 
 @NgModule({

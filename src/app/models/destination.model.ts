@@ -14,6 +14,7 @@ export interface PlaceDto {
   vicinity: string;
   rating: number | null;
   userRatingsTotal: number | null;
+  priceLevel: number | null;
   geometry: Geometry;
   photos: PlacePhoto[];
   types: string[];
@@ -26,4 +27,32 @@ export interface Geometry {
 
 export interface PlacePhoto {
   url: string;
+}
+
+export interface PlaceDetailsResponse {
+  placeId: string;
+  name: string;
+  formattedAddress: string;
+  formattedPhoneNumber: string;
+  website: string;
+  rating: number | null;
+  userRatingsTotal: number | null;
+  priceLevel: number | null;
+  geometry: Geometry;
+  photos: PlacePhoto[];
+  reviews: PlaceReview[];
+  openingHours: OpeningHours | null;
+}
+
+export interface PlaceReview {
+  authorName: string;
+  profilePhotoUrl: string;
+  rating: number;
+  text: string;
+  relativeTimeDescription: string;
+}
+
+export interface OpeningHours {
+  openNow: boolean | null;
+  weekdayText: string[];
 }
