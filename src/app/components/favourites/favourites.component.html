@@ -1,0 +1,48 @@
+<app-navbar></app-navbar>
+<div class="favourites-page">
+  <div class="favourites-header">
+    <h1>My Favourites</h1>
+    <p>Places you've saved for later</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="favourites-tabs">
+    <button [class.active]="activeTab === 'all'" (click)="activeTab = 'all'">All ({{ favourites.length }})</button>
+    <button [class.active]="activeTab === 'stays'" (click)="activeTab = 'stays'">Stays</button>
+    <button [class.active]="activeTab === 'food'" (click)="activeTab = 'food'">Food</button>
+    <button [class.active]="activeTab === 'attractions'" (click)="activeTab = 'attractions'">Attractions</button>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="filteredFavourites.length === 0">
+    <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+    </svg>
+    <h3>No favourites yet</h3>
+    <p>Explore destinations and tap the heart icon to save places here.</p>
+    <button class="explore-btn" (click)="goBack()">Explore Destinations</button>
+  </div>
+
+  <!-- Favourites grid -->
+  <div class="favourites-grid" *ngIf="filteredFavourites.length > 0">
+    <div class="fav-card" *ngFor="let item of filteredFavourites">
+      <div class="fav-card-img">
+        <img *ngIf="item.photoUrl" [src]="item.photoUrl" [alt]="item.placeName">
+        <div *ngIf="!item.photoUrl" class="fav-card-placeholder">
+          {{ item.category === 'lodging' ? '🏨' : item.category === 'restaurant' ? '🍽️' : '🏛️' }}
+        </div>
+        <button class="remove-btn" (click)="removeFavourite(item.placeId)" title="Remove from favourites">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" stroke="none">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+          </svg>
+        </button>
+        <span class="category-badge">{{ item.category === 'lodging' ? 'Stay' : item.category === 'restaurant' ? 'Food' : 'Attraction' }}</span>
+      </div>
+      <div class="fav-card-body">
+        <h3>{{ item.placeName }}</h3>
+        <p class="vicinity">{{ item.vicinity }}</p>
+        <span class="rating" *ngIf="item.rating">⭐ {{ item.rating }} <span class="rating-count" *ngIf="item.userRatingsTotal">· {{ item.userRatingsTotal }} reviews</span></span>
+      </div>
+    </div>
+  </div>
+</div>

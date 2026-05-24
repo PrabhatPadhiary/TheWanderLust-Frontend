@@ -11,10 +11,16 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { DestinationComponent } from './components/destination/destination.component';
 import { PlaceDetailPanelComponent } from './components/place-detail-panel/place-detail-panel.component';
 import { AuthGateModalComponent } from './components/auth-gate-modal/auth-gate-modal.component';
 import { TripPlannerComponent } from './components/trip-planner/trip-planner.component';
+import { NavbarComponent } from './components/navbar/navbar.component';
+import { FavouritesComponent } from './components/favourites/favourites.component';
 import { SafePipe } from './pipes/safe.pipe';
 
 @NgModule({
@@ -25,6 +31,8 @@ import { SafePipe } from './pipes/safe.pipe';
     PlaceDetailPanelComponent,
     AuthGateModalComponent,
     TripPlannerComponent,
+    NavbarComponent,
+    FavouritesComponent,
     SafePipe,
   ],
   imports: [
@@ -40,7 +48,11 @@ import { SafePipe } from './pipes/safe.pipe';
       preventDuplicates: true
     }),
     BrowserAnimationsModule,
-    MatDialogModule
+    MatDialogModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatInputModule,
+    MatFormFieldModule
   ],
   providers: [
     provideAnimationsAsync(),

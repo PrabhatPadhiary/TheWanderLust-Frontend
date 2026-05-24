@@ -1,25 +1,267 @@
-<div class="trip-planner">
-  <h1>Trip Planner</h1>
-  <p class="destination-label" *ngIf="destination">Planning trip to <strong>{{ destination }}</strong></p>
+<div class="trip-planner-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="brand">
+        <span class="brand-icon">✈️</span>
+        <span class="brand-name">WanderLust</span>
+      </div>
+    </div>
 
-  <!-- Guest mode -->
-  <div class="user-info guest" *ngIf="isGuest">
-    <p>Continuing as <strong>Guest</strong></p>
-  </div>
+    <div class="user-profile">
+      <div class="avatar">{{ getUserInitial() }}</div>
+      <div class="user-info">
+        <span class="user-name">{{ user?.name || 'Guest' }}</span>
+        <span class="user-role">{{ isGuest ? 'Guest' : user?.role || 'Traveller' }}</span>
+      </div>
+    </div>
 
-  <!-- Authenticated user details -->
-  <div class="user-info" *ngIf="user">
-    <h3>Logged in as:</h3>
-    <table>
-      <tr><td>Name</td><td>{{ user.name }}</td></tr>
-      <tr><td>Email</td><td>{{ user.email }}</td></tr>
-      <tr><td>Role</td><td>{{ user.role }}</td></tr>
-      <tr><td>User ID</td><td>{{ user.id }}</td></tr>
-      <tr><td>Firebase ID</td><td>{{ user.firebaseId }}</td></tr>
-      <tr><td>Created At</td><td>{{ user.createdAt }}</td></tr>
-      <tr><td>Active</td><td>{{ user.isActive }}</td></tr>
-    </table>
-  </div>
+    <button class="new-trip-btn">+ New Trip</button>
 
-  <p class="placeholder">Trip planning features coming soon...</p>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">PLAN</div>
+      <a class="nav-item" [class.active]="activeTab === 'overview'" (click)="setActiveTab('overview')">
+        <span class="nav-icon">🏠</span> Overview
+      </a>
+      <a class="nav-item" [class.active]="activeTab === 'itinerary'" (click)="setActiveTab('itinerary')">
+        <span class="nav-icon">📋</span> Itinerary
+        <span class="badge" *ngIf="itinerary.length">{{ itinerary.length }}</span>
+      </a>
+      <a class="nav-item" [class.active]="activeTab === 'discover'" (click)="setActiveTab('discover')">
+        <span class="nav-icon">🧭</span> Discover
+      </a>
+
+      <div class="nav-section-label">GENERAL</div>
+      <a class="nav-item">
+        <span class="nav-icon">⚙️</span> Settings
+      </a>
+    </nav>
+
+    <button class="logout-btn" (click)="logout()">
+      <span class="nav-icon">🚪</span> Logout
+    </button>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <header class="content-header">
+      <div class="greeting-section">
+        <h1>{{ greeting }}, <strong>{{ getUserName() }}</strong> 👋</h1>
+        <p *ngIf="destination">Plan your trip to <strong>{{ destination }}</strong></p>
+        <p *ngIf="!destination">Start planning your next adventure</p>
+      </div>
+      <div class="header-actions">
+        <div class="avatar-sm">{{ getUserInitial() }}</div>
+      </div>
+    </header>
+
+    <!-- Loading State -->
+    <div class="loading-state" *ngIf="loading">
+      <div class="spinner"></div>
+      <p>Loading destination data...</p>
+    </div>
+
+    <!-- Overview Tab -->
+    <div class="tab-content" *ngIf="!loading && activeTab === 'overview'">
+      <!-- Quick Stats -->
+      <div class="stats-row" *ngIf="destinationData">
+        <div class="stat-card">
+          <span class="stat-value">{{ destinationData.restaurants.length }}</span>
+          <span class="stat-label">Restaurants</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">{{ destinationData.lodging.length }}</span>
+          <span class="stat-label">Stays</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">{{ destinationData.touristAttractions.length }}</span>
+          <span class="stat-label">Attractions</span>
+        </div>
+        <div class="stat-card highlight">
+          <span class="stat-value">{{ itinerary.length }}</span>
+          <span class="stat-label">In Itinerary</span>
+        </div>
+      </div>
+
+      <!-- Upcoming Trip Card -->
+      <div class="section-card" *ngIf="destination">
+        <div class="section-card-header">
+          <h3>Your Trip</h3>
+          <span class="section-badge">Planning</span>
+        </div>
+        <div class="trip-summary">
+          <div class="trip-destination">
+            <span class="trip-icon">📍</span>
+            <div>
+              <strong>{{ destination }}</strong>
+              <p>{{ destinationData?.formattedAddress }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Picks -->
+      <div class="section-card" *ngIf="destinationData?.touristAttractions?.length">
+        <div class="section-card-header">
+          <h3>Top Attractions</h3>
+          <a class="see-all" (click)="setActiveTab('discover')">See all →</a>
+        </div>
+        <div class="places-grid">
+          <div class="place-card-mini" *ngFor="let place of destinationData!.touristAttractions.slice(0, 4)">
+            <div class="place-card-img" *ngIf="place.photos.length">
+              <img [src]="place.photos[0].url" [alt]="place.name">
+            </div>
+            <div class="place-card-img placeholder" *ngIf="!place.photos.length">
+              <span>🏛️</span>
+            </div>
+            <div class="place-card-info">
+              <strong>{{ place.name }}</strong>
+              <span class="place-rating" *ngIf="place.rating">⭐ {{ place.rating }}</span>
+              <span class="place-vicinity">{{ place.vicinity }}</span>
+            </div>
+            <button class="add-btn" [class.added]="isInItinerary(place.placeId)" (click)="addToItinerary(place)">
+              {{ isInItinerary(place.placeId) ? '✓' : '+' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Restaurants -->
+      <div class="section-card" *ngIf="destinationData?.restaurants?.length">
+        <div class="section-card-header">
+          <h3>Where to Eat</h3>
+          <a class="see-all" (click)="setActiveTab('discover')">See all →</a>
+        </div>
+        <div class="places-grid">
+          <div class="place-card-mini" *ngFor="let place of destinationData!.restaurants.slice(0, 4)">
+            <div class="place-card-img" *ngIf="place.photos.length">
+              <img [src]="place.photos[0].url" [alt]="place.name">
+            </div>
+            <div class="place-card-img placeholder" *ngIf="!place.photos.length">
+              <span>🍽️</span>
+            </div>
+            <div class="place-card-info">
+              <strong>{{ place.name }}</strong>
+              <span class="place-rating" *ngIf="place.rating">⭐ {{ place.rating }}</span>
+              <span class="place-vicinity">{{ place.vicinity }}</span>
+            </div>
+            <button class="add-btn" [class.added]="isInItinerary(place.placeId)" (click)="addToItinerary(place)">
+              {{ isInItinerary(place.placeId) ? '✓' : '+' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Itinerary Tab -->
+    <div class="tab-content" *ngIf="!loading && activeTab === 'itinerary'">
+      <div class="section-card" *ngIf="itinerary.length === 0">
+        <div class="empty-state">
+          <span class="empty-icon">📋</span>
+          <h3>Your itinerary is empty</h3>
+          <p>Add places from the Overview or Discover tabs to start building your trip.</p>
+          <button class="cta-btn" (click)="setActiveTab('discover')">Discover Places</button>
+        </div>
+      </div>
+
+      <div class="section-card" *ngIf="itinerary.length > 0">
+        <div class="section-card-header">
+          <h3>Your Itinerary ({{ itinerary.length }} places)</h3>
+        </div>
+        <div class="itinerary-list">
+          <div class="itinerary-item" *ngFor="let place of itinerary; let i = index">
+            <div class="itinerary-number">{{ i + 1 }}</div>
+            <div class="itinerary-img" *ngIf="place.photos.length">
+              <img [src]="place.photos[0].url" [alt]="place.name">
+            </div>
+            <div class="itinerary-info">
+              <strong>{{ place.name }}</strong>
+              <span>{{ place.vicinity }}</span>
+              <span class="place-rating" *ngIf="place.rating">⭐ {{ place.rating }} ({{ place.userRatingsTotal }})</span>
+            </div>
+            <button class="remove-btn" (click)="removeFromItinerary(place.placeId)">✕</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Discover Tab -->
+    <div class="tab-content" *ngIf="!loading && activeTab === 'discover'">
+      <!-- Attractions -->
+      <div class="section-card" *ngIf="destinationData?.touristAttractions?.length">
+        <div class="section-card-header">
+          <h3>🏛️ Attractions</h3>
+        </div>
+        <div class="places-grid full">
+          <div class="place-card-mini" *ngFor="let place of destinationData!.touristAttractions">
+            <div class="place-card-img" *ngIf="place.photos.length">
+              <img [src]="place.photos[0].url" [alt]="place.name">
+            </div>
+            <div class="place-card-img placeholder" *ngIf="!place.photos.length">
+              <span>🏛️</span>
+            </div>
+            <div class="place-card-info">
+              <strong>{{ place.name }}</strong>
+              <span class="place-rating" *ngIf="place.rating">⭐ {{ place.rating }} ({{ place.userRatingsTotal }})</span>
+              <span class="place-vicinity">{{ place.vicinity }}</span>
+            </div>
+            <button class="add-btn" [class.added]="isInItinerary(place.placeId)" (click)="addToItinerary(place)">
+              {{ isInItinerary(place.placeId) ? '✓' : '+' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Restaurants -->
+      <div class="section-card" *ngIf="destinationData?.restaurants?.length">
+        <div class="section-card-header">
+          <h3>🍽️ Restaurants</h3>
+        </div>
+        <div class="places-grid full">
+          <div class="place-card-mini" *ngFor="let place of destinationData!.restaurants">
+            <div class="place-card-img" *ngIf="place.photos.length">
+              <img [src]="place.photos[0].url" [alt]="place.name">
+            </div>
+            <div class="place-card-img placeholder" *ngIf="!place.photos.length">
+              <span>🍽️</span>
+            </div>
+            <div class="place-card-info">
+              <strong>{{ place.name }}</strong>
+              <span class="place-rating" *ngIf="place.rating">⭐ {{ place.rating }} ({{ place.userRatingsTotal }})</span>
+              <span class="place-vicinity">{{ place.vicinity }}</span>
+            </div>
+            <button class="add-btn" [class.added]="isInItinerary(place.placeId)" (click)="addToItinerary(place)">
+              {{ isInItinerary(place.placeId) ? '✓' : '+' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stays -->
+      <div class="section-card" *ngIf="destinationData?.lodging?.length">
+        <div class="section-card-header">
+          <h3>🏨 Stays</h3>
+        </div>
+        <div class="places-grid full">
+          <div class="place-card-mini" *ngFor="let place of destinationData!.lodging">
+            <div class="place-card-img" *ngIf="place.photos.length">
+              <img [src]="place.photos[0].url" [alt]="place.name">
+            </div>
+            <div class="place-card-img placeholder" *ngIf="!place.photos.length">
+              <span>🏨</span>
+            </div>
+            <div class="place-card-info">
+              <strong>{{ place.name }}</strong>
+              <span class="place-rating" *ngIf="place.rating">⭐ {{ place.rating }} ({{ place.userRatingsTotal }})</span>
+              <span class="place-vicinity">{{ place.vicinity }}</span>
+            </div>
+            <button class="add-btn" [class.added]="isInItinerary(place.placeId)" (click)="addToItinerary(place)">
+              {{ isInItinerary(place.placeId) ? '✓' : '+' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
 </div>

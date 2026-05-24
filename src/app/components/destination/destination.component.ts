@@ -4,6 +4,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { DestinationService } from '../../services/destination.service';
 import { PlaceCategoriesResponse, PlaceDto } from '../../models/destination.model';
 import { AuthGateModalComponent } from '../auth-gate-modal/auth-gate-modal.component';
+import { AuthService } from '../../services/auth.service';
+import { FavouritesService, FavouriteItem } from '../../services/favourites.service';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Subject } from 'rxjs';
@@ -24,6 +26,10 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
   placeId: string = '';
   heroImages: string[] = [];
   currentSlide = 0;
+  tripCardTab: 'stays' | 'food' | 'explore' = 'stays';
+  checkinDate: Date | null = null;
+  checkoutDate: Date | null = null;
+  reservationDate: Date | null = null;
   private slideInterval: any;
 
   // Chip definitions
@@ -45,7 +51,7 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
   destPredictions: any[] = [];
   showDestDropdown = false;
   leftSearchActive = false;
-  favourites = new Set<string>();
+  favourites = new Set<string>(); // kept for template compatibility
   selectedPlace: PlaceDto | null = null;
   panelOpen = false;
   private destSearchSubject = new Subject<string>();
@@ -56,7 +62,9 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private destinationService: DestinationService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private authService: AuthService,
+    public favouritesService: FavouritesService
   ) {}
 
   ngOnInit(): void {
@@ -111,7 +119,7 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
   private startSlideshow(): void {
     this.slideInterval = setInterval(() => {
       this.currentSlide = (this.currentSlide + 1) % this.heroImages.length;
-    }, 4000);
+    }, 7000);
   }
 
   onFoodChipClick(chip: string): void {
@@ -236,8 +244,10 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 200);
   }
 
-  onLocalSearch(event: Event): void {
-    const value = (event.target as HTMLInputElement).value.toLowerCase();
+  onLocalSearch(input: Event | string): void {
+    const value = typeof input === 'string'
+      ? input.toLowerCase()
+      : (input.target as HTMLInputElement).value.toLowerCase();
     if (!value) return;
     // Scroll to matching section
     if (value.includes('stay') || value.includes('hotel') || value.includes('resort')) {
@@ -250,10 +260,30 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   toggleFavourite(placeId: string): void {
-    if (this.favourites.has(placeId)) {
-      this.favourites.delete(placeId);
-    } else {
-      this.favourites.add(placeId);
+    // Find the place in our data
+    const allPlaces = [
+      ...(this.destination?.restaurants || []),
+      ...(this.destination?.lodging || []),
+      ...(this.destination?.touristAttractions || [])
+    ];
+    const place = allPlaces.find(p => p.placeId === placeId);
+
+    if (this.favouritesService.isFavourite(placeId)) {
+      this.favouritesService.remove(placeId);
+    } else if (place) {
+      const category = this.destination!.restaurants.includes(place) ? 'restaurant'
+        : this.destination!.lodging.includes(place) ? 'lodging'
+        : 'tourist_attraction';
+
+      this.favouritesService.add({
+        placeId: place.placeId,
+        placeName: place.name,
+        vicinity: place.vicinity,
+        rating: place.rating,
+        userRatingsTotal: place.userRatingsTotal,
+        photoUrl: place.photos.length > 0 ? place.photos[0].url : null,
+        category
+      });
     }
   }
 
@@ -272,6 +302,18 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openPlanTripModal(): void {
+    // If already logged in, go straight to trip planner
+    if (this.authService.isLoggedIn) {
+      this.router.navigate(['/trip-planner'], {
+        state: {
+          user: this.authService.currentUser,
+          destination: this.destination?.name || '',
+          placeId: this.placeId
+        }
+      });
+      return;
+    }
+
     const dialogRef = this.dialog.open(AuthGateModalComponent, {
       data: { destination: this.destination?.name || '' },
       panelClass: 'auth-gate-dialog',
@@ -282,11 +324,11 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
     dialogRef.afterClosed().subscribe(result => {
       if (result?.type === 'authenticated') {
         this.router.navigate(['/trip-planner'], {
-          state: { user: result.user, destination: this.destination?.name || '' }
+          state: { user: result.user, destination: this.destination?.name || '', placeId: this.placeId }
         });
       } else if (result?.type === 'guest') {
         this.router.navigate(['/trip-planner'], {
-          state: { isGuest: true, destination: this.destination?.name || '' }
+          state: { isGuest: true, destination: this.destination?.name || '', placeId: this.placeId }
         });
       }
     });

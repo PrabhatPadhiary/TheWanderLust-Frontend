@@ -1,74 +1,141 @@
+<app-navbar [destinationName]="destination?.name || ''" (localSearchInput)="onLocalSearch($event)"></app-navbar>
 <div class="destination-page" *ngIf="!loading && destination">
-    <!-- First viewport wrapper -->
-    <div class="first-viewport">
-        <!-- Hero Section -->
-        <section class="dest-hero">
-            <div class="dest-hero-content">
-                <h1>{{ destination.name }}</h1>
-                <p class="dest-address">{{ destination.formattedAddress }}</p>
-            </div>
-            <div class="dest-nav-tabs">
-                <button class="nav-tab" (click)="scrollToSection('stays')">Stays</button>
-                <button class="nav-tab" (click)="scrollToSection('food')">Food</button>
-                <button class="nav-tab" (click)="scrollToSection('attractions')">Attractions</button>
-            </div>
-            <div class="dest-carousel" *ngIf="heroImages.length > 0">
-                <div class="carousel-track">
-                    <img *ngFor="let img of heroImages; let i = index"
-                         [src]="img"
-                         [class.active]="i === currentSlide"
-                         [alt]="destination.name">
-                </div>
-                <div class="carousel-dots">
-                    <span *ngFor="let img of heroImages; let i = index"
-                          class="dot"
-                          [class.active]="i === currentSlide"
-                          (click)="currentSlide = i"></span>
-                </div>
-            </div>
-            <button class="plan-trip-btn" (click)="openPlanTripModal()">Plan your trip to <strong>{{ destination.name }}</strong></button>
-        </section>
-    </div>
+    <!-- Full-screen Hero -->
+    <section class="hero-fullscreen">
+        <!-- Background carousel -->
+        <div class="hero-bg">
+            <img *ngFor="let img of heroImages; let i = index"
+                 [src]="img"
+                 [class.active]="i === currentSlide"
+                 [alt]="destination.name"
+                 class="hero-bg-img">
+            <div class="hero-overlay"></div>
+        </div>
 
-    <!-- Sticky Split Search Bar -->
-    <div class="dest-sticky-search">
-        <div class="split-search-bar">
-            <div class="search-left">
-                <span class="search-pin">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                        <circle cx="12" cy="10" r="3"></circle>
-                    </svg>
-                </span>
-                <input type="text"
-                       [value]="!leftSearchActive ? destination.name : ''"
-                       [placeholder]="destination.name"
-                       (input)="onDestSearchInput($event)"
-                       (focus)="leftSearchActive = true; showDestDropdown = destPredictions.length > 0"
-                       (blur)="onDestBlur(); leftSearchActive = false">
+        <!-- Hero content -->
+        <div class="hero-content-wrapper">
+            <!-- Left: Text -->
+            <div class="hero-text">
+                <h1>Discover Your Next Handpicked Journey to <strong>{{ destination.name }}</strong></h1>
+                <p class="hero-subtitle">Explore curated travel experiences with unforgettable moments of relaxation, culture, and adventure.</p>
+                <button class="hero-cta" (click)="openPlanTripModal()">Plan Your Trip →</button>
             </div>
-            <div class="search-divider"></div>
-            <div class="search-right">
-                <span class="search-icon-small">
-                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <path d="M21 21l-4.35-4.35"></path>
-                    </svg>
-                </span>
-                <input type="text"
-                       placeholder="Search stays, food, attractions..."
-                       (input)="onLocalSearch($event)">
+
+            <!-- Right: Trip card -->
+            <div class="hero-trip-card">
+                <div class="trip-card-header">
+                    <button class="trip-tab" [class.active]="tripCardTab === 'stays'" (click)="tripCardTab = 'stays'">Stays</button>
+                    <button class="trip-tab" [class.active]="tripCardTab === 'food'" (click)="tripCardTab = 'food'">Food</button>
+                    <button class="trip-tab" [class.active]="tripCardTab === 'explore'" (click)="tripCardTab = 'explore'">Explore</button>
+                    <div class="tab-indicator" [style.left]="tripCardTab === 'stays' ? '0%' : tripCardTab === 'food' ? '33.33%' : '66.66%'"></div>
+                </div>
+                <div class="trip-card-body">
+                    <!-- Destination (always visible, locked) -->
+                    <div class="trip-field locked">
+                        <span class="field-icon">
+                            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                        </span>
+                        <div class="field-content">
+                            <span class="field-label">Destination</span>
+                            <span class="field-value">{{ destination.name }}</span>
+                        </div>
+                        <svg class="lock-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
+
+                    <!-- Stays content -->
+                    <div class="tab-content-fade" [class.visible]="tripCardTab === 'stays'">
+                        <div class="trip-field clickable" (click)="stayRangePicker.open()">
+                            <span class="field-icon">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            </span>
+                            <div class="field-content">
+                                <span class="field-label">Check-in → Check-out</span>
+                                <span class="field-value">
+                                    {{ checkinDate ? (checkinDate | date:'MMM d') : 'Start' }}
+                                    —
+                                    {{ checkoutDate ? (checkoutDate | date:'MMM d') : 'End' }}
+                                </span>
+                            </div>
+                            <mat-date-range-input [rangePicker]="stayRangePicker" class="hidden-date-input">
+                                <input matStartDate [(ngModel)]="checkinDate">
+                                <input matEndDate [(ngModel)]="checkoutDate">
+                            </mat-date-range-input>
+                            <mat-date-range-picker #stayRangePicker></mat-date-range-picker>
+                        </div>
+                        <div class="trip-field">
+                            <span class="field-icon">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                            </span>
+                            <div class="field-content">
+                                <span class="field-label">Guests</span>
+                                <span class="field-value">2</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Food content -->
+                    <div class="tab-content-fade" [class.visible]="tripCardTab === 'food'">
+                        <div class="trip-field clickable" (click)="reservationPicker.open()">
+                            <span class="field-icon">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            </span>
+                            <div class="field-content">
+                                <span class="field-label">Reservation Date</span>
+                                <span class="field-value">{{ reservationDate ? (reservationDate | date:'mediumDate') : 'Select date' }}</span>
+                            </div>
+                            <input [matDatepicker]="reservationPicker" [(ngModel)]="reservationDate" class="hidden-date-input">
+                            <mat-datepicker #reservationPicker></mat-datepicker>
+                        </div>
+                        <div class="trip-field">
+                            <span class="field-icon">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                            </span>
+                            <div class="field-content">
+                                <span class="field-label">Budget</span>
+                                <span class="field-value">Any price</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Explore content -->
+                    <div class="tab-content-fade" [class.visible]="tripCardTab === 'explore'">
+                        <div class="trip-field">
+                            <span class="field-icon">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                            </span>
+                            <div class="field-content">
+                                <span class="field-label">Interest</span>
+                                <span class="field-value">All attractions</span>
+                            </div>
+                        </div>
+                        <div class="trip-field">
+                            <span class="field-icon">
+                                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                            </span>
+                            <div class="field-content">
+                                <span class="field-label">Group Size</span>
+                                <span class="field-value">2 people</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="trip-card-btn" (click)="scrollToSection(tripCardTab === 'food' ? 'food' : tripCardTab === 'explore' ? 'attractions' : 'stays')">
+                    {{ tripCardTab === 'stays' ? 'Find Stays' : tripCardTab === 'food' ? 'Find Restaurants' : 'Explore Places' }}
+                </button>
             </div>
         </div>
-        <div class="dest-search-dropdown" *ngIf="showDestDropdown && destPredictions.length > 0">
-            <div class="dest-dropdown-item"
-                 *ngFor="let prediction of destPredictions"
-                 (mousedown)="selectDestPlace(prediction)">
-                <span class="dest-dropdown-main">{{ prediction.structured_formatting.main_text }}</span>
-                <span class="dest-dropdown-secondary">{{ prediction.structured_formatting.secondary_text }}</span>
-            </div>
+
+        <!-- Scroll indicator -->
+        <div class="hero-dots">
+            <span *ngFor="let img of heroImages; let i = index"
+                  class="hero-dot"
+                  [class.active]="i === currentSlide"
+                  (click)="currentSlide = i"></span>
         </div>
-    </div>
+    </section>
+
+    <!-- Content sections (overlaps hero) -->
+    <div class="content-sections">
 
     <!-- Stays Section -->
     <section class="dest-section snap-section" id="stays">
@@ -98,7 +165,7 @@
                     <div class="place-card-img">
                         <img *ngIf="place.photos.length > 0" [src]="place.photos[0].url" [alt]="place.name">
                         <div *ngIf="place.photos.length === 0" class="place-card-placeholder">🏨</div>
-                        <button class="fav-btn" [class.active]="favourites.has(place.placeId)" (click)="toggleFavourite(place.placeId)" title="Add to favourites">
+                        <button class="fav-btn" [class.active]="favouritesService.isFavourite(place.placeId)" (click)="toggleFavourite(place.placeId); $event.stopPropagation()" title="Add to favourites">
                             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                             </svg>
@@ -112,8 +179,8 @@
                         </div>
                         <span class="place-rating" *ngIf="place.rating">⭐ {{ place.rating }}<span class="rating-count" *ngIf="place.userRatingsTotal"> · {{ place.userRatingsTotal }} reviews</span></span>
                         <div class="card-actions">
-                            <button class="itinerary-btn">+ Add to Itinerary</button>
-                            <a class="maps-btn" [href]="'https://www.google.com/maps/search/?api=1&query=' + place.geometry.latitude + ',' + place.geometry.longitude" target="_blank" title="View on Google Maps">
+                            <button class="itinerary-btn" (click)="$event.stopPropagation()">+ Add to Itinerary</button>
+                            <a class="maps-btn" (click)="$event.stopPropagation()" [href]="'https://www.google.com/maps/search/?api=1&query=' + place.geometry.latitude + ',' + place.geometry.longitude" target="_blank" title="View on Google Maps">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                                     <circle cx="12" cy="10" r="3"></circle>
@@ -158,7 +225,7 @@
                     <div class="place-card-img">
                         <img *ngIf="place.photos.length > 0" [src]="place.photos[0].url" [alt]="place.name">
                         <div *ngIf="place.photos.length === 0" class="place-card-placeholder">🍽️</div>
-                        <button class="fav-btn" [class.active]="favourites.has(place.placeId)" (click)="toggleFavourite(place.placeId)" title="Add to favourites">
+                        <button class="fav-btn" [class.active]="favouritesService.isFavourite(place.placeId)" (click)="toggleFavourite(place.placeId); $event.stopPropagation()" title="Add to favourites">
                             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                             </svg>
@@ -169,8 +236,8 @@
                         <p class="place-vicinity">{{ place.vicinity }}</p>
                         <span class="place-rating" *ngIf="place.rating">⭐ {{ place.rating }}<span class="rating-count" *ngIf="place.userRatingsTotal"> · {{ place.userRatingsTotal }} reviews</span></span>
                         <div class="card-actions">
-                            <button class="itinerary-btn">+ Add to Itinerary</button>
-                            <a class="maps-btn" [href]="'https://www.google.com/maps/search/?api=1&query=' + place.geometry.latitude + ',' + place.geometry.longitude" target="_blank" title="View on Google Maps">
+                            <button class="itinerary-btn" (click)="$event.stopPropagation()">+ Add to Itinerary</button>
+                            <a class="maps-btn" (click)="$event.stopPropagation()" [href]="'https://www.google.com/maps/search/?api=1&query=' + place.geometry.latitude + ',' + place.geometry.longitude" target="_blank" title="View on Google Maps">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                                     <circle cx="12" cy="10" r="3"></circle>
@@ -212,7 +279,7 @@
                     <div class="place-card-img">
                         <img *ngIf="place.photos.length > 0" [src]="place.photos[0].url" [alt]="place.name">
                         <div *ngIf="place.photos.length === 0" class="place-card-placeholder">📍</div>
-                        <button class="fav-btn" [class.active]="favourites.has(place.placeId)" (click)="toggleFavourite(place.placeId)" title="Add to favourites">
+                        <button class="fav-btn" [class.active]="favouritesService.isFavourite(place.placeId)" (click)="toggleFavourite(place.placeId); $event.stopPropagation()" title="Add to favourites">
                             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
                             </svg>
@@ -223,8 +290,8 @@
                         <p class="place-vicinity">{{ place.vicinity }}</p>
                         <span class="place-rating" *ngIf="place.rating">⭐ {{ place.rating }}<span class="rating-count" *ngIf="place.userRatingsTotal"> · {{ place.userRatingsTotal }} reviews</span></span>
                         <div class="card-actions">
-                            <button class="itinerary-btn">+ Add to Itinerary</button>
-                            <a class="maps-btn" [href]="'https://www.google.com/maps/search/?api=1&query=' + place.geometry.latitude + ',' + place.geometry.longitude" target="_blank" title="View on Google Maps">
+                            <button class="itinerary-btn" (click)="$event.stopPropagation()">+ Add to Itinerary</button>
+                            <a class="maps-btn" (click)="$event.stopPropagation()" [href]="'https://www.google.com/maps/search/?api=1&query=' + place.geometry.latitude + ',' + place.geometry.longitude" target="_blank" title="View on Google Maps">
                                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                                     <circle cx="12" cy="10" r="3"></circle>
@@ -237,6 +304,8 @@
             <p class="no-results" *ngIf="!tourismLoading && destination.touristAttractions.length === 0">No results found for "{{ activeTourismChip }}". Try another filter.</p>
         </div>
     </section>
+
+    </div> <!-- end content-sections -->
 
     <!-- Place Detail Panel -->
     <app-place-detail-panel
