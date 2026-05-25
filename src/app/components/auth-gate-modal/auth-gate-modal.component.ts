@@ -2,6 +2,7 @@ import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../services/auth.service';
+import { FavouritesService } from '../../services/favourites.service';
 
 @Component({
   selector: 'app-auth-gate-modal',
@@ -16,7 +17,8 @@ export class AuthGateModalComponent {
     private dialogRef: MatDialogRef<AuthGateModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { destination: string },
     private toastr: ToastrService,
-    private authService: AuthService
+    private authService: AuthService,
+    private favouritesService: FavouritesService
   ) {}
 
   loginWithGoogle(): void {
@@ -26,7 +28,9 @@ export class AuthGateModalComponent {
     this.authService.loginWithGoogle().subscribe({
       next: (result) => {
         if (result.success) {
-          this.toastr.success('Login successful');
+          // Merge any guest favourites to backend on login
+          this.favouritesService.mergeOnLogin();
+          this.toastr.success('Signed in successfully');
           this.dialogRef.close({ type: 'authenticated', user: result.user });
         } else {
           this.isLoading = false;
@@ -40,10 +44,6 @@ export class AuthGateModalComponent {
         this.toastr.error('Google login failed. Please try again.');
       }
     });
-  }
-
-  continueAsGuest(): void {
-    this.dialogRef.close({ type: 'guest' });
   }
 
   closeModal(): void {

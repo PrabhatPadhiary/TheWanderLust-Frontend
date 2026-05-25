@@ -521,17 +521,29 @@
     justify-content: center;
     height: 100vh;
     gap: 20px;
+    background: #0e1b0f;
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    opacity: 1;
+    transition: opacity 0.4s ease;
+    pointer-events: all;
+
+    &.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
 
     .loading-spinner {
         width: 40px;
         height: 40px;
-        border: 3px solid rgba(45,90,39,0.2);
-        border-top-color: #2d5a27;
+        border: 3px solid rgba(255,255,255,0.15);
+        border-top-color: #fff;
         border-radius: 50%;
         animation: spin 0.8s linear infinite;
     }
 
-    p { font-size: 1rem; color: #555; }
+    p { font-size: 1rem; color: rgba(255,255,255,0.6); }
 }
 
 @keyframes spin {

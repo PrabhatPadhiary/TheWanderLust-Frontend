@@ -33,12 +33,20 @@ export class AuthService {
   private currentUserSubject = new BehaviorSubject<UserResponse | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
+  // Resolves once Firebase has restored auth state on startup
+  public authReady: Promise<void>;
+  private resolveAuthReady!: () => void;
+
+  // Injected lazily to avoid circular dependency
+  private onLogoutCallback: (() => void) | null = null;
+
   constructor() {
     this.app = initializeApp(environment.firebase);
     this.firebaseAuth = getAuth(this.app);
     this.provider = new GoogleAuthProvider();
 
-    // Restore user from localStorage on app start
+    this.authReady = new Promise(resolve => { this.resolveAuthReady = resolve; });
+
     const stored = localStorage.getItem('wanderlust_user');
     if (stored) {
       try {
@@ -48,13 +56,17 @@ export class AuthService {
       }
     }
 
-    // Listen for Firebase auth state changes
     onAuthStateChanged(this.firebaseAuth, (firebaseUser) => {
       if (!firebaseUser) {
-        // Firebase session expired/logged out
         this.clearSession();
       }
+      // Resolve once — Firebase calls this immediately on init with the restored user (or null)
+      this.resolveAuthReady();
     });
+  }
+
+  registerLogoutCallback(cb: () => void): void {
+    this.onLogoutCallback = cb;
   }
 
   get currentUser(): UserResponse | null {
@@ -105,9 +117,12 @@ export class AuthService {
     });
   }
 
-  logout(): void {
-    signOut(this.firebaseAuth);
-    this.clearSession();
+  async logout(): Promise<void> {
+    try {
+      await signOut(this.firebaseAuth);
+    } finally {
+      this.clearSession();
+    }
   }
 
   private setSession(user: UserResponse): void {
@@ -118,5 +133,6 @@ export class AuthService {
   private clearSession(): void {
     localStorage.removeItem('wanderlust_user');
     this.currentUserSubject.next(null);
+    this.onLogoutCallback?.();
   }
 }

@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { Location } from '@angular/common';
 import { FavouritesService, FavouriteItem } from '../../services/favourites.service';
+import { NavHistoryService } from '../../services/nav-history.service';
 
 @Component({
   selector: 'app-favourites',
@@ -14,7 +16,9 @@ export class FavouritesComponent implements OnInit {
 
   constructor(
     public favouritesService: FavouritesService,
-    private router: Router
+    private router: Router,
+    private location: Location,
+    private navHistory: NavHistoryService
   ) {}
 
   ngOnInit(): void {
@@ -41,6 +45,6 @@ export class FavouritesComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/']);
+    this.navHistory.goBack();
   }
 }

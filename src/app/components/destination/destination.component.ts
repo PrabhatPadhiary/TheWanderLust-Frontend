@@ -4,6 +4,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { DestinationService } from '../../services/destination.service';
 import { PlaceCategoriesResponse, PlaceDto } from '../../models/destination.model';
 import { AuthGateModalComponent } from '../auth-gate-modal/auth-gate-modal.component';
+import { TripPlanModalComponent } from '../trip-plan-modal/trip-plan-modal.component';
+import { TripService, TripResponse } from '../../services/trip.service';
 import { AuthService } from '../../services/auth.service';
 import { FavouritesService, FavouriteItem } from '../../services/favourites.service';
 import { gsap } from 'gsap';
@@ -52,6 +54,7 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
   showDestDropdown = false;
   leftSearchActive = false;
   favourites = new Set<string>(); // kept for template compatibility
+  existingTrip: TripResponse | null = null;
   selectedPlace: PlaceDto | null = null;
   panelOpen = false;
   private destSearchSubject = new Subject<string>();
@@ -64,7 +67,8 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
     private destinationService: DestinationService,
     private dialog: MatDialog,
     private authService: AuthService,
-    public favouritesService: FavouritesService
+    public favouritesService: FavouritesService,
+    private tripService: TripService
   ) {}
 
   ngOnInit(): void {
@@ -75,6 +79,7 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
         this.heroImages = [];
         this.currentSlide = 0;
         this.loading = true;
+        this.existingTrip = null;
         this.loadDestination();
         this.loadHeroImage();
       }
@@ -88,7 +93,17 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destinationService.search(this.placeId).subscribe({
       next: (data) => {
         this.destination = data;
-        this.loading = false;
+        // Wait for Firebase auth to restore before checking for existing trip
+        this.authService.authReady.then(() => {
+          if (!this.authService.isLoggedIn) { this.loading = false; return; }
+          return this.authService.getFirebaseToken().then(token => {
+            if (!token) { this.loading = false; return; }
+            this.tripService.getTripByDestination(this.placeId).subscribe({
+              next: (trip) => { this.existingTrip = trip; this.loading = false; },
+              error: () => { this.existingTrip = null; this.loading = false; }
+            });
+          });
+        });
         setTimeout(() => {
           this.initAnimations();
           this.initDestSearch();
@@ -302,35 +317,54 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   openPlanTripModal(): void {
-    // If already logged in, go straight to trip planner
-    if (this.authService.isLoggedIn) {
-      this.router.navigate(['/trip-planner'], {
+    // If existing trip found, go straight to it
+    if (this.existingTrip) {
+      this.router.navigate(['/trip-planner', this.existingTrip.id], {
         state: {
           user: this.authService.currentUser,
           destination: this.destination?.name || '',
-          placeId: this.placeId
+          placeId: this.placeId,
+          tripId: this.existingTrip.id,
+          tripName: this.existingTrip.name,
+          status: this.existingTrip.status,
+          fromDate: this.existingTrip.startDate || null,
+          toDate: this.existingTrip.endDate || null,
+          travellers: this.existingTrip.travelersCount || 0
         }
       });
       return;
     }
 
-    const dialogRef = this.dialog.open(AuthGateModalComponent, {
-      data: { destination: this.destination?.name || '' },
-      panelClass: 'auth-gate-dialog',
-      maxWidth: '600px',
-      width: '550px'
-    });
+    if (!this.authService.isLoggedIn) {
+      const authRef = this.dialog.open(AuthGateModalComponent, {
+        data: { destination: this.destination?.name || '' },
+        panelClass: 'auth-gate-dialog',
+        maxWidth: '420px',
+        width: '400px'
+      });
+      authRef.afterClosed().subscribe(result => {
+        if (result?.type === 'authenticated') {
+          this.openTripPlanModal();
+        }
+      });
+      return;
+    }
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result?.type === 'authenticated') {
-        this.router.navigate(['/trip-planner'], {
-          state: { user: result.user, destination: this.destination?.name || '', placeId: this.placeId }
-        });
-      } else if (result?.type === 'guest') {
-        this.router.navigate(['/trip-planner'], {
-          state: { isGuest: true, destination: this.destination?.name || '', placeId: this.placeId }
-        });
-      }
+    this.openTripPlanModal();
+  }
+
+  private openTripPlanModal(): void {
+    this.dialog.open(TripPlanModalComponent, {
+      data: {
+        destination: this.destination?.name || '',
+        placeId: this.placeId,
+        latitude: this.destination?.geometry?.latitude || null,
+        longitude: this.destination?.geometry?.longitude || null,
+        photoUrl: this.heroImages[0] || null
+      },
+      panelClass: 'auth-gate-dialog',
+      maxWidth: '500px',
+      width: '480px'
     });
   }
 

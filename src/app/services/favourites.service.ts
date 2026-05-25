@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject } from 'rxjs';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
+import { ToastrService } from 'ngx-toastr';
 
 export interface FavouriteItem {
   placeId: string;
@@ -11,7 +12,7 @@ export interface FavouriteItem {
   rating: number | null;
   userRatingsTotal: number | null;
   photoUrl: string | null;
-  category: string; // 'lodging' | 'restaurant' | 'tourist_attraction'
+  category: string;
   createdAt?: string;
 }
 
@@ -22,12 +23,15 @@ export class FavouritesService {
   private readonly STORAGE_KEY = 'wanderlust_favourites';
   private http = inject(HttpClient);
   private authService = inject(AuthService);
+  private toastr = inject(ToastrService);
 
   private favouritesSubject = new BehaviorSubject<FavouriteItem[]>([]);
   public favourites$ = this.favouritesSubject.asObservable();
+  private favouritesLoaded = false;
 
   constructor() {
     this.loadFromStorage();
+    this.authService.registerLogoutCallback(() => this.clearAll());
   }
 
   get favourites(): FavouriteItem[] {
@@ -52,8 +56,8 @@ export class FavouritesService {
     const updated = [...this.favouritesSubject.value, { ...item, createdAt: new Date().toISOString() }];
     this.favouritesSubject.next(updated);
     this.persist(updated);
+    this.toastr.success('Added to favourites');
 
-    // If logged in, also save to backend
     if (this.authService.isLoggedIn) {
       this.authService.getFirebaseToken().then(token => {
         if (token) {
@@ -65,11 +69,14 @@ export class FavouritesService {
   }
 
   remove(placeId: string): void {
+    const item = this.favouritesSubject.value.find(f => f.placeId === placeId);
     const updated = this.favouritesSubject.value.filter(f => f.placeId !== placeId);
     this.favouritesSubject.next(updated);
     this.persist(updated);
+    if (item) {
+      this.toastr.info('Removed from favourites');
+    }
 
-    // If logged in, also remove from backend
     if (this.authService.isLoggedIn) {
       this.authService.getFirebaseToken().then(token => {
         if (token) {
@@ -81,15 +88,18 @@ export class FavouritesService {
   }
 
   // Load favourites - from API if logged in, otherwise localStorage
-  loadFavourites(): void {
+  loadFavourites(forceRefresh = false): void {
+    if (this.favouritesLoaded && !forceRefresh) return;
+
     if (this.authService.isLoggedIn) {
-      this.authService.getFirebaseToken().then(token => {
+      this.authService.authReady.then(() => this.authService.getFirebaseToken()).then(token => {
         if (token) {
           const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
           this.http.get<FavouriteItem[]>(`${environment.apiUrl}/Favourites`, { headers }).subscribe({
             next: (items) => {
               this.favouritesSubject.next(items);
               this.persist(items);
+              this.favouritesLoaded = true;
             },
             error: () => {
               this.loadFromStorage();
@@ -99,6 +109,7 @@ export class FavouritesService {
       });
     } else {
       this.loadFromStorage();
+      this.favouritesLoaded = true;
     }
   }
 
@@ -111,13 +122,15 @@ export class FavouritesService {
           const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
           this.http.post(`${environment.apiUrl}/Favourites/sync`, { favourites: local }, { headers }).subscribe({
             next: () => {
-              // After sync, load the full list from backend
+              localStorage.removeItem(this.STORAGE_KEY);
               this.loadFavourites();
+              this.toastr.success('Your favourites have been synced');
             }
           });
         }
       });
     } else {
+      localStorage.removeItem(this.STORAGE_KEY);
       this.loadFavourites();
     }
   }
@@ -129,6 +142,7 @@ export class FavouritesService {
 
   clearAll(): void {
     this.favouritesSubject.next([]);
+    this.favouritesLoaded = false;
     localStorage.removeItem(this.STORAGE_KEY);
   }
 

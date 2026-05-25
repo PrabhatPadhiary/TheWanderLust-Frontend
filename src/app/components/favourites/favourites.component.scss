@@ -8,6 +8,24 @@
 .favourites-header {
   margin-bottom: 32px;
 
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #f4f4f4;
+    border: none;
+    color: #333;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 10px 20px 10px 14px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+    font-family: 'Poppins', sans-serif;
+    transition: background 0.2s, color 0.2s;
+    &:hover { background: #e8f5e9; color: #2d5a27; }
+  }
+
   h1 {
     font-size: 2rem;
     font-weight: 800;

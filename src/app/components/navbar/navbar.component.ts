@@ -5,6 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { AuthGateModalComponent } from '../auth-gate-modal/auth-gate-modal.component';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
+import { ToastrService } from 'ngx-toastr';
 
 declare var google: any;
 
@@ -16,14 +17,13 @@ declare var google: any;
 })
 export class NavbarComponent {
   @Input() destinationName: string = '';
+  @Input() solid: boolean = false;
   @Output() localSearchInput = new EventEmitter<string>();
 
   predictions: any[] = [];
   showDropdown = false;
   showUserMenu = false;
   searchActive = false;
-  isScrolled = false;
-
   private searchSubject = new Subject<string>();
   private autocompleteService: any;
   private blurTimeout: any;
@@ -32,12 +32,13 @@ export class NavbarComponent {
   constructor(
     public authService: AuthService,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private toastr: ToastrService
   ) {}
 
   @HostListener('window:scroll')
   onWindowScroll(): void {
-    this.isScrolled = window.scrollY > window.innerHeight * 0.7;
+    // scroll tracking removed — navbar is always solid
   }
 
   private initAutocomplete(): void {
@@ -116,9 +117,7 @@ export class NavbarComponent {
       this.openAuthModal();
       return;
     }
-    this.router.navigate(['/trip-planner'], {
-      state: { user: this.authService.currentUser }
-    });
+    this.router.navigate(['/my-trips']);
   }
 
   onSignIn(): void {
@@ -135,10 +134,13 @@ export class NavbarComponent {
     }, 150);
   }
 
-  logout(): void {
-    this.authService.logout();
-    this.showUserMenu = false;
-    this.router.navigate(['/']);
+  async logout(): Promise<void> {
+    try {
+      await this.authService.logout();
+      this.toastr.info('Signed out successfully');
+    } finally {
+      this.showUserMenu = false;
+    }
   }
 
   goHome(): void {
@@ -154,8 +156,8 @@ export class NavbarComponent {
     const dialogRef = this.dialog.open(AuthGateModalComponent, {
       data: { destination: this.destinationName },
       panelClass: 'auth-gate-dialog',
-      maxWidth: '600px',
-      width: '550px'
+      maxWidth: '500px',
+      width: '500px'
     });
 
     dialogRef.afterClosed().subscribe(result => {

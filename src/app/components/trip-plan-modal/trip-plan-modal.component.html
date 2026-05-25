@@ -1,0 +1,71 @@
+<div class="trip-plan-modal">
+  <button class="modal-close" (click)="close()">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="18" y1="6" x2="6" y2="18"></line>
+      <line x1="6" y1="6" x2="18" y2="18"></line>
+    </svg>
+  </button>
+
+  <h2>Plan your trip to <strong>{{ data.destination }}</strong></h2>
+  <p class="subtitle">Tell us a bit about your trip to get started.</p>
+
+  <!-- Trip name -->
+  <div class="field-group">
+    <label>Trip Name</label>
+    <input
+      type="text"
+      class="text-input"
+      [(ngModel)]="tripName"
+      [placeholder]="'A trip to ' + data.destination"
+    >
+  </div>
+
+  <!-- Destination field -->
+  <div class="field-group">
+    <label>Destination</label>
+    <div class="destination-display">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+        <circle cx="12" cy="10" r="3"></circle>
+      </svg>
+      <span>{{ data.destination }}</span>
+    </div>
+    <p class="field-hint">You can add more destinations in the trip planner.</p>
+  </div>
+
+  <!-- Dates -->
+  <div class="field-group">
+    <div class="label-row">
+      <label>Travel Dates <span class="optional">(optional)</span></label>
+      <button class="undecided-btn" [class.active]="datesUndecided" (click)="toggleDatesUndecided()">
+        Not decided yet
+      </button>
+    </div>
+    <div class="date-row" [class.disabled]="datesUndecided">
+      <div class="date-input-wrap">
+        <label class="date-label">From</label>
+        <input type="date" [(ngModel)]="fromDate" [disabled]="datesUndecided" [min]="today">
+      </div>
+      <div class="date-separator">→</div>
+      <div class="date-input-wrap">
+        <label class="date-label">To</label>
+        <input type="date" [(ngModel)]="toDate" [disabled]="datesUndecided" [min]="fromDate || today">
+      </div>
+    </div>
+  </div>
+
+  <!-- Travellers -->
+  <div class="field-group">
+    <label>Number of Travellers</label>
+    <div class="travellers-row">
+      <button class="counter-btn" (click)="decrement()" [disabled]="travellers <= 1">−</button>
+      <span class="counter-value">{{ travellers }}</span>
+      <button class="counter-btn" (click)="increment()" [disabled]="travellers >= 20">+</button>
+      <span class="counter-label">{{ travellers === 1 ? 'person' : 'people' }}</span>
+    </div>
+  </div>
+
+  <button class="start-btn" (click)="startPlanning()" [disabled]="isLoading">
+    {{ isLoading ? 'Creating trip...' : 'Start Planning →' }}
+  </button>
+</div>

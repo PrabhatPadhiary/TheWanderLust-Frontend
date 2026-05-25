@@ -1,0 +1,61 @@
+<app-navbar [solid]="true"></app-navbar>
+<div class="my-trips-page">
+  <div class="page-header">
+    <button class="back-btn" (click)="goBack()">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      Back
+    </button>
+    <h1>My Trips</h1>
+    <p>All your planned adventures in one place</p>
+  </div>
+
+  <!-- Loading -->
+  <div class="loading-state" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Loading your trips...</p>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="!loading && trips.length === 0">
+    <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
+    </svg>
+    <h3>No trips yet</h3>
+    <p>Start planning your first adventure from any destination page.</p>
+  </div>
+
+  <!-- Trips grid -->
+  <div class="trips-grid" *ngIf="!loading && trips.length > 0">
+    <div class="trip-card" *ngFor="let trip of trips" (click)="openTrip(trip)">
+      <!-- Cover photo or placeholder -->
+      <div class="trip-card-cover"
+           [style.backgroundImage]="trip.coverPhotoUrl ? 'url(' + trip.coverPhotoUrl + ')' : 'none'">
+        <div class="trip-card-cover-placeholder" *ngIf="!trip.coverPhotoUrl">✈️</div>
+        <span class="trip-status-badge" [ngClass]="'status-' + getStatusClass(trip.status)">
+          {{ mapStatus(trip.status) }}
+        </span>
+      </div>
+
+      <div class="trip-card-body">
+        <h3>{{ trip.name }}</h3>
+        <p class="trip-destination" *ngIf="trip.primaryDestination">
+          {{ trip.primaryDestination }}
+        </p>
+
+        <div class="trip-meta">
+          <span *ngIf="trip.startDate">
+            {{ trip.startDate | date:'MMM d' }}
+            <span *ngIf="trip.endDate"> → {{ trip.endDate | date:'MMM d, y' }}</span>
+          </span>
+          <span *ngIf="!trip.startDate" class="no-dates">Dates TBD</span>
+
+          <span class="travellers" *ngIf="trip.travelersCount">
+            · {{ trip.travelersCount }} {{ trip.travelersCount === 1 ? 'person' : 'people' }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

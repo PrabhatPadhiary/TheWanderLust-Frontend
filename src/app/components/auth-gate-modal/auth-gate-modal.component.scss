@@ -1,6 +1,6 @@
 .auth-gate {
     position: relative;
-    padding: 40px;
+    padding: 50px 40px;
     font-family: 'Poppins', sans-serif;
 }
 
@@ -77,17 +77,6 @@
 
             .google-icon {
                 flex-shrink: 0;
-            }
-        }
-
-        &.guest-btn {
-            background: transparent;
-            color: #666;
-            border: 1px solid #ddd;
-
-            &:hover:not(:disabled) {
-                border-color: #999;
-                color: #333;
             }
         }
     }

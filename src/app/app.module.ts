@@ -22,6 +22,8 @@ import { TripPlannerComponent } from './components/trip-planner/trip-planner.com
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FavouritesComponent } from './components/favourites/favourites.component';
 import { SafePipe } from './pipes/safe.pipe';
+import { TripPlanModalComponent } from './components/trip-plan-modal/trip-plan-modal.component';
+import { MyTripsComponent } from './components/my-trips/my-trips.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +36,8 @@ import { SafePipe } from './pipes/safe.pipe';
     NavbarComponent,
     FavouritesComponent,
     SafePipe,
+    TripPlanModalComponent,
+    MyTripsComponent,
   ],
   imports: [
     FormsModule,
@@ -43,9 +47,22 @@ import { SafePipe } from './pipes/safe.pipe';
     HttpClientModule,
     MatTooltipModule,
     ToastrModule.forRoot({
-      timeOut: 3000,
-      positionClass: 'toast-top-right',
-      preventDuplicates: true
+      timeOut: 2500,
+      positionClass: 'toast-bottom-center',
+      preventDuplicates: false,
+      toastClass: 'wl-toast',
+      iconClasses: {
+        success: 'wl-toast-success',
+        error: 'wl-toast-error',
+        info: 'wl-toast-info',
+        warning: 'wl-toast-warning'
+      },
+      easeTime: 0,
+      easing: 'ease',
+      disableTimeOut: false,
+      tapToDismiss: true,
+      maxOpened: 1,
+      autoDismiss: true,
     }),
     BrowserAnimationsModule,
     MatDialogModule,

@@ -4,38 +4,29 @@
   left: 0;
   right: 0;
   height: 64px;
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(5px);
-  border-bottom: 1px solid transparent;
+  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 50%, #fff8e1 100%);
+  border-bottom: 1px solid #ebebeb;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.36);
   display: flex;
   align-items: center;
   padding: 0 40px;
   z-index: 1000;
   font-family: 'Poppins', sans-serif;
-  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
 
-  &.scrolled {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-bottom-color: #ebebeb;
-    box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+  .brand-icon { color: #4caf50; }
+  .brand-name { color: #1a1a1a; .brand-accent { color: #4caf50; } }
+  .nav-action-btn { color: #555; &:hover { background: rgba(0,0,0,0.05); color: #1a1a1a; } }
+  .sign-in-btn { background: #1a1a1a; color: #fff; &:hover { background: #333; } }
+  .user-avatar-btn { border-color: #1a1a1a; }
 
-    .brand-icon { color: #4caf50; }
-    .brand-name { color: #1a1a1a; .brand-accent { color: #4caf50; } }
-    .nav-action-btn { color: #555; &:hover { background: rgba(0,0,0,0.05); color: #1a1a1a; } }
-    .sign-in-btn { background: #1a1a1a; color: #fff; &:hover { background: #333; } }
-    .user-avatar-btn { border-color: #1a1a1a; }
-
-    .split-search-bar {
-      background: #f3f3f3;
-      border-color: #e0e0e0;
-      .search-left, .search-right {
-        span { color: #888; }
-        input { color: #1a1a1a; &::placeholder { color: #999; } }
-      }
-      .search-divider { background: #ddd; }
+  .split-search-bar {
+    background: rgba(255,255,255,0.7);
+    border-color: rgba(0,0,0,0.08);
+    .search-left, .search-right {
+      span { color: #888; }
+      input { color: #1a1a1a; &::placeholder { color: #999; } }
     }
+    .search-divider { background: #ddd; }
   }
 }
 
@@ -54,7 +45,7 @@
   .brand-name {
     font-size: 1.8rem;
     font-weight: 800;
-    color: #fff;
+    color: #1a1a1a;
     letter-spacing: -0.5px;
     font-family: 'Poppins', sans-serif;
     line-height: 1;
@@ -158,8 +149,8 @@
 
   .sign-in-btn {
     padding: 8px 20px;
-    background: #fff;
-    color: #1a1a1a;
+    background: #1a1a1a;
+    color: #fff;
     border: none;
     border-radius: 50px;
     font-size: 0.85rem;
@@ -168,7 +159,7 @@
     font-family: 'Poppins', sans-serif;
     transition: all 0.2s;
     white-space: nowrap;
-    &:hover { background: #f0f0f0; }
+    &:hover { background: #333; }
   }
 
   .nav-action-btn {
@@ -180,11 +171,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #fff;
+    color: #555;
     transition: all 0.15s;
     padding: 0 10px;
     svg { width: 22px; height: 22px; flex-shrink: 0; }
-    &:hover { background: rgba(255,255,255,0.15); }
+    &:hover { background: rgba(0,0,0,0.05); color: #1a1a1a; }
 
     &.with-label {
       gap: 8px;

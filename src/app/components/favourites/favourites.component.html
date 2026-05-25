@@ -1,6 +1,12 @@
-<app-navbar></app-navbar>
+<app-navbar [solid]="true"></app-navbar>
 <div class="favourites-page">
   <div class="favourites-header">
+    <button class="back-btn" (click)="goBack()">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 5l-7 7 7 7"/>
+      </svg>
+      Back
+    </button>
     <h1>My Favourites</h1>
     <p>Places you've saved for later</p>
   </div>

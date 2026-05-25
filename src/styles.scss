@@ -11,8 +11,70 @@ body {
 body {
     margin: 0;
     font-family: Roboto, "Helvetica Neue", sans-serif;
+    background-color: #0e1b0f; // dark green — matches the app's hero/landing feel
+}
+
+app-root {
+    display: block;
+    min-height: 100vh;
+    background-color: #0e1b0f;
 }
 
 body.no-scroll {
     overflow: hidden;
+}
+
+// WanderLust custom toast styles
+@keyframes wl-slide-up {
+  0%   { opacity: 0; transform: translateY(60px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes wl-slide-down {
+  0%   { opacity: 1; transform: translateY(0); }
+  100% { opacity: 0; transform: translateY(20px); }
+}
+
+.toast-bottom-center {
+  position: fixed !important;
+  bottom: 32px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: auto !important;
+  right: auto !important;
+}
+
+.toast-bottom-center .wl-toast {
+  position: relative !important;
+  width: auto !important;
+  min-width: 160px !important;
+  margin: 0 !important;
+  font-family: 'Poppins', sans-serif !important;
+  border-radius: 100px !important;
+  padding: 12px 28px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.18) !important;
+  font-size: 0.88rem !important;
+  font-weight: 500 !important;
+  text-align: center !important;
+  border: none !important;
+  background: #1a1a1a !important;
+  background-image: none !important;
+  color: #fff !important;
+  cursor: default !important;
+  animation: wl-slide-up 0.4s ease forwards !important;
+
+  &.toast-hiding {
+    animation: wl-slide-down 0.3s ease forwards !important;
+  }
+
+  .toast-title { display: none !important; }
+
+  .toast-message {
+    font-weight: 500 !important;
+    font-size: 0.88rem !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background-image: none !important;
+    color: #fff !important;
+  }
 }
