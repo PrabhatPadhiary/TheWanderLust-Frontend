@@ -4,7 +4,12 @@ import { AuthService, UserResponse } from '../../services/auth.service';
 import { DestinationService } from '../../services/destination.service';
 import { PlaceCategoriesResponse, PlaceDto } from '../../models/destination.model';
 import { FavouritesService, FavouriteItem } from '../../services/favourites.service';
-import { TripService } from '../../services/trip.service';
+import { TripService, CreateTripDestinationDto } from '../../services/trip.service';
+import { LoaderService } from '../../services/loader.service';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
+
+declare var google: any;
 
 @Component({
   selector: 'app-trip-planner',
@@ -27,9 +32,41 @@ export class TripPlannerComponent implements OnInit {
   toDate: string | null = null;
   travellers: number = 0;
 
+  // Destinations list (primary + added)
+  destinations: { id?: string; name: string; startDate: string | null; endDate: string | null }[] = [];
+
+  // Add destination dialog
+  showAddDestDialog = false;
+  addDestStart: Date | null = null;
+  addDestEnd: Date | null = null;
+  editDestIndex: number | null = null;
+
+  // Delete confirm
+  showDeleteDestConfirm = false;
+  deleteDestIndex: number | null = null;
+  deleteDestName = '';
+
+  // Destination search in dialog
+  destSearchQuery = '';
+  destSearchPredictions: any[] = [];
+  destSearchShowDropdown = false;
+  selectedDestPrediction: any = null;
+  private destSearchSubject = new Subject<string>();
+  private autocompleteService: any;
+  private autocompleteInitialized = false;
+
+  get fromDateObj(): Date | null {
+    return this.fromDate ? new Date(this.fromDate) : null;
+  }
+  get toDateObj(): Date | null {
+    return this.toDate ? new Date(this.toDate) : null;
+  }
+
   // Destination data
   destinationData: PlaceCategoriesResponse | null = null;
   loading = true;
+  tripLoading = true;
+  deletingDestId: string | null = null;
 
   // Itinerary
   itinerary: PlaceDto[] = [];
@@ -56,7 +93,8 @@ export class TripPlannerComponent implements OnInit {
     private destinationService: DestinationService,
     private authService: AuthService,
     public favouritesService: FavouritesService,
-    private tripService: TripService
+    private tripService: TripService,
+    private loaderService: LoaderService
   ) {}
 
   ngOnInit(): void {
@@ -73,16 +111,10 @@ export class TripPlannerComponent implements OnInit {
     const tripId = routeTripId || state?.tripId;
     if (tripId) {
       this.tripId = tripId;
-      // If we have state data use it, otherwise fetch from API
-      if (state?.tripName) {
-        this.tripName = state.tripName;
-        this.tripStatus = this.mapStatus(state.status || '');
-        this.fromDate = state.fromDate || null;
-        this.toDate = state.toDate || null;
-        this.travellers = state.travellers || 0;
-        // Update URL to include tripId without triggering re-navigation
-        window.history.replaceState(state, '', `/trip-planner/${tripId}`);
-      } else {
+
+      // Always load from API — handles fresh nav, back nav, refresh, and My Trips
+      const load = () => {
+        this.loaderService.show('Loading your trip...');
         this.tripService.getTrip(tripId).subscribe({
           next: (trip) => {
             this.tripName = trip.name;
@@ -91,8 +123,45 @@ export class TripPlannerComponent implements OnInit {
             this.toDate = trip.endDate || null;
             this.travellers = trip.travelersCount || 0;
             this.destination = this.destination || trip.primaryDestination || '';
+
+            if (trip.destinations && trip.destinations.length > 0) {
+              this.destinations = trip.destinations
+                .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+                .map((d, i) => ({
+                  id: d.id,
+                  name: d.name,
+                  startDate: d.startDate || (i === 0 ? (trip.startDate || null) : null),
+                  endDate: d.endDate || (i === 0 ? (trip.endDate || null) : null)
+                }));
+            } else {
+              this.destinations = [{ name: this.destination, startDate: this.fromDate, endDate: this.toDate }];
+            }
+            this.tripLoading = false;
+            this.loaderService.hide();
+          },
+          error: () => {
+            if (!this.destinations.length && this.destination) {
+              this.destinations = [{ name: this.destination, startDate: this.fromDate, endDate: this.toDate }];
+            }
+            this.tripLoading = false;
+            this.loaderService.hide();
           }
         });
+      };
+
+      // If state has tripName, we can paint the header immediately from state
+      // while the full API call runs in the background
+      if (state?.tripName) {
+        this.tripName = state.tripName;
+        this.tripStatus = this.mapStatus(state.status || '');
+        this.fromDate = state.fromDate || null;
+        this.toDate = state.toDate || null;
+        this.travellers = state.travellers || 0;
+        this.tripLoading = false; // header data available from state immediately
+        window.history.replaceState(state, '', `/trip-planner/${tripId}`);
+        load(); // still fetch full destinations in background
+      } else {
+        load();
       }
     }
 
@@ -186,6 +255,209 @@ export class TripPlannerComponent implements OnInit {
       geometry: { latitude: 0, longitude: 0 }
     };
     this.addToItinerary(place);
+  }
+
+  openAddDestDialog(): void {
+    this.addDestStart = null;
+    this.addDestEnd = null;
+    this.destSearchQuery = '';
+    this.destSearchPredictions = [];
+    this.destSearchShowDropdown = false;
+    this.selectedDestPrediction = null;
+    this.editDestIndex = null;
+    this.showAddDestDialog = true;
+  }
+
+  openEditDestDialog(index: number): void {
+    const dest = this.destinations[index];
+    this.editDestIndex = index;
+    this.destSearchQuery = dest.name;
+    this.selectedDestPrediction = { structured_formatting: { main_text: dest.name, secondary_text: '' } };
+    this.addDestStart = dest.startDate ? new Date(dest.startDate) : null;
+    this.addDestEnd = dest.endDate ? new Date(dest.endDate) : null;
+    this.destSearchPredictions = [];
+    this.destSearchShowDropdown = false;
+    this.showAddDestDialog = true;
+  }
+
+  closeAddDestDialog(): void {
+    this.showAddDestDialog = false;
+    this.editDestIndex = null;
+  }
+
+  openDeleteDestConfirm(index: number): void {
+    this.deleteDestIndex = index;
+    this.deleteDestName = this.destinations[index].name;
+    this.showDeleteDestConfirm = true;
+  }
+
+  cancelDeleteDest(): void {
+    this.showDeleteDestConfirm = false;
+    this.deleteDestIndex = null;
+    this.deleteDestName = '';
+  }
+
+  confirmDeleteDest(): void {
+    if (this.deleteDestIndex === null) return;
+    const dest = this.destinations[this.deleteDestIndex];
+    const index = this.deleteDestIndex;
+    this.cancelDeleteDest();
+
+    if (dest.id && this.tripId) {
+      this.deletingDestId = dest.id;
+      this.loaderService.show('Removing destination...');
+      this.tripService.deleteDestination(this.tripId, dest.id).subscribe({
+        next: () => {
+          this.destinations.splice(index, 1);
+          this.deletingDestId = null;
+          this.loaderService.hide();
+        },
+        error: () => {
+          this.destinations.splice(index, 1);
+          this.deletingDestId = null;
+          this.loaderService.hide();
+        }
+      });
+    } else {
+      this.destinations.splice(index, 1);
+    }
+  }
+
+  private initDestAutocomplete(): void {
+    if (this.autocompleteInitialized) return;
+    if (typeof google !== 'undefined' && google.maps?.places) {
+      this.autocompleteService = new google.maps.places.AutocompleteService();
+      this.autocompleteInitialized = true;
+
+      this.destSearchSubject.pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        filter(v => v.length >= 2)
+      ).subscribe(value => {
+        this.autocompleteService.getPlacePredictions(
+          { input: value },
+          (predictions: any[], status: string) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+              const allowed = ['locality', 'administrative_area_level_1', 'country'];
+              this.destSearchPredictions = predictions.filter((p: any) =>
+                p.types?.some((t: string) => allowed.includes(t))
+              );
+              this.destSearchShowDropdown = this.destSearchPredictions.length > 0;
+            } else {
+              this.destSearchPredictions = [];
+              this.destSearchShowDropdown = false;
+            }
+          }
+        );
+      });
+    }
+  }
+
+  onDestSearchInput(event: Event): void {
+    this.initDestAutocomplete();
+    const value = (event.target as HTMLInputElement).value;
+    this.destSearchQuery = value;
+    this.selectedDestPrediction = null;
+    if (value.length < 2) {
+      this.destSearchPredictions = [];
+      this.destSearchShowDropdown = false;
+      return;
+    }
+    this.destSearchSubject.next(value);
+  }
+
+  selectDestPrediction(prediction: any): void {
+    this.selectedDestPrediction = prediction;
+    this.destSearchQuery = prediction.structured_formatting.main_text;
+    this.destSearchPredictions = [];
+    this.destSearchShowDropdown = false;
+
+    // Fetch place details to get lat/lng and photo
+    if (typeof google !== 'undefined' && google.maps?.places) {
+      const mapDiv = document.createElement('div');
+      const placesService = new google.maps.places.PlacesService(mapDiv);
+      placesService.getDetails(
+        { placeId: prediction.place_id, fields: ['geometry', 'photos'] },
+        (place: any, status: string) => {
+          if (status === google.maps.places.PlacesServiceStatus.OK && place) {
+            this.selectedDestPrediction = {
+              ...prediction,
+              latitude: place.geometry?.location?.lat() ?? null,
+              longitude: place.geometry?.location?.lng() ?? null,
+              photoUrl: place.photos?.[0]?.getUrl({ maxWidth: 800 }) ?? null
+            };
+          }
+        }
+      );
+    }
+  }
+
+  onDestSearchBlur(): void {
+    setTimeout(() => { this.destSearchShowDropdown = false; }, 200);
+  }
+
+  confirmAddDest(): void {
+    if (!this.selectedDestPrediction) return;
+    const fmt = (d: Date) => d.toISOString().split('T')[0];
+    const entry = {
+      name: this.selectedDestPrediction.structured_formatting.main_text,
+      startDate: this.addDestStart ? fmt(this.addDestStart) : null,
+      endDate: this.addDestEnd ? fmt(this.addDestEnd) : null
+    };
+
+    if (this.editDestIndex !== null) {
+      // Edit: update locally only
+      this.destinations[this.editDestIndex] = entry;
+      this.showAddDestDialog = false;
+      this.editDestIndex = null;
+    } else {
+      // Add: call API then update locally
+      this.showAddDestDialog = false;
+      this.loaderService.show('Adding destination...');
+      const dto: CreateTripDestinationDto = {
+        googlePlaceId: this.selectedDestPrediction.place_id,
+        name: entry.name,
+        latitude: this.selectedDestPrediction.latitude ?? undefined,
+        longitude: this.selectedDestPrediction.longitude ?? undefined,
+        photoUrl: this.selectedDestPrediction.photoUrl ?? null,
+        order: this.destinations.length,
+        startDate: entry.startDate,
+        endDate: entry.endDate
+      };
+      this.tripService.addDestination(this.tripId, dto).subscribe({
+        next: (res) => {
+          this.destinations.push({ id: res.id, ...entry });
+          this.showAddDestDialog = false;
+          this.loaderService.hide();
+        },
+        error: () => {
+          this.destinations.push(entry);
+          this.showAddDestDialog = false;
+          this.loaderService.hide();
+        }
+      });
+    }
+  }
+
+  getTripDuration(): string {
+    if (!this.fromDate || !this.toDate) return '';
+    const start = new Date(this.fromDate);
+    const end = new Date(this.toDate);
+    const diffMs = end.getTime() - start.getTime();
+    const nights = Math.round(diffMs / (1000 * 60 * 60 * 24));
+    if (nights <= 0) return '';
+    const days = nights + 1;
+    return `${nights} night${nights !== 1 ? 's' : ''} · ${days} day${days !== 1 ? 's' : ''}`;
+  }
+
+  getDaysLeft(): number | null {
+    if (!this.fromDate) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const start = new Date(this.fromDate);
+    start.setHours(0, 0, 0, 0);
+    const diff = Math.ceil((start.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    return diff;
   }
 
   async logout(): Promise<void> {

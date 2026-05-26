@@ -11,13 +11,13 @@ body {
 body {
     margin: 0;
     font-family: Roboto, "Helvetica Neue", sans-serif;
-    background-color: #0e1b0f; // dark green — matches the app's hero/landing feel
+    background-color: #fff;
 }
 
 app-root {
     display: block;
     min-height: 100vh;
-    background-color: #0e1b0f;
+    background-color: #fff;
 }
 
 body.no-scroll {
@@ -77,4 +77,155 @@ body.no-scroll {
     background-image: none !important;
     color: #fff !important;
   }
+}
+
+// ===== MATERIAL DATEPICKER GLOBAL STYLES =====
+.mat-datepicker-content {
+  border-radius: 16px !important;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.14) !important;
+  font-family: 'Poppins', sans-serif !important;
+}
+
+.mat-calendar {
+  font-family: 'Poppins', sans-serif !important;
+  width: 296px !important;
+}
+
+.mat-calendar-header {
+  background: #2d5a27 !important;
+  border-radius: 16px 16px 0 0 !important;
+  padding: 12px 8px 8px !important;
+}
+
+.mat-calendar-controls {
+  .mat-calendar-period-button {
+    color: #fff !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+  }
+  .mat-calendar-previous-button,
+  .mat-calendar-next-button {
+    color: #fff !important;
+  }
+}
+
+.mat-calendar-table-header th {
+  color: #888 !important;
+  font-size: 0.72rem !important;
+  font-weight: 600 !important;
+}
+
+.mat-calendar-body-cell-content {
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 0.85rem !important;
+  border-radius: 50% !important;
+}
+
+.mat-calendar-body-selected {
+  background-color: #2d5a27 !important;
+  color: #fff !important;
+}
+
+.mat-calendar-body-today:not(.mat-calendar-body-selected) {
+  border-color: #2d5a27 !important;
+  color: #2d5a27 !important;
+  font-weight: 700 !important;
+}
+
+.mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover
+  .mat-calendar-body-cell-content:not(.mat-calendar-body-selected) {
+  background-color: #e8f5e9 !important;
+  color: #2d5a27 !important;
+}
+
+// Form field styling for date fields
+.date-field {
+  width: 100%;
+
+  .mat-mdc-text-field-wrapper {
+    border-radius: 10px !important;
+    background: #fff !important;
+  }
+
+  .mdc-notched-outline__leading,
+  .mdc-notched-outline__notch,
+  .mdc-notched-outline__trailing {
+    border-color: #e8e8e8 !important;
+  }
+
+  &.mat-focused {
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: #2d5a27 !important;
+    }
+  }
+
+  .mat-mdc-form-field-infix {
+    padding: 10px 0 !important;
+    min-height: unset !important;
+  }
+
+  input.mat-mdc-input-element {
+    font-family: 'Poppins', sans-serif !important;
+    font-size: 0.9rem !important;
+    color: #1a1a1a !important;
+  }
+
+  .mat-mdc-form-field-subscript-wrapper {
+    display: none !important;
+  }
+
+  .mat-datepicker-toggle {
+    color: #2d5a27 !important;
+  }
+}
+
+// ===== GLOBAL BLUR LOADER =====
+// Reusable full-screen frosted glass loader overlay.
+// Usage: <div class="app-loader" [class.hidden]="!loading">
+//          <div class="app-loader-spinner"></div>
+//          <p>Loading...</p>
+//        </div>
+.app-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.55);
+  opacity: 1;
+  transition: opacity 0.35s ease;
+  pointer-events: all;
+
+  &.hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .app-loader-spinner {
+    width: 36px;
+    height: 36px;
+    border: 3px solid rgba(45, 90, 39, 0.15);
+    border-top-color: #2d5a27;
+    border-radius: 50%;
+    animation: app-loader-spin 0.8s linear infinite;
+  }
+
+  p {
+    font-size: 0.9rem;
+    color: #555;
+    font-weight: 500;
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+  }
+}
+
+@keyframes app-loader-spin {
+  to { transform: rotate(360deg); }
 }

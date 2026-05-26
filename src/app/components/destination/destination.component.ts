@@ -8,6 +8,7 @@ import { TripPlanModalComponent } from '../trip-plan-modal/trip-plan-modal.compo
 import { TripService, TripResponse } from '../../services/trip.service';
 import { AuthService } from '../../services/auth.service';
 import { FavouritesService, FavouriteItem } from '../../services/favourites.service';
+import { LoaderService } from '../../services/loader.service';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Subject } from 'rxjs';
@@ -68,7 +69,8 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
     private dialog: MatDialog,
     private authService: AuthService,
     public favouritesService: FavouritesService,
-    private tripService: TripService
+    private tripService: TripService,
+    private loaderService: LoaderService
   ) {}
 
   ngOnInit(): void {
@@ -89,18 +91,18 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
   loadDestination(): void {
     this.loading = true;
     this.error = null;
+    this.loaderService.show('Discovering this destination...');
 
     this.destinationService.search(this.placeId).subscribe({
       next: (data) => {
         this.destination = data;
-        // Wait for Firebase auth to restore before checking for existing trip
         this.authService.authReady.then(() => {
-          if (!this.authService.isLoggedIn) { this.loading = false; return; }
+          if (!this.authService.isLoggedIn) { this.loading = false; this.loaderService.hide(); return; }
           return this.authService.getFirebaseToken().then(token => {
-            if (!token) { this.loading = false; return; }
+            if (!token) { this.loading = false; this.loaderService.hide(); return; }
             this.tripService.getTripByDestination(this.placeId).subscribe({
-              next: (trip) => { this.existingTrip = trip; this.loading = false; },
-              error: () => { this.existingTrip = null; this.loading = false; }
+              next: (trip) => { this.existingTrip = trip; this.loading = false; this.loaderService.hide(); },
+              error: () => { this.existingTrip = null; this.loading = false; this.loaderService.hide(); }
             });
           });
         });
@@ -112,6 +114,7 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
       error: (err) => {
         this.error = 'Failed to load destination details. Please try again.';
         this.loading = false;
+        this.loaderService.hide();
         console.error(err);
       }
     });

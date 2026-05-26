@@ -50,40 +50,243 @@
       </div>
     </header>
 
-    <!-- Loading State -->
-    <div class="loading-state" *ngIf="loading">
+    <!-- Loading State (non-overview tabs) -->
+    <div class="loading-state" *ngIf="loading && activeTab !== 'overview'">
       <div class="spinner"></div>
-      <p>Loading destination data...</p>
+      <p>Loading...</p>
     </div>
 
     <!-- Overview Tab -->
-    <div class="tab-content" *ngIf="!loading && activeTab === 'overview'">
+    <div class="tab-content" *ngIf="activeTab === 'overview'">
 
       <!-- Your Trip card at top -->
-      <div class="section-card" *ngIf="destination">
+      <div class="section-card trip-card-skeleton" *ngIf="tripLoading">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-short"></div>
+        <div class="skeleton-dest-row">
+          <div class="skeleton-dest-box" *ngFor="let i of [1,2,3]"></div>
+        </div>
+      </div>
+
+      <!-- Your Trip card at top -->
+      <div class="section-card" *ngIf="!tripLoading && destination">
         <div class="section-card-header">
           <h3>{{ tripName || destination }}</h3>
           <span class="section-badge" [ngClass]="'status-' + getStatusClass(tripStatus)">{{ tripStatus }}</span>
         </div>
         <div class="trip-summary">
+
+          <!-- Row 1: Dates + Duration + Travellers + Invite -->
           <div class="trip-meta-row">
             <div class="trip-meta-item">
-              <span class="meta-label">Destination</span>
-              <span class="meta-value">{{ destination }}</span>
-            </div>
-            <div class="trip-meta-item" *ngIf="fromDate || toDate">
               <span class="meta-label">Dates</span>
-              <span class="meta-value">
+              <span class="meta-value" *ngIf="fromDate || toDate">
                 {{ fromDate ? (fromDate | date:'MMM d, y') : '—' }}
                 <span *ngIf="toDate"> → {{ toDate | date:'MMM d, y' }}</span>
               </span>
+              <span class="meta-value" *ngIf="!fromDate && !toDate">TBD</span>
+              <span class="meta-sub" *ngIf="getTripDuration()">{{ getTripDuration() }}</span>
             </div>
-            <div class="trip-meta-item" *ngIf="travellers > 0">
+            <div class="trip-meta-divider"></div>
+            <div class="trip-meta-item">
               <span class="meta-label">Travellers</span>
-              <span class="meta-value">{{ travellers }} {{ travellers === 1 ? 'person' : 'people' }}</span>
+              <span class="meta-value">{{ travellers > 0 ? travellers + (travellers === 1 ? ' person' : ' people') : '—' }}</span>
+            </div>
+            <button class="invite-btn">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <line x1="19" y1="8" x2="19" y2="14"/>
+                <line x1="22" y1="11" x2="16" y2="11"/>
+              </svg>
+              Invite
+            </button>
+          </div>
+
+          <!-- Row 3: Destination boxes -->
+          <p class="dest-boxes-label">Destinations</p>
+          <div class="dest-boxes-row">
+            <!-- Index 0 = primary, no actions -->
+            <div class="dest-box" *ngFor="let dest of destinations; let i = index"
+                 [class.dest-box--deleting]="deletingDestId && dest.id === deletingDestId">
+              <div class="dest-box-spinner" *ngIf="deletingDestId && dest.id === deletingDestId">
+                <svg class="spin-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#2d5a27" stroke-width="2.5">
+                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
+                </svg>
+              </div>
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2d5a27" stroke-width="1.8">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              <span class="dest-box-name">{{ dest.name }}</span>
+              <span class="dest-box-dates">
+                {{ dest.startDate ? (dest.startDate | date:'MMM d') : '—' }}
+                <span *ngIf="dest.endDate"> → {{ dest.endDate | date:'MMM d' }}</span>
+              </span>
+              <div class="dest-box-actions" *ngIf="i > 0">
+                <button class="dest-action-btn" title="Edit" (click)="openEditDestDialog(i); $event.stopPropagation()">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                </button>
+                <button class="dest-action-btn dest-action-btn--delete" title="Remove" (click)="openDeleteDestConfirm(i); $event.stopPropagation()">
+                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                    <path d="M10 11v6M14 11v6"/>
+                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="dest-box add-dest-box" (click)="openAddDestDialog()">
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#bbb" stroke-width="1.8">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              <span class="add-dest-text">Add destination</span>
             </div>
           </div>
-          <button class="add-dest-btn">+ Add more destinations</button>
+
+        </div>
+      </div>
+
+      <!-- Trip stat cards -->
+      <div class="trip-stat-cards" *ngIf="destination">
+
+        <div class="stat-card">
+          <div class="stat-card-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <span class="stat-card-value">{{ destinations.length }}</span>
+          <span class="stat-card-label">Destination{{ destinations.length !== 1 ? 's' : '' }}</span>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <span class="stat-card-value">$0</span>
+          <span class="stat-card-label">Budget</span>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-card-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <span class="stat-card-value">{{ itinerary.length }}</span>
+          <span class="stat-card-label">Activit{{ itinerary.length !== 1 ? 'ies' : 'y' }}</span>
+        </div>
+
+        <div class="stat-card" [class.stat-card--soon]="getDaysLeft() !== null && getDaysLeft()! <= 7 && getDaysLeft()! >= 0">
+          <div class="stat-card-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <span class="stat-card-value" *ngIf="getDaysLeft() === null">—</span>
+          <span class="stat-card-value" *ngIf="getDaysLeft() !== null && getDaysLeft()! > 0">{{ getDaysLeft() }}</span>
+          <span class="stat-card-value" *ngIf="getDaysLeft() !== null && getDaysLeft()! === 0">Today</span>
+          <span class="stat-card-value" *ngIf="getDaysLeft() !== null && getDaysLeft()! < 0">Done</span>
+          <span class="stat-card-label" *ngIf="getDaysLeft() === null || getDaysLeft()! <= 0">Days Left</span>
+          <span class="stat-card-label" *ngIf="getDaysLeft() !== null && getDaysLeft()! > 0">Day{{ getDaysLeft() !== 1 ? 's' : '' }} to Go</span>
+        </div>
+      </div>
+
+      <!-- Add / Edit Destination Dialog -->
+      <div class="dialog-backdrop" *ngIf="showAddDestDialog" (click)="closeAddDestDialog()">
+        <div class="add-dest-dialog" (click)="$event.stopPropagation()">
+          <h4>{{ editDestIndex !== null ? 'Edit Destination' : 'Add Destination' }}</h4>
+          <p class="dialog-hint">Search for a destination to add to your trip.</p>
+
+          <!-- Search field -->
+          <div class="dialog-field dest-search-field">
+            <label>Destination</label>
+            <div class="dest-search-wrap">
+              <span class="dest-search-icon">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                  <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+              </span>
+              <input
+                type="text"
+                class="dest-search-input"
+                [value]="destSearchQuery"
+                placeholder="Search destination..."
+                (input)="onDestSearchInput($event)"
+                (blur)="onDestSearchBlur()"
+                autocomplete="off"
+              >
+              <div class="dest-search-dropdown" *ngIf="destSearchShowDropdown && destSearchPredictions.length > 0">
+                <div
+                  class="dest-dropdown-item"
+                  *ngFor="let p of destSearchPredictions"
+                  (mousedown)="selectDestPrediction(p)"
+                >
+                  <span class="dest-dropdown-main">{{ p.structured_formatting.main_text }}</span>
+                  <span class="dest-dropdown-secondary">{{ p.structured_formatting.secondary_text }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="dialog-fields" *ngIf="fromDate || toDate">
+            <p class="dialog-dates-hint" *ngIf="fromDate || toDate">
+              Dates <span class="optional">(optional)</span>
+              <span *ngIf="fromDate && toDate"> · Trip: {{ fromDate | date:'MMM d' }} → {{ toDate | date:'MMM d, y' }}</span>
+            </p>
+            <div class="dialog-field">
+              <label>Start Date</label>
+              <mat-form-field appearance="outline" class="date-field">
+                <input matInput [matDatepicker]="destStartPicker" [(ngModel)]="addDestStart"
+                       [min]="fromDateObj" [max]="addDestEnd || toDateObj" placeholder="Start date">
+                <mat-datepicker-toggle matIconSuffix [for]="destStartPicker"></mat-datepicker-toggle>
+                <mat-datepicker #destStartPicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div class="dialog-field">
+              <label>End Date</label>
+              <mat-form-field appearance="outline" class="date-field">
+                <input matInput [matDatepicker]="destEndPicker" [(ngModel)]="addDestEnd"
+                       [min]="addDestStart || fromDateObj" [max]="toDateObj" placeholder="End date">
+                <mat-datepicker-toggle matIconSuffix [for]="destEndPicker"></mat-datepicker-toggle>
+                <mat-datepicker #destEndPicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <div class="dialog-actions">
+            <button class="dialog-cancel" (click)="closeAddDestDialog()">Cancel</button>
+            <button class="dialog-confirm" (click)="confirmAddDest()" [disabled]="!selectedDestPrediction">
+              {{ editDestIndex !== null ? 'Save' : 'Add' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delete Destination Confirm -->
+      <div class="dialog-backdrop" *ngIf="showDeleteDestConfirm" (click)="cancelDeleteDest()">
+        <div class="add-dest-dialog confirm-dialog" (click)="$event.stopPropagation()">
+          <h4>Remove Destination</h4>
+          <p class="dialog-hint">Are you sure you want to remove <strong>{{ deleteDestName }}</strong> from your trip?</p>
+          <div class="dialog-actions">
+            <button class="dialog-cancel" (click)="cancelDeleteDest()">Cancel</button>
+            <button class="dialog-confirm dialog-confirm--danger" (click)="confirmDeleteDest()">Remove</button>
+          </div>
         </div>
       </div>
 

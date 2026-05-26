@@ -44,12 +44,20 @@
     <div class="date-row" [class.disabled]="datesUndecided">
       <div class="date-input-wrap">
         <label class="date-label">From</label>
-        <input type="date" [(ngModel)]="fromDate" [disabled]="datesUndecided" [min]="today">
+        <mat-form-field appearance="outline" class="date-field">
+          <input matInput [matDatepicker]="fromPicker" [(ngModel)]="fromDate" [min]="todayDate" placeholder="Start date">
+          <mat-datepicker-toggle matIconSuffix [for]="fromPicker"></mat-datepicker-toggle>
+          <mat-datepicker #fromPicker></mat-datepicker>
+        </mat-form-field>
       </div>
       <div class="date-separator">→</div>
       <div class="date-input-wrap">
         <label class="date-label">To</label>
-        <input type="date" [(ngModel)]="toDate" [disabled]="datesUndecided" [min]="fromDate || today">
+        <mat-form-field appearance="outline" class="date-field">
+          <input matInput [matDatepicker]="toPicker" [(ngModel)]="toDate" [min]="fromDate || todayDate" placeholder="End date">
+          <mat-datepicker-toggle matIconSuffix [for]="toPicker"></mat-datepicker-toggle>
+          <mat-datepicker #toPicker></mat-datepicker>
+        </mat-form-field>
       </div>
     </div>
   </div>

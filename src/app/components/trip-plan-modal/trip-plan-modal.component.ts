@@ -20,10 +20,11 @@ export interface TripPlanModalData {
   standalone: false
 })
 export class TripPlanModalComponent {
-  fromDate: string = '';
-  toDate: string = '';
+  fromDate: Date | null = null;
+  toDate: Date | null = null;
   datesUndecided: boolean = false;
   travellers: number = 2;
+  todayDate: Date = new Date();
   today: string = new Date().toISOString().split('T')[0];
   tripName: string = '';
   isLoading: boolean = false;
@@ -42,8 +43,8 @@ export class TripPlanModalComponent {
   toggleDatesUndecided(): void {
     this.datesUndecided = !this.datesUndecided;
     if (this.datesUndecided) {
-      this.fromDate = '';
-      this.toDate = '';
+      this.fromDate = null;
+      this.toDate = null;
     }
   }
 
@@ -63,8 +64,8 @@ export class TripPlanModalComponent {
       name: this.tripName || `A trip to ${this.data.destination}`,
       primaryDestination: this.data.destination,
       coverPhotoUrl: this.data.photoUrl || null,
-      startDate: this.datesUndecided || !this.fromDate ? null : this.fromDate,
-      endDate: this.datesUndecided || !this.toDate ? null : this.toDate,
+      startDate: this.datesUndecided || !this.fromDate ? null : this.fromDate.toISOString().split('T')[0],
+      endDate: this.datesUndecided || !this.toDate ? null : this.toDate.toISOString().split('T')[0],
       travelersCount: this.travellers,
       destination: {
         googlePlaceId: this.data.placeId,

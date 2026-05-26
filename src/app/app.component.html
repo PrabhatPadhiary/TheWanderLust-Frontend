@@ -1,1 +1,7 @@
 <router-outlet></router-outlet>
+
+<!-- Global full-screen blur loader -->
+<div class="app-loader" [class.hidden]="!(loaderService.visible$ | async)">
+  <div class="app-loader-spinner"></div>
+  <p>{{ loaderService.message$ | async }}</p>
+</div>

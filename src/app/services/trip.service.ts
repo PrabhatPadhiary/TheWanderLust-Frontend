@@ -4,6 +4,29 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
 
+export interface CreateTripDestinationDto {
+  googlePlaceId: string;
+  name: string;
+  latitude?: number;
+  longitude?: number;
+  photoUrl?: string | null;
+  order?: number;
+  startDate?: string | null;
+  endDate?: string | null;
+}
+
+export interface TripDestinationResponse {
+  id: string;
+  googlePlaceId: string;
+  name: string;
+  latitude?: number;
+  longitude?: number;
+  photoUrl?: string | null;
+  order?: number;
+  startDate?: string | null;
+  endDate?: string | null;
+}
+
 export interface CreateTripDto {
   name: string;
   description?: string;
@@ -32,6 +55,7 @@ export interface TripResponse {
   description?: string;
   coverPhotoUrl?: string | null;
   createdAt?: string;
+  destinations?: TripDestinationResponse[];
 }
 
 @Injectable({
@@ -107,17 +131,47 @@ export class TripService {
 
   getTrip(tripId: string): Observable<TripResponse> {
     return new Observable(observer => {
-      this.authService.getFirebaseToken().then(token => {
-        if (!token) { observer.error('Not authenticated'); return; }
-        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
-        this.http.get<TripResponse>(`${environment.apiUrl}/Trips/${tripId}`, { headers })
-          .subscribe({ next: (res) => { observer.next(res); observer.complete(); }, error: (err) => observer.error(err) });
-      });
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken().then(token => {
+          if (!token) { observer.error('Not authenticated'); return; }
+          const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+          this.http.get<TripResponse>(`${environment.apiUrl}/Trips/${tripId}`, { headers })
+            .subscribe({ next: (res) => { observer.next(res); observer.complete(); }, error: (err) => observer.error(err) });
+        })
+      );
     });
   }
 
   clearCache(): void {
     this.tripsLoaded = false;
     this.tripsSubject.next([]);
+  }
+
+  addDestination(tripId: string, dto: CreateTripDestinationDto): Observable<TripDestinationResponse> {
+    return new Observable(observer => {
+      this.authService.getFirebaseToken().then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.post<TripDestinationResponse>(`${environment.apiUrl}/Trips/${tripId}/destinations`, dto, { headers })
+          .subscribe({
+            next: (res) => { observer.next(res); observer.complete(); },
+            error: (err) => observer.error(err)
+          });
+      });
+    });
+  }
+
+  deleteDestination(tripId: string, destinationId: string): Observable<void> {
+    return new Observable(observer => {
+      this.authService.getFirebaseToken().then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.delete<void>(`${environment.apiUrl}/Trips/${tripId}/destinations/${destinationId}`, { headers })
+          .subscribe({
+            next: (res) => { observer.next(res); observer.complete(); },
+            error: (err) => observer.error(err)
+          });
+      });
+    });
   }
 }
