@@ -7,8 +7,8 @@
     <span class="brand-name">Wander<span class="brand-accent">Lust</span></span>
   </div>
 
-  <!-- Center: Split Search Bar -->
-  <div class="navbar-search">
+  <!-- Center: Split Search Bar (hidden on trip planner) -->
+  <div class="navbar-search" *ngIf="!isTripPlanner">
     <div class="split-search-bar">
       <div class="search-left">
         <span class="search-pin">
@@ -48,8 +48,24 @@
   <!-- Right: Actions -->
   <div class="navbar-actions">
 
-    <!-- Favourites: always visible -->
-    <button class="nav-action-btn with-label" (click)="onFavouritesClick()" title="Favourites">
+    <!-- Active trip indicator (shown when on a destination page with an existing trip) -->
+    <div class="trip-indicator" *ngIf="existingTrip && !isTripPlanner"
+         (click)="navigateToTrip()"
+         (mouseenter)="showTripTooltip = true"
+         (mouseleave)="showTripTooltip = false">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+      </svg>
+      <span class="trip-indicator-badge"></span>
+      <div class="trip-tooltip" *ngIf="showTripTooltip">
+        <span class="trip-tooltip-label">Active trip</span>
+        <strong>{{ getTripCapsuleLabel() }}</strong>
+        <span class="trip-tooltip-cta">Continue Planning →</span>
+      </div>
+    </div>
+
+    <!-- Favourites: hidden on trip planner -->
+    <button class="nav-action-btn with-label" *ngIf="!isTripPlanner" (click)="onFavouritesClick()" title="Favourites">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
       </svg>

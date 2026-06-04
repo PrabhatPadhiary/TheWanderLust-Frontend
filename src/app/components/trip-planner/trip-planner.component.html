@@ -1,15 +1,8 @@
+<app-navbar [solid]="true" [isTripPlanner]="true" [destinationName]="destination" [primaryDestinationPlaceId]="primaryPlaceId"></app-navbar>
+
 <div class="trip-planner-layout">
   <!-- Sidebar -->
   <aside class="sidebar">
-    <div class="sidebar-header">
-      <div class="brand">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
-        </svg>
-        <span class="brand-name">Wander<span class="brand-accent">Lust</span></span>
-      </div>
-    </div>
-
     <div class="user-profile">
       <div class="avatar">{{ getUserInitial() }}</div>
       <div class="user-info">
@@ -17,9 +10,7 @@
         <span class="user-role">{{ isGuest ? 'Guest' : user?.role || 'Traveller' }}</span>
       </div>
     </div>
-
     <button class="new-trip-btn">+ New Trip</button>
-
     <nav class="sidebar-nav">
       <a class="nav-item" [class.active]="activeTab === 'overview'" (click)="setActiveTab('overview')">Overview</a>
       <a class="nav-item" [class.active]="activeTab === 'itinerary'" (click)="setActiveTab('itinerary')">
@@ -38,19 +29,29 @@
 
   <!-- Main Content -->
   <main class="main-content">
+
     <!-- Header -->
     <header class="content-header">
-      <div class="greeting-section">
-        <h1>{{ greeting }}, <strong>{{ getUserName() }}</strong> 👋</h1>
-        <p *ngIf="destination">Plan your trip to <strong>{{ destination }}</strong></p>
-        <p *ngIf="!destination">Start planning your next adventure</p>
+      <div class="back-capsule-wrap">
+        <button class="back-capsule" (click)="goBackToDestination()">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M19 12H5M12 5l-7 7 7 7"/>
+          </svg>
+          <span>Back to {{ destination || 'Destination' }}</span>
+        </button>
       </div>
-      <div class="header-actions">
-        <div class="avatar-sm">{{ getUserInitial() }}</div>
+      <div class="greeting-row">
+        <div class="greeting-section">
+          <h1>{{ greeting }}, <strong>{{ getUserName() }}</strong> 👋</h1>
+          <p *ngIf="destination">Plan your trip to <strong>{{ destination }}</strong></p>
+          <p *ngIf="!destination">Start planning your next adventure</p>
+        </div>
+        <div class="header-actions">
+          <div class="avatar-sm">{{ getUserInitial() }}</div>
+        </div>
       </div>
     </header>
 
-    <!-- Loading State (non-overview tabs) -->
     <div class="loading-state" *ngIf="loading && activeTab !== 'overview'">
       <div class="spinner"></div>
       <p>Loading...</p>
@@ -59,7 +60,57 @@
     <!-- Overview Tab -->
     <div class="tab-content" *ngIf="activeTab === 'overview'">
 
-      <!-- Your Trip card at top -->
+      <!-- Stat cards — right after greeting -->
+      <div class="trip-stat-cards" *ngIf="destination">
+        <div class="stat-card">
+          <div class="stat-card-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <span class="stat-card-value">{{ destinations.length }}</span>
+          <span class="stat-card-label">Destination{{ destinations.length !== 1 ? 's' : '' }}</span>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+          </div>
+          <span class="stat-card-value">$0</span>
+          <span class="stat-card-label">Budget</span>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
+            </svg>
+          </div>
+          <span class="stat-card-value">{{ itinerary.length }}</span>
+          <span class="stat-card-label">Activit{{ itinerary.length !== 1 ? 'ies' : 'y' }}</span>
+        </div>
+        <div class="stat-card" [class.stat-card--soon]="getDaysLeft() !== null && getDaysLeft()! <= 7 && getDaysLeft()! >= 0">
+          <div class="stat-card-icon">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <span class="stat-card-value" *ngIf="getDaysLeft() === null">—</span>
+          <span class="stat-card-value" *ngIf="getDaysLeft() !== null && getDaysLeft()! > 0">{{ getDaysLeft() }}</span>
+          <span class="stat-card-value" *ngIf="getDaysLeft() !== null && getDaysLeft()! === 0">Today</span>
+          <span class="stat-card-value" *ngIf="getDaysLeft() !== null && getDaysLeft()! < 0">Done</span>
+          <span class="stat-card-label" *ngIf="getDaysLeft() === null || getDaysLeft()! <= 0">Days Left</span>
+          <span class="stat-card-label" *ngIf="getDaysLeft() !== null && getDaysLeft()! > 0">Day{{ getDaysLeft() !== 1 ? 's' : '' }} to Go</span>
+        </div>
+      </div>
+
+      <!-- Trip card skeleton -->
       <div class="section-card trip-card-skeleton" *ngIf="tripLoading">
         <div class="skeleton-line skeleton-title"></div>
         <div class="skeleton-line skeleton-short"></div>
@@ -68,15 +119,40 @@
         </div>
       </div>
 
-      <!-- Your Trip card at top -->
+      <!-- Trip card -->
       <div class="section-card" *ngIf="!tripLoading && destination">
         <div class="section-card-header">
           <h3>{{ tripName || destination }}</h3>
-          <span class="section-badge" [ngClass]="'status-' + getStatusClass(tripStatus)">{{ tripStatus }}</span>
+          <div class="section-options">
+            <span class="section-badge" [ngClass]="'status-' + getStatusClass(tripStatus)">{{ tripStatus }}</span>
+            <div class="trip-menu-wrap">
+              <button class="trip-menu-btn" (click)="showTripMenu = !showTripMenu; $event.stopPropagation()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                  <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
+                </svg>
+              </button>
+              <div class="trip-menu-dropdown" *ngIf="showTripMenu">
+                <button class="trip-menu-item" (click)="showTripMenu = false">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                  </svg>
+                  Edit trip
+                </button>
+                <button class="trip-menu-item trip-menu-item--danger" (click)="showTripMenu = false; showDeleteTripConfirm = true">
+                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"/>
+                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                    <path d="M10 11v6M14 11v6"/>
+                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                  </svg>
+                  Delete trip
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
         <div class="trip-summary">
-
-          <!-- Row 1: Dates + Duration + Travellers + Invite -->
           <div class="trip-meta-row">
             <div class="trip-meta-item">
               <span class="meta-label">Dates</span>
@@ -103,106 +179,165 @@
             </button>
           </div>
 
-          <!-- Row 3: Destination boxes -->
-          <p class="dest-boxes-label">Destinations</p>
-          <div class="dest-boxes-row">
-            <!-- Index 0 = primary, no actions -->
-            <div class="dest-box" *ngFor="let dest of destinations; let i = index"
-                 [class.dest-box--deleting]="deletingDestId && dest.id === deletingDestId">
-              <div class="dest-box-spinner" *ngIf="deletingDestId && dest.id === deletingDestId">
-                <svg class="spin-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#2d5a27" stroke-width="2.5">
-                  <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/>
-                </svg>
-              </div>
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#2d5a27" stroke-width="1.8">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
-              <span class="dest-box-name">{{ dest.name }}</span>
-              <span class="dest-box-dates">
-                {{ dest.startDate ? (dest.startDate | date:'MMM d') : '—' }}
-                <span *ngIf="dest.endDate"> → {{ dest.endDate | date:'MMM d' }}</span>
-              </span>
-              <div class="dest-box-actions" *ngIf="i > 0">
-                <button class="dest-action-btn" title="Edit" (click)="openEditDestDialog(i); $event.stopPropagation()">
-                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                  </svg>
-                </button>
-                <button class="dest-action-btn dest-action-btn--delete" title="Remove" (click)="openDeleteDestConfirm(i); $event.stopPropagation()">
-                  <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5">
-                    <polyline points="3 6 5 6 21 6"/>
-                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                    <path d="M10 11v6M14 11v6"/>
-                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-                  </svg>
-                </button>
-              </div>
-            </div>
-            <div class="dest-box add-dest-box" (click)="openAddDestDialog()">
-              <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#bbb" stroke-width="1.8">
-                <line x1="12" y1="5" x2="12" y2="19"/>
-                <line x1="5" y1="12" x2="19" y2="12"/>
-              </svg>
-              <span class="add-dest-text">Add destination</span>
-            </div>
+          <!-- Destination capsules -->
+          <p class="dest-capsules-label">Destinations — click to manage places</p>
+          <div class="dest-capsules-row">
+            <button
+              class="dest-capsule"
+              *ngFor="let dest of destinations; let i = index"
+              [class.dest-capsule--active]="activeDestIndex === i"
+              [class.dest-capsule--deleting]="deletingDestId && dest.id === deletingDestId"
+              (click)="selectDest(i)">
+              {{ dest.name }}
+            </button>
+            <button class="dest-capsule dest-capsule--add" (click)="openAddDestDialog()">
+              + Add destination
+            </button>
           </div>
-
         </div>
       </div>
 
-      <!-- Trip stat cards -->
-      <div class="trip-stat-cards" *ngIf="destination">
-
-        <div class="stat-card">
-          <div class="stat-card-icon">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+      <!-- Destination detail panel -->
+      <div class="dest-detail-panel" *ngIf="!tripLoading && destinations.length > 0">
+        <div class="dest-detail-header">
+          <div class="dest-detail-title">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#2d5a27" stroke-width="2">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
               <circle cx="12" cy="10" r="3"/>
             </svg>
+            <strong>{{ destinations[activeDestIndex]?.name }}</strong>
           </div>
-          <span class="stat-card-value">{{ destinations.length }}</span>
-          <span class="stat-card-label">Destination{{ destinations.length !== 1 ? 's' : '' }}</span>
+          <div class="dest-detail-header-right">
+            <span class="dest-detail-dates" *ngIf="destinations[activeDestIndex]?.startDate || destinations[activeDestIndex]?.endDate">
+              {{ destinations[activeDestIndex]?.startDate | date:'MMM d' }}
+              <span *ngIf="destinations[activeDestIndex]?.endDate"> → {{ destinations[activeDestIndex]?.endDate | date:'MMM d' }}</span>
+            </span>
+            <button class="dest-hdr-btn" title="Edit" (click)="openEditDestDialog(activeDestIndex)" *ngIf="activeDestIndex > 0">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+              </svg>
+            </button>
+            <button class="dest-hdr-btn dest-hdr-btn--delete" title="Remove" (click)="openDeleteDestConfirm(activeDestIndex)" *ngIf="activeDestIndex > 0">
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="3 6 5 6 21 6"/>
+                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                <path d="M10 11v6M14 11v6"/>
+                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              </svg>
+            </button>
+          </div>
         </div>
-
-        <div class="stat-card">
-          <div class="stat-card-icon">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="1" x2="12" y2="23"/>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        <div class="dest-detail-tabs">
+          <button class="dest-tab" [class.dest-tab--active]="activeDestTab === 'stays'" (click)="activeDestTab = 'stays'">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
             </svg>
-          </div>
-          <span class="stat-card-value">$0</span>
-          <span class="stat-card-label">Budget</span>
+            Stays
+          </button>
+          <button class="dest-tab" [class.dest-tab--active]="activeDestTab === 'food'" (click)="activeDestTab = 'food'">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+              <line x1="6" y1="1" x2="6" y2="4"/>
+              <line x1="10" y1="1" x2="10" y2="4"/>
+              <line x1="14" y1="1" x2="14" y2="4"/>
+            </svg>
+            Food
+          </button>
+          <button class="dest-tab" [class.dest-tab--active]="activeDestTab === 'activities'" (click)="activeDestTab = 'activities'">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+            </svg>
+            Activities
+          </button>
+          <div class="dest-tab-ink" [style.transform]="'translateX(' + (getDestTabIndex() * 100) + '%)'"></div>
         </div>
-
-        <div class="stat-card">
-          <div class="stat-card-icon">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-              <line x1="16" y1="2" x2="16" y2="6"/>
-              <line x1="8" y1="2" x2="8" y2="6"/>
-              <line x1="3" y1="10" x2="21" y2="10"/>
-            </svg>
+        <div class="dest-detail-body">
+          <div class="dest-detail-empty">
+            <p [hidden]="activeDestTab !== 'stays'">No stays added yet for <strong>{{ destinations[activeDestIndex]?.name }}</strong>.</p>
+            <p [hidden]="activeDestTab !== 'food'">No restaurants added yet for <strong>{{ destinations[activeDestIndex]?.name }}</strong>.</p>
+            <p [hidden]="activeDestTab !== 'activities'">No activities added yet for <strong>{{ destinations[activeDestIndex]?.name }}</strong>.</p>
+            <button class="dest-detail-add-btn" (click)="openAddPlaceModal()">+ Add</button>
           </div>
-          <span class="stat-card-value">{{ itinerary.length }}</span>
-          <span class="stat-card-label">Activit{{ itinerary.length !== 1 ? 'ies' : 'y' }}</span>
         </div>
+      </div>
 
-        <div class="stat-card" [class.stat-card--soon]="getDaysLeft() !== null && getDaysLeft()! <= 7 && getDaysLeft()! >= 0">
-          <div class="stat-card-icon">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"/>
-              <polyline points="12 6 12 12 16 14"/>
-            </svg>
+      <!-- Add Place Modal -->
+      <div class="dialog-backdrop" *ngIf="showAddPlaceModal" (click)="closeAddPlaceModal()">
+        <div class="add-place-modal" (click)="$event.stopPropagation()">
+          <div class="add-place-modal-header">
+            <div class="add-place-modal-title">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#2d5a27" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              <span>Add to {{ destinations[activeDestIndex]?.name }}</span>
+              <span class="add-place-tab-label">{{ activeDestTab | titlecase }} tab</span>
+            </div>
+            <button class="add-place-close" (click)="closeAddPlaceModal()">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
           </div>
-          <span class="stat-card-value" *ngIf="getDaysLeft() === null">—</span>
-          <span class="stat-card-value" *ngIf="getDaysLeft() !== null && getDaysLeft()! > 0">{{ getDaysLeft() }}</span>
-          <span class="stat-card-value" *ngIf="getDaysLeft() !== null && getDaysLeft()! === 0">Today</span>
-          <span class="stat-card-value" *ngIf="getDaysLeft() !== null && getDaysLeft()! < 0">Done</span>
-          <span class="stat-card-label" *ngIf="getDaysLeft() === null || getDaysLeft()! <= 0">Days Left</span>
-          <span class="stat-card-label" *ngIf="getDaysLeft() !== null && getDaysLeft()! > 0">Day{{ getDaysLeft() !== 1 ? 's' : '' }} to Go</span>
+
+          <div class="add-place-modal-body">
+            <!-- Google Places search -->
+            <p class="add-place-section-label">Search Google Places</p>
+            <div class="add-place-search-wrap">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#aaa" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+              </svg>
+              <input
+                type="text"
+                class="add-place-search-input"
+                [value]="addPlaceSearch"
+                placeholder="Search for a place..."
+                (input)="onAddPlaceSearchInput($event)"
+                (blur)="onAddPlaceBlur()"
+                autocomplete="off">
+            </div>
+
+            <!-- Search results -->
+            <div class="add-place-results" *ngIf="addPlacePredictions.length > 0">
+              <div class="add-place-result-item" *ngFor="let p of addPlacePredictions" (mousedown)="addPlaceFromPrediction(p)">
+                <div class="add-place-result-thumb">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#aaa" stroke-width="1.8">
+                    <rect x="3" y="3" width="18" height="18" rx="2"/>
+                    <path d="M3 9h18M9 21V9"/>
+                  </svg>
+                </div>
+                <div class="add-place-result-info">
+                  <span class="add-place-result-main">{{ p.structured_formatting.main_text }}</span>
+                  <span class="add-place-result-sub">
+                    <span *ngIf="p.rating">⭐ {{ p.rating }} · </span>{{ p.structured_formatting.secondary_text }}
+                  </span>
+                </div>
+                <button class="add-place-result-btn">+ Add</button>
+              </div>
+            </div>
+
+            <p class="add-place-or">or add manually</p>
+
+            <!-- Manual entry -->
+            <div class="add-place-field">
+              <label>Place name</label>
+              <input type="text" [(ngModel)]="addPlaceCustomName" placeholder="Custom place...">
+            </div>
+            <div class="add-place-field">
+              <label>Notes (optional)</label>
+              <textarea [(ngModel)]="addPlaceNotes" placeholder="e.g. Book tickets in advance, opens at 8am..." rows="3"></textarea>
+            </div>
+          </div>
+
+          <div class="add-place-modal-footer">
+            <button class="dialog-cancel" (click)="closeAddPlaceModal()">Cancel</button>
+            <button class="dialog-confirm" (click)="confirmAddPlace()" [disabled]="!addPlaceCustomName && !addPlaceSearch">
+              Add to {{ destinations[activeDestIndex]?.name }}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -211,8 +346,6 @@
         <div class="add-dest-dialog" (click)="$event.stopPropagation()">
           <h4>{{ editDestIndex !== null ? 'Edit Destination' : 'Add Destination' }}</h4>
           <p class="dialog-hint">Search for a destination to add to your trip.</p>
-
-          <!-- Search field -->
           <div class="dialog-field dest-search-field">
             <label>Destination</label>
             <div class="dest-search-wrap">
@@ -222,30 +355,19 @@
                   <circle cx="12" cy="10" r="3"></circle>
                 </svg>
               </span>
-              <input
-                type="text"
-                class="dest-search-input"
-                [value]="destSearchQuery"
-                placeholder="Search destination..."
-                (input)="onDestSearchInput($event)"
-                (blur)="onDestSearchBlur()"
-                autocomplete="off"
-              >
+              <input type="text" class="dest-search-input" [value]="destSearchQuery"
+                placeholder="Search destination..." (input)="onDestSearchInput($event)"
+                (blur)="onDestSearchBlur()" autocomplete="off">
               <div class="dest-search-dropdown" *ngIf="destSearchShowDropdown && destSearchPredictions.length > 0">
-                <div
-                  class="dest-dropdown-item"
-                  *ngFor="let p of destSearchPredictions"
-                  (mousedown)="selectDestPrediction(p)"
-                >
+                <div class="dest-dropdown-item" *ngFor="let p of destSearchPredictions" (mousedown)="selectDestPrediction(p)">
                   <span class="dest-dropdown-main">{{ p.structured_formatting.main_text }}</span>
                   <span class="dest-dropdown-secondary">{{ p.structured_formatting.secondary_text }}</span>
                 </div>
               </div>
             </div>
           </div>
-
           <div class="dialog-fields" *ngIf="fromDate || toDate">
-            <p class="dialog-dates-hint" *ngIf="fromDate || toDate">
+            <p class="dialog-dates-hint">
               Dates <span class="optional">(optional)</span>
               <span *ngIf="fromDate && toDate"> · Trip: {{ fromDate | date:'MMM d' }} → {{ toDate | date:'MMM d, y' }}</span>
             </p>
@@ -268,11 +390,24 @@
               </mat-form-field>
             </div>
           </div>
-
           <div class="dialog-actions">
             <button class="dialog-cancel" (click)="closeAddDestDialog()">Cancel</button>
             <button class="dialog-confirm" (click)="confirmAddDest()" [disabled]="!selectedDestPrediction">
               {{ editDestIndex !== null ? 'Save' : 'Add' }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delete Trip Confirm -->
+      <div class="dialog-backdrop" *ngIf="showDeleteTripConfirm" (click)="showDeleteTripConfirm = false">
+        <div class="add-dest-dialog confirm-dialog" (click)="$event.stopPropagation()">
+          <h4>Delete Trip</h4>
+          <p class="dialog-hint">Are you sure you want to delete <strong>{{ tripName }}</strong>? This cannot be undone.</p>
+          <div class="dialog-actions">
+            <button class="dialog-cancel" (click)="showDeleteTripConfirm = false">Cancel</button>
+            <button class="dialog-confirm dialog-confirm--danger" [disabled]="deletingTrip" (click)="confirmDeleteTrip()">
+              {{ deletingTrip ? 'Deleting...' : 'Delete' }}
             </button>
           </div>
         </div>
@@ -296,24 +431,20 @@
           <h3>Favourites</h3>
           <button class="view-all-favs-btn-sm" (click)="setActiveTab('favourites')">View all →</button>
         </div>
-
         <div class="fav-deck-wrapper" (click)="advanceFavStack()">
           <div class="fav-deck">
             <div class="fav-deck-card back-2" [class.animating]="isFavAnimating" *ngIf="favouritesService.favourites.length > 2">
-              <div class="deck-img-fill"
-                   [style.backgroundImage]="'url(' + (favouritesService.favourites[(favStackIndex + 2) % favouritesService.favourites.length].photoUrl || '') + ')'">
+              <div class="deck-img-fill" [style.backgroundImage]="'url(' + (favouritesService.favourites[(favStackIndex + 2) % favouritesService.favourites.length].photoUrl || '') + ')'">
                 <div *ngIf="!favouritesService.favourites[(favStackIndex + 2) % favouritesService.favourites.length].photoUrl" class="deck-placeholder">🏛️</div>
               </div>
             </div>
             <div class="fav-deck-card back-1" [class.animating]="isFavAnimating" *ngIf="favouritesService.favourites.length > 1">
-              <div class="deck-img-fill"
-                   [style.backgroundImage]="'url(' + (favouritesService.favourites[(favStackIndex + 1) % favouritesService.favourites.length].photoUrl || '') + ')'">
+              <div class="deck-img-fill" [style.backgroundImage]="'url(' + (favouritesService.favourites[(favStackIndex + 1) % favouritesService.favourites.length].photoUrl || '') + ')'">
                 <div *ngIf="!favouritesService.favourites[(favStackIndex + 1) % favouritesService.favourites.length].photoUrl" class="deck-placeholder">🏛️</div>
               </div>
             </div>
             <div class="fav-deck-card front" [class.animating]="isFavAnimating">
-              <div class="deck-img-fill"
-                   [style.backgroundImage]="'url(' + (favouritesService.favourites[favStackIndex].photoUrl || '') + ')'">
+              <div class="deck-img-fill" [style.backgroundImage]="'url(' + (favouritesService.favourites[favStackIndex].photoUrl || '') + ')'">
                 <div *ngIf="!favouritesService.favourites[favStackIndex].photoUrl" class="deck-placeholder">
                   {{ favouritesService.favourites[favStackIndex].category === 'lodging' ? '🏨' : favouritesService.favourites[favStackIndex].category === 'restaurant' ? '🍽️' : '🏛️' }}
                 </div>
@@ -397,14 +528,9 @@
           <p>Heart places on the destination page to save them here.</p>
         </div>
       </div>
-
       <div class="fav-cards-list" *ngIf="favouritesService.favourites.length > 0">
-        <div class="fav-card-row"
-             *ngFor="let item of favouritesService.favourites"
-             [class.expanded]="expandedFavId === item.placeId"
-             (click)="toggleFavExpand(item.placeId)">
-
-          <!-- Collapsed view -->
+        <div class="fav-card-row" *ngFor="let item of favouritesService.favourites"
+             [class.expanded]="expandedFavId === item.placeId" (click)="toggleFavExpand(item.placeId)">
           <div class="fav-card-collapsed">
             <div class="fav-card-thumb">
               <img *ngIf="item.photoUrl" [src]="item.photoUrl" [alt]="item.placeName">
@@ -418,8 +544,6 @@
             </div>
             <span class="fav-expand-icon">{{ expandedFavId === item.placeId ? '▲' : '▼' }}</span>
           </div>
-
-          <!-- Expanded view -->
           <div class="fav-card-expanded" *ngIf="expandedFavId === item.placeId">
             <img *ngIf="item.photoUrl" [src]="item.photoUrl" [alt]="item.placeName" class="fav-expanded-img">
             <div class="fav-expanded-info">
@@ -429,16 +553,11 @@
                 <span *ngIf="item.userRatingsTotal"> · {{ item.userRatingsTotal }} reviews</span>
               </span>
               <div class="fav-expanded-actions">
-                <button class="fav-add-itinerary-btn" (click)="addFavToItinerary(item); $event.stopPropagation()">
-                  + Add to Itinerary
-                </button>
-                <button class="fav-remove-btn" (click)="favouritesService.remove(item.placeId); $event.stopPropagation()">
-                  Remove
-                </button>
+                <button class="fav-add-itinerary-btn" (click)="addFavToItinerary(item); $event.stopPropagation()">+ Add to Itinerary</button>
+                <button class="fav-remove-btn" (click)="favouritesService.remove(item.placeId); $event.stopPropagation()">Remove</button>
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>

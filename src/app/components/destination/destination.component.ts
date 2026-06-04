@@ -5,7 +5,7 @@ import { DestinationService } from '../../services/destination.service';
 import { PlaceCategoriesResponse, PlaceDto } from '../../models/destination.model';
 import { AuthGateModalComponent } from '../auth-gate-modal/auth-gate-modal.component';
 import { TripPlanModalComponent } from '../trip-plan-modal/trip-plan-modal.component';
-import { TripService, TripResponse } from '../../services/trip.service';
+import { TripService, TripResponse, CreateTripPlaceDto } from '../../services/trip.service';
 import { AuthService } from '../../services/auth.service';
 import { FavouritesService, FavouriteItem } from '../../services/favourites.service';
 import { LoaderService } from '../../services/loader.service';
@@ -319,6 +319,122 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log('Added to itinerary:', place.name);
   }
 
+  // Add to Trip modal
+  showAddToTripModal = false;
+  addToTripPlace: PlaceDto | null = null;
+  addToTripPlaceCategory: string = '';
+  addToTripNotes: string = '';
+  addingToTrip = false;
+  allTrips: TripResponse[] = [];
+  tripsLoading = false;
+  selectedTripId: string = '';
+  selectedDestinationIndex: number = 0;
+  selectedTripDestinations: { id?: string; name: string }[] = [];
+
+  openAddToTripModal(place: PlaceDto): void {
+    if (!this.authService.isLoggedIn) {
+      const authRef = this.dialog.open(AuthGateModalComponent, {
+        data: { destination: this.destination?.name || '' },
+        panelClass: 'auth-gate-dialog',
+        maxWidth: '420px',
+        width: '400px'
+      });
+      authRef.afterClosed().subscribe(result => {
+        if (result?.type === 'authenticated') this.openAddToTripModal(place);
+      });
+      return;
+    }
+    this.addToTripPlace = place;
+    this.addToTripNotes = '';
+    this.addToTripPlaceCategory = this.destination?.lodging.includes(place) ? 'stay'
+      : this.destination?.restaurants.includes(place) ? 'food'
+      : 'activity';
+    this.showAddToTripModal = true;
+    this.selectedTripId = '';
+    this.selectedDestinationIndex = 0;
+    this.selectedTripDestinations = [];
+    this.tripsLoading = true;
+    this.tripService.getAllTrips().subscribe({
+      next: (trips) => {
+        this.allTrips = trips.filter(t => t.status?.toLowerCase() !== 'completed');
+        this.tripsLoading = false;
+      },
+      error: () => { this.tripsLoading = false; }
+    });
+  }
+
+  closeAddToTripModal(): void {
+    this.showAddToTripModal = false;
+    this.addToTripPlace = null;
+  }
+
+  selectTripForAdd(trip: TripResponse): void {
+    this.selectedTripId = trip.id;
+    this.selectedDestinationIndex = 0;
+
+    const mapped = (trip.destinations || [])
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+      .map(d => ({ id: d.id, name: d.name }));
+
+    if (mapped.length > 0 && mapped[0].id) {
+      // Full destination data already in cache
+      this.selectedTripDestinations = mapped;
+    } else {
+      // Destinations missing or no ids — fetch full trip
+      this.selectedTripDestinations = mapped.length
+        ? mapped
+        : [{ name: trip.primaryDestination || trip.name }];
+
+      this.tripService.getTrip(trip.id).subscribe({
+        next: (full) => {
+          const fullMapped = (full.destinations || [])
+            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
+            .map(d => ({ id: d.id, name: d.name }));
+          this.selectedTripDestinations = fullMapped.length
+            ? fullMapped
+            : [{ name: full.primaryDestination || full.name }];
+        }
+      });
+    }
+  }
+
+  getSelectedTrip(): TripResponse | undefined {
+    return this.allTrips.find(t => t.id === this.selectedTripId);
+  }
+
+  confirmAddToTrip(): void {
+    if (!this.addToTripPlace || !this.selectedTripId || this.addingToTrip) return;
+    const dest = this.selectedTripDestinations[this.selectedDestinationIndex];
+    if (!dest?.id) return;
+
+    const dto: CreateTripPlaceDto = {
+      placeId: this.addToTripPlace.placeId,
+      placeName: this.addToTripPlace.name,
+      vicinity: this.addToTripPlace.vicinity,
+      rating: this.addToTripPlace.rating,
+      userRatingsTotal: this.addToTripPlace.userRatingsTotal,
+      photoUrl: this.addToTripPlace.photos[0]?.url || null,
+      category: this.addToTripPlaceCategory,
+      notes: this.addToTripNotes || null
+    };
+
+    this.addingToTrip = true;
+    this.tripService.addPlace(this.selectedTripId, dest.id, dto).subscribe({
+      next: () => {
+        this.addingToTrip = false;
+        this.closeAddToTripModal();
+      },
+      error: () => {
+        this.addingToTrip = false;
+      }
+    });
+  }
+
+  openCreateNewTrip(): void {
+    this.closeAddToTripModal();
+    this.openTripPlanModal();
+  }
+
   openPlanTripModal(): void {
     // If existing trip found, go straight to it
     if (this.existingTrip) {
@@ -353,6 +469,10 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    this.openTripPlanModal();
+  }
+
+  openTripPlanModalPublic(): void {
     this.openTripPlanModal();
   }
 

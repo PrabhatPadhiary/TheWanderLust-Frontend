@@ -4,6 +4,24 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
 
+export interface CreateTripPlaceDto {
+  placeId: string;
+  placeName: string;
+  vicinity?: string | null;
+  rating?: number | null;
+  userRatingsTotal?: number | null;
+  photoUrl?: string | null;
+  category: string;
+  notes?: string | null;
+}
+
+export interface TripPlaceResponse {
+  id: string;
+  placeId: string;
+  placeName: string;
+  category: string;
+}
+
 export interface CreateTripDestinationDto {
   googlePlaceId: string;
   name: string;
@@ -41,6 +59,8 @@ export interface CreateTripDto {
     latitude: number;
     longitude: number;
     photoUrl?: string | null;
+    startDate?: string | null;
+    endDate?: string | null;
   };
 }
 
@@ -155,6 +175,41 @@ export class TripService {
         this.http.post<TripDestinationResponse>(`${environment.apiUrl}/Trips/${tripId}/destinations`, dto, { headers })
           .subscribe({
             next: (res) => { observer.next(res); observer.complete(); },
+            error: (err) => observer.error(err)
+          });
+      });
+    });
+  }
+
+  addPlace(tripId: string, destinationId: string, dto: CreateTripPlaceDto): Observable<TripPlaceResponse> {
+    return new Observable(observer => {
+      this.authService.getFirebaseToken().then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.post<TripPlaceResponse>(
+          `${environment.apiUrl}/Trips/${tripId}/destinations/${destinationId}/places`,
+          dto, { headers }
+        ).subscribe({
+          next: (res) => { observer.next(res); observer.complete(); },
+          error: (err) => observer.error(err)
+        });
+      });
+    });
+  }
+
+  deleteTrip(tripId: string): Observable<void> {
+    return new Observable(observer => {
+      this.authService.getFirebaseToken().then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.delete<void>(`${environment.apiUrl}/Trips/${tripId}`, { headers })
+          .subscribe({
+            next: (res) => {
+              // Remove from cache
+              this.tripsSubject.next(this.tripsSubject.value.filter(t => t.id !== tripId));
+              observer.next(res);
+              observer.complete();
+            },
             error: (err) => observer.error(err)
           });
       });

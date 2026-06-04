@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../services/auth.service';
 import { AuthGateModalComponent } from '../auth-gate-modal/auth-gate-modal.component';
+import { TripResponse } from '../../services/trip.service';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
@@ -18,12 +19,16 @@ declare var google: any;
 export class NavbarComponent {
   @Input() destinationName: string = '';
   @Input() solid: boolean = false;
+  @Input() existingTrip: TripResponse | null = null;
+  @Input() isTripPlanner: boolean = false;
+  @Input() primaryDestinationPlaceId: string = '';
   @Output() localSearchInput = new EventEmitter<string>();
 
   predictions: any[] = [];
   showDropdown = false;
   showUserMenu = false;
   searchActive = false;
+  showTripTooltip = false;
   private searchSubject = new Subject<string>();
   private autocompleteService: any;
   private blurTimeout: any;
@@ -143,8 +148,43 @@ export class NavbarComponent {
     }
   }
 
+  getTripCapsuleLabel(): string {
+    if (!this.existingTrip) return '';
+    const name = this.existingTrip.name || `${this.destinationName} Trip`;
+    if (this.existingTrip.startDate && this.existingTrip.endDate) {
+      const start = new Date(this.existingTrip.startDate);
+      const end = new Date(this.existingTrip.endDate);
+      const nights = Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+      if (nights > 0) return `${name} · ${nights} night${nights !== 1 ? 's' : ''}`;
+    }
+    return name;
+  }
+
+  navigateToTrip(): void {
+    if (!this.existingTrip) return;
+    this.router.navigate(['/trip-planner', this.existingTrip.id], {
+      state: {
+        destination: this.destinationName,
+        tripId: this.existingTrip.id,
+        tripName: this.existingTrip.name,
+        status: this.existingTrip.status,
+        fromDate: this.existingTrip.startDate || null,
+        toDate: this.existingTrip.endDate || null,
+        travellers: this.existingTrip.travelersCount || 0
+      }
+    });
+  }
+
   goHome(): void {
     this.router.navigate(['/']);
+  }
+
+  backToDestination(): void {
+    if (this.primaryDestinationPlaceId) {
+      this.router.navigate(['/destination', this.primaryDestinationPlaceId]);
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 
   getUserInitial(): string {

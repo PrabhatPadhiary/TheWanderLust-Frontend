@@ -60,19 +60,24 @@ export class TripPlanModalComponent {
     if (this.isLoading) return;
     this.isLoading = true;
 
+    const startDate = this.datesUndecided || !this.fromDate ? null : this.fromDate.toISOString().split('T')[0];
+    const endDate = this.datesUndecided || !this.toDate ? null : this.toDate.toISOString().split('T')[0];
+
     const dto = {
       name: this.tripName || `A trip to ${this.data.destination}`,
       primaryDestination: this.data.destination,
       coverPhotoUrl: this.data.photoUrl || null,
-      startDate: this.datesUndecided || !this.fromDate ? null : this.fromDate.toISOString().split('T')[0],
-      endDate: this.datesUndecided || !this.toDate ? null : this.toDate.toISOString().split('T')[0],
+      startDate,
+      endDate,
       travelersCount: this.travellers,
       destination: {
         googlePlaceId: this.data.placeId,
         name: this.data.destination,
         latitude: this.data.latitude || 0,
         longitude: this.data.longitude || 0,
-        photoUrl: this.data.photoUrl || null
+        photoUrl: this.data.photoUrl || null,
+        startDate,
+        endDate
       }
     };
 

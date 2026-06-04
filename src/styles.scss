@@ -229,3 +229,7 @@ body.no-scroll {
 @keyframes app-loader-spin {
   to { transform: rotate(360deg); }
 }
+
+.mat-mdc-dialog-container, .mat-dialog-container {
+  overflow-x: hidden !important;
+}

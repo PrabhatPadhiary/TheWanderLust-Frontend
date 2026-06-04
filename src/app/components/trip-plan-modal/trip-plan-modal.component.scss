@@ -2,7 +2,9 @@
   position: relative;
   padding: 40px;
   font-family: 'Poppins', sans-serif;
-  min-width: 420px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
 
   h2 {
     font-size: 1.3rem;
@@ -126,6 +128,7 @@
   align-items: center;
   gap: 12px;
   transition: opacity 0.2s;
+  min-width: 0;
 
   &.disabled {
     opacity: 0.35;
@@ -135,6 +138,7 @@
 
 .date-input-wrap {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 4px;

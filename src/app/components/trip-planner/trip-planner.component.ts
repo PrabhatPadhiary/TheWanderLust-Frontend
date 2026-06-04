@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService, UserResponse } from '../../services/auth.service';
 import { DestinationService } from '../../services/destination.service';
@@ -33,7 +33,8 @@ export class TripPlannerComponent implements OnInit {
   travellers: number = 0;
 
   // Destinations list (primary + added)
-  destinations: { id?: string; name: string; startDate: string | null; endDate: string | null }[] = [];
+  destinations: { id?: string; name: string; startDate: string | null; endDate: string | null; latitude?: number; longitude?: number }[] = [];
+  primaryPlaceId: string = ''; // for back-to-destination nav
 
   // Add destination dialog
   showAddDestDialog = false;
@@ -71,9 +72,27 @@ export class TripPlannerComponent implements OnInit {
   // Itinerary
   itinerary: PlaceDto[] = [];
 
-  // Active tab
+  // Trip menu
+  showTripMenu = false;
+  showDeleteTripConfirm = false;
+  deletingTrip = false;
+
+  // Active destination for the detail panel
+  activeDestIndex: number = 0;
+  activeDestTab: 'stays' | 'food' | 'activities' = 'stays';
+  // Sidebar tab
   activeTab: 'overview' | 'itinerary' | 'budget' | 'checklist' | 'travellers' | 'favourites' = 'overview';
   expandedFavId: string | null = null;
+
+  // Add place modal
+  showAddPlaceModal = false;
+  addPlaceSearch = '';
+  addPlacePredictions: any[] = [];
+  addPlaceShowDropdown = false;
+  addPlaceCustomName = '';
+  addPlaceNotes = '';
+  private addPlaceSubject = new Subject<string>();
+  private addPlaceAutocompleteInit = false;
   favStackIndex: number = 0;
   isFavAnimating: boolean = false;
 
@@ -104,6 +123,7 @@ export class TripPlannerComponent implements OnInit {
     this.user = state?.user || this.authService.currentUser;
     this.destination = state?.destination || '';
     this.placeId = state?.placeId || '';
+    this.primaryPlaceId = this.placeId;
     this.isGuest = state?.isGuest || false;
     this.greeting = this.getGreeting();
 
@@ -130,9 +150,15 @@ export class TripPlannerComponent implements OnInit {
                 .map((d, i) => ({
                   id: d.id,
                   name: d.name,
+                  latitude: d.latitude,
+                  longitude: d.longitude,
                   startDate: d.startDate || (i === 0 ? (trip.startDate || null) : null),
                   endDate: d.endDate || (i === 0 ? (trip.endDate || null) : null)
                 }));
+              // Capture primary destination placeId for back navigation
+              if (!this.primaryPlaceId && trip.destinations[0]?.googlePlaceId) {
+                this.primaryPlaceId = trip.destinations[0].googlePlaceId;
+              }
             } else {
               this.destinations = [{ name: this.destination, startDate: this.fromDate, endDate: this.toDate }];
             }
@@ -236,6 +262,105 @@ export class TripPlannerComponent implements OnInit {
 
   setActiveTab(tab: 'overview' | 'itinerary' | 'budget' | 'checklist' | 'travellers' | 'favourites'): void {
     this.activeTab = tab;
+  }
+
+  selectDest(index: number): void {
+    this.activeDestIndex = index;
+    this.activeDestTab = 'stays';
+  }
+
+  getDestTabIndex(): number {
+    return ['stays', 'food', 'activities'].indexOf(this.activeDestTab);
+  }
+
+  openAddPlaceModal(): void {
+    this.addPlaceSearch = '';
+    this.addPlacePredictions = [];
+    this.addPlaceShowDropdown = false;
+    this.addPlaceCustomName = '';
+    this.addPlaceNotes = '';
+    this.showAddPlaceModal = true;
+  }
+
+  closeAddPlaceModal(): void {
+    this.showAddPlaceModal = false;
+  }
+
+  private getPlaceTypeForTab(): string {
+    if (this.activeDestTab === 'stays') return 'lodging';
+    if (this.activeDestTab === 'food') return 'restaurant';
+    return 'tourist_attraction';
+  }
+
+  private initAddPlaceAutocomplete(): void {
+    if (this.addPlaceAutocompleteInit) return;
+    this.addPlaceAutocompleteInit = true;
+    this.addPlaceSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      filter(v => v.length >= 2)
+    ).subscribe(value => this.runAddPlaceSearch(value));
+  }
+
+  private runAddPlaceSearch(query: string): void {
+    if (typeof google === 'undefined' || !google.maps?.places) return;
+    const dest = this.destinations[this.activeDestIndex];
+    const mapDiv = document.createElement('div');
+    const service = new google.maps.places.PlacesService(mapDiv);
+    const request: any = {
+      query,
+      type: this.getPlaceTypeForTab()
+    };
+    if (dest?.latitude && dest?.longitude) {
+      request.location = new google.maps.LatLng(dest.latitude, dest.longitude);
+      request.radius = 50000;
+    }
+    service.textSearch(request, (results: any[], status: string) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+        this.addPlacePredictions = results.slice(0, 5).map(r => ({
+          place_id: r.place_id,
+          name: r.name,
+          rating: r.rating,
+          types: r.types,
+          structured_formatting: {
+            main_text: r.name,
+            secondary_text: r.vicinity || r.formatted_address || ''
+          }
+        }));
+        this.addPlaceShowDropdown = this.addPlacePredictions.length > 0;
+      } else {
+        this.addPlacePredictions = [];
+        this.addPlaceShowDropdown = false;
+      }
+    });
+  }
+
+  onAddPlaceSearchInput(event: Event): void {
+    this.initAddPlaceAutocomplete();
+    const value = (event.target as HTMLInputElement).value;
+    this.addPlaceSearch = value;
+    if (value.length < 2) {
+      this.addPlacePredictions = [];
+      this.addPlaceShowDropdown = false;
+      return;
+    }
+    this.addPlaceSubject.next(value);
+  }
+
+  onAddPlaceBlur(): void {
+    setTimeout(() => { this.addPlaceShowDropdown = false; }, 200);
+  }
+
+  addPlaceFromPrediction(prediction: any): void {
+    // For now just close — real implementation would save to trip
+    this.addPlacePredictions = [];
+    this.addPlaceShowDropdown = false;
+    this.addPlaceSearch = prediction.structured_formatting.main_text;
+  }
+
+  confirmAddPlace(): void {
+    // Placeholder — wire to API when ready
+    this.closeAddPlaceModal();
   }
 
   toggleFavExpand(placeId: string): void {
@@ -426,7 +551,7 @@ export class TripPlannerComponent implements OnInit {
       };
       this.tripService.addDestination(this.tripId, dto).subscribe({
         next: (res) => {
-          this.destinations.push({ id: res.id, ...entry });
+          this.destinations.push({ id: res.id, ...entry, latitude: res.latitude, longitude: res.longitude });
           this.showAddDestDialog = false;
           this.loaderService.hide();
         },
@@ -462,5 +587,40 @@ export class TripPlannerComponent implements OnInit {
 
   async logout(): Promise<void> {
     await this.authService.logout();
+  }
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    if (this.showTripMenu) this.showTripMenu = false;
+  }
+
+  confirmDeleteTrip(): void {
+    if (!this.tripId || this.deletingTrip) return;
+    this.deletingTrip = true;
+    this.loaderService.show('Deleting trip...');
+    this.tripService.deleteTrip(this.tripId).subscribe({
+      next: () => {
+        this.deletingTrip = false;
+        this.showDeleteTripConfirm = false;
+        this.loaderService.hide();
+        if (this.primaryPlaceId) {
+          this.router.navigate(['/destination', this.primaryPlaceId]);
+        } else {
+          this.router.navigate(['/my-trips']);
+        }
+      },
+      error: () => {
+        this.deletingTrip = false;
+        this.loaderService.hide();
+      }
+    });
+  }
+
+  goBackToDestination(): void {
+    if (this.primaryPlaceId) {
+      this.router.navigate(['/destination', this.primaryPlaceId]);
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 }
