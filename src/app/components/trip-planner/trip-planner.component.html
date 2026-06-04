@@ -139,7 +139,7 @@
                   </svg>
                   Edit trip
                 </button>
-                <button class="trip-menu-item trip-menu-item--danger" (click)="showTripMenu = false; showDeleteTripConfirm = true">
+                <button class="trip-menu-item trip-menu-item--danger" (click)="showTripMenu = false; openDeleteTripConfirm()">
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="3 6 5 6 21 6"/>
                     <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
@@ -168,7 +168,7 @@
               <span class="meta-label">Travellers</span>
               <span class="meta-value">{{ travellers > 0 ? travellers + (travellers === 1 ? ' person' : ' people') : '—' }}</span>
             </div>
-            <button class="invite-btn">
+            <button class="invite-btn" (click)="openInviteModal()">
               <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
                 <circle cx="9" cy="7" r="4"/>
@@ -189,11 +189,15 @@
               [class.dest-capsule--deleting]="deletingDestId && dest.id === deletingDestId"
               (click)="selectDest(i)">
               {{ dest.name }}
+              <span class="dest-capsule-delete" *ngIf="managingDestinations && i > 0" (click)="openDeleteDestConfirm(i); $event.stopPropagation()">×</span>
             </button>
             <button class="dest-capsule dest-capsule--add" (click)="openAddDestDialog()">
               + Add destination
             </button>
           </div>
+          <button class="manage-dest-btn" (click)="managingDestinations = !managingDestinations" *ngIf="destinations.length > 1">
+            {{ managingDestinations ? 'Done' : 'Manage destinations' }}
+          </button>
         </div>
       </div>
 
@@ -264,166 +268,6 @@
         </div>
       </div>
 
-      <!-- Add Place Modal -->
-      <div class="dialog-backdrop" *ngIf="showAddPlaceModal" (click)="closeAddPlaceModal()">
-        <div class="add-place-modal" (click)="$event.stopPropagation()">
-          <div class="add-place-modal-header">
-            <div class="add-place-modal-title">
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="#2d5a27" stroke-width="2">
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                <circle cx="12" cy="10" r="3"/>
-              </svg>
-              <span>Add to {{ destinations[activeDestIndex]?.name }}</span>
-              <span class="add-place-tab-label">{{ activeDestTab | titlecase }} tab</span>
-            </div>
-            <button class="add-place-close" (click)="closeAddPlaceModal()">
-              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
-                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-              </svg>
-            </button>
-          </div>
-
-          <div class="add-place-modal-body">
-            <!-- Google Places search -->
-            <p class="add-place-section-label">Search Google Places</p>
-            <div class="add-place-search-wrap">
-              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#aaa" stroke-width="2">
-                <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
-              </svg>
-              <input
-                type="text"
-                class="add-place-search-input"
-                [value]="addPlaceSearch"
-                placeholder="Search for a place..."
-                (input)="onAddPlaceSearchInput($event)"
-                (blur)="onAddPlaceBlur()"
-                autocomplete="off">
-            </div>
-
-            <!-- Search results -->
-            <div class="add-place-results" *ngIf="addPlacePredictions.length > 0">
-              <div class="add-place-result-item" *ngFor="let p of addPlacePredictions" (mousedown)="addPlaceFromPrediction(p)">
-                <div class="add-place-result-thumb">
-                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#aaa" stroke-width="1.8">
-                    <rect x="3" y="3" width="18" height="18" rx="2"/>
-                    <path d="M3 9h18M9 21V9"/>
-                  </svg>
-                </div>
-                <div class="add-place-result-info">
-                  <span class="add-place-result-main">{{ p.structured_formatting.main_text }}</span>
-                  <span class="add-place-result-sub">
-                    <span *ngIf="p.rating">⭐ {{ p.rating }} · </span>{{ p.structured_formatting.secondary_text }}
-                  </span>
-                </div>
-                <button class="add-place-result-btn">+ Add</button>
-              </div>
-            </div>
-
-            <p class="add-place-or">or add manually</p>
-
-            <!-- Manual entry -->
-            <div class="add-place-field">
-              <label>Place name</label>
-              <input type="text" [(ngModel)]="addPlaceCustomName" placeholder="Custom place...">
-            </div>
-            <div class="add-place-field">
-              <label>Notes (optional)</label>
-              <textarea [(ngModel)]="addPlaceNotes" placeholder="e.g. Book tickets in advance, opens at 8am..." rows="3"></textarea>
-            </div>
-          </div>
-
-          <div class="add-place-modal-footer">
-            <button class="dialog-cancel" (click)="closeAddPlaceModal()">Cancel</button>
-            <button class="dialog-confirm" (click)="confirmAddPlace()" [disabled]="!addPlaceCustomName && !addPlaceSearch">
-              Add to {{ destinations[activeDestIndex]?.name }}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Add / Edit Destination Dialog -->
-      <div class="dialog-backdrop" *ngIf="showAddDestDialog" (click)="closeAddDestDialog()">
-        <div class="add-dest-dialog" (click)="$event.stopPropagation()">
-          <h4>{{ editDestIndex !== null ? 'Edit Destination' : 'Add Destination' }}</h4>
-          <p class="dialog-hint">Search for a destination to add to your trip.</p>
-          <div class="dialog-field dest-search-field">
-            <label>Destination</label>
-            <div class="dest-search-wrap">
-              <span class="dest-search-icon">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-                  <circle cx="12" cy="10" r="3"></circle>
-                </svg>
-              </span>
-              <input type="text" class="dest-search-input" [value]="destSearchQuery"
-                placeholder="Search destination..." (input)="onDestSearchInput($event)"
-                (blur)="onDestSearchBlur()" autocomplete="off">
-              <div class="dest-search-dropdown" *ngIf="destSearchShowDropdown && destSearchPredictions.length > 0">
-                <div class="dest-dropdown-item" *ngFor="let p of destSearchPredictions" (mousedown)="selectDestPrediction(p)">
-                  <span class="dest-dropdown-main">{{ p.structured_formatting.main_text }}</span>
-                  <span class="dest-dropdown-secondary">{{ p.structured_formatting.secondary_text }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="dialog-fields" *ngIf="fromDate || toDate">
-            <p class="dialog-dates-hint">
-              Dates <span class="optional">(optional)</span>
-              <span *ngIf="fromDate && toDate"> · Trip: {{ fromDate | date:'MMM d' }} → {{ toDate | date:'MMM d, y' }}</span>
-            </p>
-            <div class="dialog-field">
-              <label>Start Date</label>
-              <mat-form-field appearance="outline" class="date-field">
-                <input matInput [matDatepicker]="destStartPicker" [(ngModel)]="addDestStart"
-                       [min]="fromDateObj" [max]="addDestEnd || toDateObj" placeholder="Start date">
-                <mat-datepicker-toggle matIconSuffix [for]="destStartPicker"></mat-datepicker-toggle>
-                <mat-datepicker #destStartPicker></mat-datepicker>
-              </mat-form-field>
-            </div>
-            <div class="dialog-field">
-              <label>End Date</label>
-              <mat-form-field appearance="outline" class="date-field">
-                <input matInput [matDatepicker]="destEndPicker" [(ngModel)]="addDestEnd"
-                       [min]="addDestStart || fromDateObj" [max]="toDateObj" placeholder="End date">
-                <mat-datepicker-toggle matIconSuffix [for]="destEndPicker"></mat-datepicker-toggle>
-                <mat-datepicker #destEndPicker></mat-datepicker>
-              </mat-form-field>
-            </div>
-          </div>
-          <div class="dialog-actions">
-            <button class="dialog-cancel" (click)="closeAddDestDialog()">Cancel</button>
-            <button class="dialog-confirm" (click)="confirmAddDest()" [disabled]="!selectedDestPrediction">
-              {{ editDestIndex !== null ? 'Save' : 'Add' }}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Delete Trip Confirm -->
-      <div class="dialog-backdrop" *ngIf="showDeleteTripConfirm" (click)="showDeleteTripConfirm = false">
-        <div class="add-dest-dialog confirm-dialog" (click)="$event.stopPropagation()">
-          <h4>Delete Trip</h4>
-          <p class="dialog-hint">Are you sure you want to delete <strong>{{ tripName }}</strong>? This cannot be undone.</p>
-          <div class="dialog-actions">
-            <button class="dialog-cancel" (click)="showDeleteTripConfirm = false">Cancel</button>
-            <button class="dialog-confirm dialog-confirm--danger" [disabled]="deletingTrip" (click)="confirmDeleteTrip()">
-              {{ deletingTrip ? 'Deleting...' : 'Delete' }}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Delete Destination Confirm -->
-      <div class="dialog-backdrop" *ngIf="showDeleteDestConfirm" (click)="cancelDeleteDest()">
-        <div class="add-dest-dialog confirm-dialog" (click)="$event.stopPropagation()">
-          <h4>Remove Destination</h4>
-          <p class="dialog-hint">Are you sure you want to remove <strong>{{ deleteDestName }}</strong> from your trip?</p>
-          <div class="dialog-actions">
-            <button class="dialog-cancel" (click)="cancelDeleteDest()">Cancel</button>
-            <button class="dialog-confirm dialog-confirm--danger" (click)="confirmDeleteDest()">Remove</button>
-          </div>
-        </div>
-      </div>
 
       <!-- Favourites deck -->
       <div class="fav-deck-section" *ngIf="favouritesService.favourites.length > 0">

@@ -229,4 +229,18 @@ export class TripService {
       });
     });
   }
+
+  joinTrip(tripId: string): Observable<TripResponse> {
+    return new Observable(observer => {
+      this.authService.getFirebaseToken().then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.post<TripResponse>(`${environment.apiUrl}/Trips/${tripId}/join`, {}, { headers })
+          .subscribe({
+            next: (res) => { observer.next(res); observer.complete(); },
+            error: (err) => observer.error(err)
+          });
+      });
+    });
+  }
 }

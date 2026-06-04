@@ -4,7 +4,7 @@ import { LandingpageComponent } from './components/landingpage/landingpage.compo
 import { DestinationComponent } from './components/destination/destination.component';
 import { TripPlannerComponent } from './components/trip-planner/trip-planner.component';
 import { FavouritesComponent } from './components/favourites/favourites.component';
-
+import { JoinTripComponent } from './components/join-trip/join-trip.component';
 import { MyTripsComponent } from './components/my-trips/my-trips.component';
 
 const routes: Routes = [
@@ -13,6 +13,7 @@ const routes: Routes = [
   { path: 'destination/:placeId', component: DestinationComponent },
   { path: 'trip-planner', component: TripPlannerComponent },
   { path: 'trip-planner/:tripId', component: TripPlannerComponent },
+  { path: 'join/:tripId', component: JoinTripComponent },
   { path: 'favourites', component: FavouritesComponent },
   { path: 'my-trips', component: MyTripsComponent },
 ];

@@ -1,0 +1,54 @@
+<div class="add-dest-dialog">
+  <h4>{{ data.editMode ? 'Edit Destination' : 'Add Destination' }}</h4>
+  <p class="dialog-hint">Search for a destination to add to your trip.</p>
+  <div class="dialog-field dest-search-field">
+    <label>Destination</label>
+    <div class="dest-search-wrap">
+      <span class="dest-search-icon">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+      </span>
+      <input type="text" class="dest-search-input" [value]="destSearchQuery"
+        placeholder="Search destination..." (input)="onSearchInput($event)"
+        (blur)="onBlur()" autocomplete="off">
+      <div class="dest-search-dropdown" *ngIf="destSearchShowDropdown && destSearchPredictions.length > 0">
+        <div class="dest-dropdown-item" *ngFor="let p of destSearchPredictions" (mousedown)="selectPrediction(p)">
+          <span class="dest-dropdown-main">{{ p.structured_formatting.main_text }}</span>
+          <span class="dest-dropdown-secondary">{{ p.structured_formatting.secondary_text }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="dialog-fields" *ngIf="data.fromDate || data.toDate">
+    <p class="dialog-dates-hint">
+      Dates <span class="optional">(optional)</span>
+      <span *ngIf="data.fromDate && data.toDate"> · Trip: {{ data.fromDate | date:'MMM d' }} → {{ data.toDate | date:'MMM d, y' }}</span>
+    </p>
+    <div class="dialog-field">
+      <label>Start Date</label>
+      <mat-form-field appearance="outline" class="date-field">
+        <input matInput [matDatepicker]="destStartPicker" [(ngModel)]="addDestStart"
+               [min]="fromDateObj" [max]="addDestEnd || toDateObj" placeholder="Start date">
+        <mat-datepicker-toggle matIconSuffix [for]="destStartPicker"></mat-datepicker-toggle>
+        <mat-datepicker #destStartPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+    <div class="dialog-field">
+      <label>End Date</label>
+      <mat-form-field appearance="outline" class="date-field">
+        <input matInput [matDatepicker]="destEndPicker" [(ngModel)]="addDestEnd"
+               [min]="addDestStart || fromDateObj" [max]="toDateObj" placeholder="End date">
+        <mat-datepicker-toggle matIconSuffix [for]="destEndPicker"></mat-datepicker-toggle>
+        <mat-datepicker #destEndPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+  </div>
+  <div class="dialog-actions">
+    <button class="dialog-cancel" (click)="cancel()">Cancel</button>
+    <button class="dialog-confirm" (click)="confirm()" [disabled]="!selectedDestPrediction">
+      {{ data.editMode ? 'Save' : 'Add' }}
+    </button>
+  </div>
+</div>

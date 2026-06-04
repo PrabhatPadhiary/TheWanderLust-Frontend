@@ -1,0 +1,123 @@
+.add-place-modal {
+  background: #fff;
+  border-radius: 16px;
+  width: 480px;
+  max-width: 95vw;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+.add-place-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.add-place-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  span:first-of-type { font-size: 0.95rem; font-weight: 700; color: #1a1a1a; }
+}
+
+.add-place-tab-label {
+  font-size: 0.72rem !important;
+  font-weight: 500 !important;
+  color: #aaa !important;
+  background: #f5f5f5;
+  border-radius: 10px;
+  padding: 2px 8px;
+}
+
+.add-place-close {
+  width: 28px; height: 28px; border-radius: 50%; border: none;
+  background: #f5f5f5; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: #888; transition: background 0.15s;
+  &:hover { background: #eee; color: #1a1a1a; }
+}
+
+.add-place-modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+
+.add-place-section-label { font-size: 0.75rem; font-weight: 600; color: #888; margin: 0 0 10px; }
+
+.add-place-search-wrap {
+  display: flex; align-items: center; gap: 10px;
+  border: 1.5px solid #e0e0e0; border-radius: 10px; padding: 10px 14px;
+  margin-bottom: 12px; transition: border-color 0.2s;
+  &:focus-within { border-color: #2d5a27; }
+  svg { flex-shrink: 0; }
+}
+
+.add-place-search-input {
+  flex: 1; border: none; outline: none; font-family: 'Poppins', sans-serif;
+  font-size: 0.88rem; color: #1a1a1a; background: transparent;
+  &::placeholder { color: #bbb; }
+}
+
+.add-place-results { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+
+.add-place-result-item {
+  display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+  border: 1px solid #f0f0f0; border-radius: 10px; cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  &:hover { border-color: #d4eacf; background: #f9fdf8; }
+}
+
+.add-place-result-thumb {
+  width: 36px; height: 36px; border-radius: 8px; background: #f5f5f5;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+
+.add-place-result-info { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.add-place-result-main { font-size: 0.85rem; font-weight: 600; color: #1a1a1a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.add-place-result-sub { font-size: 0.72rem; color: #999; }
+
+.add-place-result-btn {
+  font-family: 'Poppins', sans-serif; font-size: 0.78rem; font-weight: 600;
+  color: #2d5a27; background: #eaf3e8; border: none; border-radius: 16px;
+  padding: 5px 12px; cursor: pointer; flex-shrink: 0; transition: background 0.15s;
+  &:hover { background: #d4eacf; }
+}
+
+.add-place-or {
+  font-size: 0.75rem; color: #bbb; text-align: center; margin: 4px 0 16px; position: relative;
+  &::before, &::after { content: ''; position: absolute; top: 50%; width: 38%; height: 1px; background: #eee; }
+  &::before { left: 0; }
+  &::after { right: 0; }
+}
+
+.add-place-field {
+  display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px;
+  label { font-size: 0.75rem; font-weight: 600; color: #888; }
+  input, textarea {
+    font-family: 'Poppins', sans-serif; font-size: 0.88rem; color: #1a1a1a;
+    border: 1.5px solid #e0e0e0; border-radius: 10px; padding: 10px 14px;
+    outline: none; resize: none; transition: border-color 0.2s;
+    &:focus { border-color: #2d5a27; }
+    &::placeholder { color: #bbb; }
+  }
+}
+
+.add-place-modal-footer {
+  display: flex; justify-content: flex-end; gap: 10px; padding: 16px 24px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.dialog-cancel {
+  font-family: 'Poppins', sans-serif; font-size: 0.85rem; font-weight: 500;
+  padding: 9px 20px; background: #f4f4f4; color: #555; border: none;
+  border-radius: 20px; cursor: pointer; transition: background 0.2s;
+  &:hover { background: #eee; }
+}
+
+.dialog-confirm {
+  font-family: 'Poppins', sans-serif; font-size: 0.85rem; font-weight: 600;
+  padding: 9px 20px; background: #2d5a27; color: #fff; border: none;
+  border-radius: 20px; cursor: pointer; transition: background 0.2s;
+  &:hover { background: #1e3d1a; }
+  &:disabled { opacity: 0.4; cursor: default; }
+}

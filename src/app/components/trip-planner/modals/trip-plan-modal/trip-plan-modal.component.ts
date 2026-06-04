@@ -1,8 +1,8 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
-import { TripService } from '../../services/trip.service';
+import { AuthService } from '../../../../services/auth.service';
+import { TripService } from '../../../../services/trip.service';
 import { ToastrService } from 'ngx-toastr';
 
 export interface TripPlanModalData {

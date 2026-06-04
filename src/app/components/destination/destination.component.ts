@@ -4,7 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { DestinationService } from '../../services/destination.service';
 import { PlaceCategoriesResponse, PlaceDto } from '../../models/destination.model';
 import { AuthGateModalComponent } from '../auth-gate-modal/auth-gate-modal.component';
-import { TripPlanModalComponent } from '../trip-plan-modal/trip-plan-modal.component';
+import { TripPlanModalComponent } from '../trip-planner/modals/trip-plan-modal/trip-plan-modal.component';
 import { TripService, TripResponse, CreateTripPlaceDto } from '../../services/trip.service';
 import { AuthService } from '../../services/auth.service';
 import { FavouritesService, FavouriteItem } from '../../services/favourites.service';

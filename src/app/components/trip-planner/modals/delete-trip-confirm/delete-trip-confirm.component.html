@@ -1,0 +1,10 @@
+<div class="confirm-dialog">
+  <h4>Delete Trip</h4>
+  <p class="dialog-hint">Are you sure you want to delete <strong>{{ data.tripName }}</strong>? This cannot be undone.</p>
+  <div class="dialog-actions">
+    <button class="dialog-cancel" (click)="cancel()">Cancel</button>
+    <button class="dialog-confirm dialog-confirm--danger" [disabled]="deleting" (click)="confirm()">
+      {{ deleting ? 'Deleting...' : 'Delete' }}
+    </button>
+  </div>
+</div>

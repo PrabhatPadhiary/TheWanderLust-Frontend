@@ -20,11 +20,17 @@ import { DestinationComponent } from './components/destination/destination.compo
 import { PlaceDetailPanelComponent } from './components/place-detail-panel/place-detail-panel.component';
 import { AuthGateModalComponent } from './components/auth-gate-modal/auth-gate-modal.component';
 import { TripPlannerComponent } from './components/trip-planner/trip-planner.component';
+import { AddPlaceModalComponent } from './components/trip-planner/modals/add-place-modal/add-place-modal.component';
+import { AddDestinationDialogComponent } from './components/trip-planner/modals/add-destination-dialog/add-destination-dialog.component';
+import { DeleteTripConfirmComponent } from './components/trip-planner/modals/delete-trip-confirm/delete-trip-confirm.component';
+import { DeleteDestinationConfirmComponent } from './components/trip-planner/modals/delete-destination-confirm/delete-destination-confirm.component';
+import { InviteModalComponent } from './components/trip-planner/modals/invite-modal/invite-modal.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FavouritesComponent } from './components/favourites/favourites.component';
 import { SafePipe } from './pipes/safe.pipe';
-import { TripPlanModalComponent } from './components/trip-plan-modal/trip-plan-modal.component';
+import { TripPlanModalComponent } from './components/trip-planner/modals/trip-plan-modal/trip-plan-modal.component';
 import { MyTripsComponent } from './components/my-trips/my-trips.component';
+import { JoinTripComponent } from './components/join-trip/join-trip.component';
 
 @NgModule({
   declarations: [
@@ -34,11 +40,17 @@ import { MyTripsComponent } from './components/my-trips/my-trips.component';
     PlaceDetailPanelComponent,
     AuthGateModalComponent,
     TripPlannerComponent,
+    AddPlaceModalComponent,
+    AddDestinationDialogComponent,
+    DeleteTripConfirmComponent,
+    DeleteDestinationConfirmComponent,
+    InviteModalComponent,
     NavbarComponent,
     FavouritesComponent,
     SafePipe,
     TripPlanModalComponent,
     MyTripsComponent,
+    JoinTripComponent,
   ],
   imports: [
     FormsModule,

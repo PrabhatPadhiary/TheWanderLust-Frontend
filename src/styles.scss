@@ -233,3 +233,16 @@ body.no-scroll {
 .mat-mdc-dialog-container, .mat-dialog-container {
   overflow-x: hidden !important;
 }
+
+
+// Custom dialog panel for trip planner modals
+.custom-dialog-container .mat-mdc-dialog-surface {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 16px !important;
+  overflow: visible !important;
+}
+
+.custom-dialog-container .mat-mdc-dialog-container {
+  padding: 0 !important;
+}
