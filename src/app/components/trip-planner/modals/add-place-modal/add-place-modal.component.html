@@ -6,7 +6,7 @@
         <circle cx="12" cy="10" r="3"/>
       </svg>
       <span>Add to {{ data.destinationName }}</span>
-      <span class="add-place-tab-label">{{ data.activeTab | titlecase }} tab</span>
+      <span class="add-place-tab-label">{{ data.activeTab | titlecase }}</span>
     </div>
     <button class="add-place-close" (click)="cancel()">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -16,8 +16,7 @@
   </div>
 
   <div class="add-place-modal-body">
-    <!-- Google Places search -->
-    <p class="add-place-section-label">Search Google Places</p>
+    <p class="add-place-section-label">Search for a place</p>
     <div class="add-place-search-wrap">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#aaa" stroke-width="2">
         <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
@@ -34,7 +33,7 @@
 
     <!-- Search results -->
     <div class="add-place-results" *ngIf="addPlacePredictions.length > 0">
-      <div class="add-place-result-item" *ngFor="let p of addPlacePredictions" (mousedown)="selectPrediction(p)">
+      <div class="add-place-result-item" *ngFor="let p of addPlacePredictions" (mousedown)="addPlace(p)">
         <div class="add-place-result-thumb">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#aaa" stroke-width="1.8">
             <rect x="3" y="3" width="18" height="18" rx="2"/>
@@ -44,30 +43,13 @@
         <div class="add-place-result-info">
           <span class="add-place-result-main">{{ p.structured_formatting.main_text }}</span>
           <span class="add-place-result-sub">
-            <span *ngIf="p.rating">⭐ {{ p.rating }} · </span>{{ p.structured_formatting.secondary_text }}
+            <span *ngIf="p.rating"><svg viewBox="0 0 24 24" width="10" height="10" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> {{ p.rating }} · </span>{{ p.structured_formatting.secondary_text }}
           </span>
         </div>
-        <button class="add-place-result-btn">+ Add</button>
+        <button class="add-place-result-btn" [disabled]="addingPlaceId === p.place_id">
+          {{ addingPlaceId === p.place_id ? 'Adding...' : '+ Add' }}
+        </button>
       </div>
     </div>
-
-    <p class="add-place-or">or add manually</p>
-
-    <!-- Manual entry -->
-    <div class="add-place-field">
-      <label>Place name</label>
-      <input type="text" [(ngModel)]="addPlaceCustomName" placeholder="Custom place...">
-    </div>
-    <div class="add-place-field">
-      <label>Notes (optional)</label>
-      <textarea [(ngModel)]="addPlaceNotes" placeholder="e.g. Book tickets in advance, opens at 8am..." rows="3"></textarea>
-    </div>
-  </div>
-
-  <div class="add-place-modal-footer">
-    <button class="dialog-cancel" (click)="cancel()">Cancel</button>
-    <button class="dialog-confirm" (click)="confirm()" [disabled]="!addPlaceCustomName && !addPlaceSearch">
-      Add to {{ data.destinationName }}
-    </button>
   </div>
 </div>

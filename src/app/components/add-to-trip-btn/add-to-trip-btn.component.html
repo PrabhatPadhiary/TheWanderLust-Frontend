@@ -1,0 +1,18 @@
+<!-- Not added yet -->
+<button class="att-btn" *ngIf="!isAdded" (click)="onAddClick($event)">+ Add to Trip</button>
+
+<!-- Already added -->
+<div class="att-btn-wrap" *ngIf="isAdded" (click)="$event.stopPropagation()">
+  <button class="att-btn att-btn--added" (click)="toggleDropdown($event)">
+    Added ▾
+  </button>
+  <div class="att-dropdown" *ngIf="dropdownOpen">
+    <div class="att-dropdown-item att-dropdown-item--info" *ngFor="let t of tripsContaining">
+      <span>{{ t.name }}</span>
+    </div>
+    <div class="att-dropdown-divider" *ngIf="tripsContaining.length > 0"></div>
+    <button class="att-dropdown-item att-dropdown-item--action" (click)="onAddToAnotherClick($event)">
+      + Add to another trip
+    </button>
+  </div>
+</div>

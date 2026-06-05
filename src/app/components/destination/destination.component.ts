@@ -1,11 +1,12 @@
-import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { DestinationService } from '../../services/destination.service';
 import { PlaceCategoriesResponse, PlaceDto } from '../../models/destination.model';
 import { AuthGateModalComponent } from '../auth-gate-modal/auth-gate-modal.component';
 import { TripPlanModalComponent } from '../trip-planner/modals/trip-plan-modal/trip-plan-modal.component';
-import { TripService, TripResponse, CreateTripPlaceDto } from '../../services/trip.service';
+import { AddToTripModalComponent, AddToTripModalData, AddToTripModalResult } from '../add-to-trip-modal/add-to-trip-modal.component';
+import { TripService, TripResponse } from '../../services/trip.service';
 import { AuthService } from '../../services/auth.service';
 import { FavouritesService, FavouriteItem } from '../../services/favourites.service';
 import { LoaderService } from '../../services/loader.service';
@@ -103,6 +104,10 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
             this.tripService.getTripByDestination(this.placeId).subscribe({
               next: (trip) => { this.existingTrip = trip; this.loading = false; this.loaderService.hide(); },
               error: () => { this.existingTrip = null; this.loading = false; this.loaderService.hide(); }
+            });
+            // Load all trips to know which places are already added
+            this.tripService.getAllTrips().subscribe({
+              next: (trips) => { this.allTrips = trips.filter(t => t.status?.toLowerCase() !== 'completed'); }
             });
           });
         });
@@ -319,17 +324,9 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log('Added to itinerary:', place.name);
   }
 
-  // Add to Trip modal
-  showAddToTripModal = false;
-  addToTripPlace: PlaceDto | null = null;
-  addToTripPlaceCategory: string = '';
-  addToTripNotes: string = '';
-  addingToTrip = false;
+  // Add to Trip
   allTrips: TripResponse[] = [];
-  tripsLoading = false;
-  selectedTripId: string = '';
-  selectedDestinationIndex: number = 0;
-  selectedTripDestinations: { id?: string; name: string }[] = [];
+  placeDropdownId: string | null = null;
 
   openAddToTripModal(place: PlaceDto): void {
     if (!this.authService.isLoggedIn) {
@@ -344,95 +341,48 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
       });
       return;
     }
-    this.addToTripPlace = place;
-    this.addToTripNotes = '';
-    this.addToTripPlaceCategory = this.destination?.lodging.includes(place) ? 'stay'
+
+    const category = this.destination?.lodging.includes(place) ? 'stay'
       : this.destination?.restaurants.includes(place) ? 'food'
       : 'activity';
-    this.showAddToTripModal = true;
-    this.selectedTripId = '';
-    this.selectedDestinationIndex = 0;
-    this.selectedTripDestinations = [];
-    this.tripsLoading = true;
-    this.tripService.getAllTrips().subscribe({
-      next: (trips) => {
-        this.allTrips = trips.filter(t => t.status?.toLowerCase() !== 'completed');
-        this.tripsLoading = false;
-      },
-      error: () => { this.tripsLoading = false; }
+
+    const dialogRef = this.dialog.open(AddToTripModalComponent, {
+      panelClass: 'custom-dialog-container',
+      data: {
+        place,
+        category,
+        destinationName: this.destination?.name || ''
+      } as AddToTripModalData
     });
-  }
 
-  closeAddToTripModal(): void {
-    this.showAddToTripModal = false;
-    this.addToTripPlace = null;
-  }
-
-  selectTripForAdd(trip: TripResponse): void {
-    this.selectedTripId = trip.id;
-    this.selectedDestinationIndex = 0;
-
-    const mapped = (trip.destinations || [])
-      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-      .map(d => ({ id: d.id, name: d.name }));
-
-    if (mapped.length > 0 && mapped[0].id) {
-      // Full destination data already in cache
-      this.selectedTripDestinations = mapped;
-    } else {
-      // Destinations missing or no ids — fetch full trip
-      this.selectedTripDestinations = mapped.length
-        ? mapped
-        : [{ name: trip.primaryDestination || trip.name }];
-
-      this.tripService.getTrip(trip.id).subscribe({
-        next: (full) => {
-          const fullMapped = (full.destinations || [])
-            .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-            .map(d => ({ id: d.id, name: d.name }));
-          this.selectedTripDestinations = fullMapped.length
-            ? fullMapped
-            : [{ name: full.primaryDestination || full.name }];
-        }
-      });
-    }
-  }
-
-  getSelectedTrip(): TripResponse | undefined {
-    return this.allTrips.find(t => t.id === this.selectedTripId);
-  }
-
-  confirmAddToTrip(): void {
-    if (!this.addToTripPlace || !this.selectedTripId || this.addingToTrip) return;
-    const dest = this.selectedTripDestinations[this.selectedDestinationIndex];
-    if (!dest?.id) return;
-
-    const dto: CreateTripPlaceDto = {
-      placeId: this.addToTripPlace.placeId,
-      placeName: this.addToTripPlace.name,
-      vicinity: this.addToTripPlace.vicinity,
-      rating: this.addToTripPlace.rating,
-      userRatingsTotal: this.addToTripPlace.userRatingsTotal,
-      photoUrl: this.addToTripPlace.photos[0]?.url || null,
-      category: this.addToTripPlaceCategory,
-      notes: this.addToTripNotes || null
-    };
-
-    this.addingToTrip = true;
-    this.tripService.addPlace(this.selectedTripId, dest.id, dto).subscribe({
-      next: () => {
-        this.addingToTrip = false;
-        this.closeAddToTripModal();
-      },
-      error: () => {
-        this.addingToTrip = false;
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === 'create-new') {
+        this.openTripPlanModal();
       }
+      // AddToTripModalResult — place was added, button component auto-updates via tripsCache
     });
   }
 
-  openCreateNewTrip(): void {
-    this.closeAddToTripModal();
-    this.openTripPlanModal();
+  isPlaceInAnyTrip(placeId: string): boolean {
+    return this.allTrips.some(t => t.placeIds?.includes(placeId));
+  }
+
+  getTripsContainingPlace(placeId: string): TripResponse[] {
+    return this.allTrips.filter(t => t.placeIds?.includes(placeId));
+  }
+
+  isTripDisabledForPlace(tripId: string, placeId: string): boolean {
+    const trip = this.allTrips.find(t => t.id === tripId);
+    return trip?.placeIds?.includes(placeId) || false;
+  }
+
+  togglePlaceDropdown(placeId: string): void {
+    this.placeDropdownId = this.placeDropdownId === placeId ? null : placeId;
+  }
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    this.placeDropdownId = null;
   }
 
   openPlanTripModal(): void {

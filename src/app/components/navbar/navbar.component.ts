@@ -18,6 +18,7 @@ declare var google: any;
 })
 export class NavbarComponent {
   @Input() destinationName: string = '';
+  @Input() tripName: string = '';
   @Input() solid: boolean = false;
   @Input() existingTrip: TripResponse | null = null;
   @Input() isTripPlanner: boolean = false;

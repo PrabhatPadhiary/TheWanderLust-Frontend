@@ -43,6 +43,20 @@ export interface TripDestinationResponse {
   order?: number;
   startDate?: string | null;
   endDate?: string | null;
+  places?: TripPlaceDetailResponse[];
+}
+
+export interface TripPlaceDetailResponse {
+  id: string;
+  placeId: string;
+  placeName: string;
+  vicinity?: string | null;
+  rating?: number | null;
+  userRatingsTotal?: number | null;
+  photoUrl?: string | null;
+  category: string;
+  notes?: string | null;
+  createdAt?: string;
 }
 
 export interface CreateTripDto {
@@ -64,6 +78,14 @@ export interface CreateTripDto {
   };
 }
 
+export interface TripMemberResponse {
+  userId: string;
+  name: string;
+  email: string;
+  role: string;
+  joinedAt: string;
+}
+
 export interface TripResponse {
   id: string;
   name: string;
@@ -76,6 +98,8 @@ export interface TripResponse {
   coverPhotoUrl?: string | null;
   createdAt?: string;
   destinations?: TripDestinationResponse[];
+  members?: TripMemberResponse[];
+  placeIds?: string[];
 }
 
 @Injectable({
@@ -87,6 +111,22 @@ export class TripService {
 
   private tripsSubject = new BehaviorSubject<TripResponse[]>([]);
   public trips$ = this.tripsSubject.asObservable();
+
+  get tripsCache(): TripResponse[] {
+    return this.tripsSubject.value;
+  }
+
+  addPlaceIdToTrip(tripId: string, placeId: string): void {
+    const trips = this.tripsSubject.value;
+    const trip = trips.find(t => t.id === tripId);
+    if (trip) {
+      if (!trip.placeIds) trip.placeIds = [];
+      if (!trip.placeIds.includes(placeId)) {
+        trip.placeIds.push(placeId);
+        this.tripsSubject.next([...trips]);
+      }
+    }
+  }
 
   private tripsLoaded = false;
 

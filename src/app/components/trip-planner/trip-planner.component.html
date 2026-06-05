@@ -1,16 +1,14 @@
-<app-navbar [solid]="true" [isTripPlanner]="true" [destinationName]="destination" [primaryDestinationPlaceId]="primaryPlaceId"></app-navbar>
+<app-navbar [solid]="true" [isTripPlanner]="true" [destinationName]="destination" [tripName]="tripName" [primaryDestinationPlaceId]="primaryPlaceId"></app-navbar>
 
 <div class="trip-planner-layout">
   <!-- Sidebar -->
   <aside class="sidebar">
-    <div class="user-profile">
-      <div class="avatar">{{ getUserInitial() }}</div>
-      <div class="user-info">
-        <span class="user-name">{{ user?.name || 'Guest' }}</span>
-        <span class="user-role">{{ isGuest ? 'Guest' : user?.role || 'Traveller' }}</span>
-      </div>
+    <div class="sidebar-brand" (click)="goBackToDestination()">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#2d5a27" stroke-width="2">
+        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
+      </svg>
+      <span class="sidebar-brand-name">Wander<span class="sidebar-brand-accent">Lust</span></span>
     </div>
-    <button class="new-trip-btn">+ New Trip</button>
     <nav class="sidebar-nav">
       <a class="nav-item" [class.active]="activeTab === 'overview'" (click)="setActiveTab('overview')">Overview</a>
       <a class="nav-item" [class.active]="activeTab === 'itinerary'" (click)="setActiveTab('itinerary')">
@@ -20,11 +18,8 @@
       <a class="nav-item" [class.active]="activeTab === 'budget'" (click)="setActiveTab('budget')">Budget</a>
       <a class="nav-item" [class.active]="activeTab === 'checklist'" (click)="setActiveTab('checklist')">Checklist</a>
       <a class="nav-item" [class.active]="activeTab === 'travellers'" (click)="setActiveTab('travellers')">Travellers</a>
-      <a class="nav-item" [class.active]="activeTab === 'favourites'" (click)="setActiveTab('favourites')">
-        Favourites
-        <span class="badge" *ngIf="favouritesService.favourites.length">{{ favouritesService.favourites.length }}</span>
-      </a>
     </nav>
+    <button class="new-trip-btn">+ New Trip</button>
   </aside>
 
   <!-- Main Content -->
@@ -45,9 +40,6 @@
           <h1>{{ greeting }}, <strong>{{ getUserName() }}</strong> 👋</h1>
           <p *ngIf="destination">Plan your trip to <strong>{{ destination }}</strong></p>
           <p *ngIf="!destination">Start planning your next adventure</p>
-        </div>
-        <div class="header-actions">
-          <div class="avatar-sm">{{ getUserInitial() }}</div>
         </div>
       </div>
     </header>
@@ -79,7 +71,7 @@
               <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
             </svg>
           </div>
-          <span class="stat-card-value">$0</span>
+          <span class="stat-card-value stat-card-value--cta" (click)="setActiveTab('budget')">Set up</span>
           <span class="stat-card-label">Budget</span>
         </div>
         <div class="stat-card">
@@ -167,6 +159,25 @@
             <div class="trip-meta-item">
               <span class="meta-label">Travellers</span>
               <span class="meta-value">{{ travellers > 0 ? travellers + (travellers === 1 ? ' person' : ' people') : '—' }}</span>
+            </div>
+            <!-- Member avatars -->
+            <div class="members-stack" *ngIf="members.length > 0" (click)="showMembersDropdown = !showMembersDropdown; $event.stopPropagation()">
+              <div class="member-avatar" *ngFor="let m of members.slice(0, 5)">
+                {{ getMemberInitial(m.name) }}
+              </div>
+              <div class="member-avatar member-avatar--more" *ngIf="members.length > 5">
+                +{{ members.length - 5 }}
+              </div>
+              <!-- Members dropdown -->
+              <div class="members-dropdown" *ngIf="showMembersDropdown">
+                <div class="members-dropdown-item" *ngFor="let m of members">
+                  <div class="members-dropdown-avatar">{{ getMemberInitial(m.name) }}</div>
+                  <div class="members-dropdown-info">
+                    <span class="members-dropdown-name">{{ m.name }}</span>
+                    <span class="members-dropdown-role">{{ m.role === 'owner' ? 'Owner' : 'Member' }}</span>
+                  </div>
+                </div>
+              </div>
             </div>
             <button class="invite-btn" (click)="openInviteModal()">
               <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
@@ -259,79 +270,43 @@
           <div class="dest-tab-ink" [style.transform]="'translateX(' + (getDestTabIndex() * 100) + '%)'"></div>
         </div>
         <div class="dest-detail-body">
-          <div class="dest-detail-empty">
+          <!-- Places list -->
+          <div class="dest-places-list" *ngIf="getPlacesForActiveTab().length > 0">
+            <div class="dest-place-card" *ngFor="let place of getPlacesForActiveTab()">
+              <div class="dest-place-img">
+                <img *ngIf="place.photoUrl" [src]="place.photoUrl" [alt]="place.placeName">
+                <div *ngIf="!place.photoUrl" class="dest-place-img-placeholder">
+                  {{ activeDestTab === 'stays' ? '🏨' : activeDestTab === 'food' ? '🍽️' : '🏛️' }}
+                </div>
+              </div>
+              <div class="dest-place-info">
+                <strong>{{ place.placeName }}</strong>
+                <span class="dest-place-vicinity" *ngIf="place.vicinity">{{ place.vicinity }}</span>
+                <span class="dest-place-rating" *ngIf="place.rating"><svg class="star-icon" viewBox="0 0 24 24" width="12" height="12" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> {{ place.rating }}<span *ngIf="place.userRatingsTotal"> · {{ place.userRatingsTotal }} reviews</span></span>
+                <span class="dest-place-notes" *ngIf="place.notes">{{ place.notes }}</span>
+              </div>
+            </div>
+          </div>
+          <!-- Empty state -->
+          <div class="dest-detail-empty" *ngIf="getPlacesForActiveTab().length === 0">
             <p [hidden]="activeDestTab !== 'stays'">No stays added yet for <strong>{{ destinations[activeDestIndex]?.name }}</strong>.</p>
             <p [hidden]="activeDestTab !== 'food'">No restaurants added yet for <strong>{{ destinations[activeDestIndex]?.name }}</strong>.</p>
             <p [hidden]="activeDestTab !== 'activities'">No activities added yet for <strong>{{ destinations[activeDestIndex]?.name }}</strong>.</p>
-            <button class="dest-detail-add-btn" (click)="openAddPlaceModal()">+ Add</button>
           </div>
+          <button class="dest-detail-add-btn" (click)="openAddPlaceModal()">+ Add</button>
         </div>
       </div>
 
-
-      <!-- Favourites deck -->
-      <div class="fav-deck-section" *ngIf="favouritesService.favourites.length > 0">
-        <div class="fav-deck-header">
-          <h3>Favourites</h3>
-          <button class="view-all-favs-btn-sm" (click)="setActiveTab('favourites')">View all →</button>
-        </div>
-        <div class="fav-deck-wrapper" (click)="advanceFavStack()">
-          <div class="fav-deck">
-            <div class="fav-deck-card back-2" [class.animating]="isFavAnimating" *ngIf="favouritesService.favourites.length > 2">
-              <div class="deck-img-fill" [style.backgroundImage]="'url(' + (favouritesService.favourites[(favStackIndex + 2) % favouritesService.favourites.length].photoUrl || '') + ')'">
-                <div *ngIf="!favouritesService.favourites[(favStackIndex + 2) % favouritesService.favourites.length].photoUrl" class="deck-placeholder">🏛️</div>
-              </div>
-            </div>
-            <div class="fav-deck-card back-1" [class.animating]="isFavAnimating" *ngIf="favouritesService.favourites.length > 1">
-              <div class="deck-img-fill" [style.backgroundImage]="'url(' + (favouritesService.favourites[(favStackIndex + 1) % favouritesService.favourites.length].photoUrl || '') + ')'">
-                <div *ngIf="!favouritesService.favourites[(favStackIndex + 1) % favouritesService.favourites.length].photoUrl" class="deck-placeholder">🏛️</div>
-              </div>
-            </div>
-            <div class="fav-deck-card front" [class.animating]="isFavAnimating">
-              <div class="deck-img-fill" [style.backgroundImage]="'url(' + (favouritesService.favourites[favStackIndex].photoUrl || '') + ')'">
-                <div *ngIf="!favouritesService.favourites[favStackIndex].photoUrl" class="deck-placeholder">
-                  {{ favouritesService.favourites[favStackIndex].category === 'lodging' ? '🏨' : favouritesService.favourites[favStackIndex].category === 'restaurant' ? '🍽️' : '🏛️' }}
-                </div>
-              </div>
-              <div class="deck-info">
-                <strong>{{ favouritesService.favourites[favStackIndex].placeName }}</strong>
-                <span>{{ favouritesService.favourites[favStackIndex].category === 'lodging' ? 'Stay' : favouritesService.favourites[favStackIndex].category === 'restaurant' ? 'Food' : 'Attraction' }}</span>
-              </div>
-              <button class="deck-next-btn" (click)="advanceFavStack(); $event.stopPropagation()">→</button>
-            </div>
-          </div>
-        </div>
-      </div>
 
     </div>
 
     <!-- Itinerary Tab -->
     <div class="tab-content" *ngIf="!loading && activeTab === 'itinerary'">
-      <div class="section-card" *ngIf="itinerary.length === 0">
-        <div class="empty-state">
-          <h3>Your itinerary is empty</h3>
-          <p>Add places from the Overview tab to start building your trip.</p>
-        </div>
-      </div>
-      <div class="section-card" *ngIf="itinerary.length > 0">
-        <div class="section-card-header">
-          <h3>Your Itinerary ({{ itinerary.length }} places)</h3>
-        </div>
-        <div class="itinerary-list">
-          <div class="itinerary-item" *ngFor="let place of itinerary; let i = index">
-            <div class="itinerary-number">{{ i + 1 }}</div>
-            <div class="itinerary-img" *ngIf="place.photos.length">
-              <img [src]="place.photos[0].url" [alt]="place.name">
-            </div>
-            <div class="itinerary-info">
-              <strong>{{ place.name }}</strong>
-              <span>{{ place.vicinity }}</span>
-              <span class="place-rating" *ngIf="place.rating">⭐ {{ place.rating }}</span>
-            </div>
-            <button class="remove-btn" (click)="removeFromItinerary(place.placeId)">✕</button>
-          </div>
-        </div>
-      </div>
+      <app-itinerary-tab
+        [fromDate]="fromDate"
+        [toDate]="toDate"
+        [places]="getAllPlaces()">
+      </app-itinerary-tab>
     </div>
 
     <!-- Budget Tab -->
@@ -364,47 +339,6 @@
       </div>
     </div>
 
-    <!-- Favourites Tab -->
-    <div class="tab-content" *ngIf="!loading && activeTab === 'favourites'">
-      <div class="section-card" *ngIf="favouritesService.favourites.length === 0">
-        <div class="empty-state">
-          <h3>No favourites yet</h3>
-          <p>Heart places on the destination page to save them here.</p>
-        </div>
-      </div>
-      <div class="fav-cards-list" *ngIf="favouritesService.favourites.length > 0">
-        <div class="fav-card-row" *ngFor="let item of favouritesService.favourites"
-             [class.expanded]="expandedFavId === item.placeId" (click)="toggleFavExpand(item.placeId)">
-          <div class="fav-card-collapsed">
-            <div class="fav-card-thumb">
-              <img *ngIf="item.photoUrl" [src]="item.photoUrl" [alt]="item.placeName">
-              <div *ngIf="!item.photoUrl" class="fav-thumb-placeholder">
-                {{ item.category === 'lodging' ? '🏨' : item.category === 'restaurant' ? '🍽️' : '🏛️' }}
-              </div>
-            </div>
-            <div class="fav-card-summary">
-              <strong>{{ item.placeName }}</strong>
-              <span class="fav-category">{{ item.category === 'lodging' ? 'Stay' : item.category === 'restaurant' ? 'Food' : 'Attraction' }}</span>
-            </div>
-            <span class="fav-expand-icon">{{ expandedFavId === item.placeId ? '▲' : '▼' }}</span>
-          </div>
-          <div class="fav-card-expanded" *ngIf="expandedFavId === item.placeId">
-            <img *ngIf="item.photoUrl" [src]="item.photoUrl" [alt]="item.placeName" class="fav-expanded-img">
-            <div class="fav-expanded-info">
-              <h4>{{ item.placeName }}</h4>
-              <p class="fav-vicinity">{{ item.vicinity }}</p>
-              <span class="fav-rating" *ngIf="item.rating">⭐ {{ item.rating }}
-                <span *ngIf="item.userRatingsTotal"> · {{ item.userRatingsTotal }} reviews</span>
-              </span>
-              <div class="fav-expanded-actions">
-                <button class="fav-add-itinerary-btn" (click)="addFavToItinerary(item); $event.stopPropagation()">+ Add to Itinerary</button>
-                <button class="fav-remove-btn" (click)="favouritesService.remove(item.placeId); $event.stopPropagation()">Remove</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
 
   </main>
 </div>

@@ -1,0 +1,71 @@
+<div class="itinerary-container">
+  <!-- Header -->
+  <div class="itinerary-header">
+    <h2>Itinerary</h2>
+    <span class="itinerary-meta" *ngIf="fromDate && toDate">
+      {{ days.length }} day{{ days.length !== 1 ? 's' : '' }} · {{ fromDate | date:'MMM d' }} – {{ toDate | date:'MMM d, y' }}
+    </span>
+    <span class="itinerary-meta" *ngIf="!fromDate || !toDate">No dates set</span>
+  </div>
+
+  <!-- Empty state -->
+  <div class="itinerary-empty" *ngIf="places.length === 0">
+    <div class="itinerary-empty-icon">
+      <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#ccc" stroke-width="1.5">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+      </svg>
+    </div>
+    <h3>No activities planned yet</h3>
+    <p>Add places from the Overview tab, then organise them here by day.</p>
+  </div>
+
+  <!-- Days timeline -->
+  <div class="itinerary-timeline" *ngIf="places.length > 0">
+    <div class="itinerary-day" *ngFor="let day of days">
+      <!-- Day header -->
+      <div class="day-header">
+        <div class="day-badge">{{ day.dayNumber }}</div>
+        <div class="day-info">
+          <span class="day-title">Day {{ day.dayNumber }}</span>
+          <span class="day-date" *ngIf="day.date">{{ getDayLabel(day) }}, {{ day.date | date:'MMM d' }}</span>
+          <span class="day-date" *ngIf="!day.date">Unscheduled</span>
+        </div>
+        <span class="day-count" *ngIf="day.items.length">{{ day.items.length }} place{{ day.items.length !== 1 ? 's' : '' }}</span>
+      </div>
+
+      <!-- Day items -->
+      <div class="day-items" *ngIf="day.items.length > 0">
+        <div class="day-item" *ngFor="let place of day.items; let i = index">
+          <div class="day-item-connector">
+            <div class="connector-dot"></div>
+            <div class="connector-line" *ngIf="i < day.items.length - 1"></div>
+          </div>
+          <div class="day-item-card">
+            <div class="day-item-img" *ngIf="place.photoUrl">
+              <img [src]="place.photoUrl" [alt]="place.placeName">
+            </div>
+            <div class="day-item-img day-item-img--placeholder" *ngIf="!place.photoUrl">
+              {{ getCategoryIcon(place.category) }}
+            </div>
+            <div class="day-item-info">
+              <strong>{{ place.placeName }}</strong>
+              <span class="day-item-meta">
+                <span class="day-item-category">{{ getCategoryLabel(place.category) }}</span>
+                <span *ngIf="place.vicinity"> · {{ place.vicinity }}</span>
+              </span>
+              <span class="day-item-rating" *ngIf="place.rating">{{ place.rating }} · {{ place.userRatingsTotal }} reviews</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty day -->
+      <div class="day-empty" *ngIf="day.items.length === 0">
+        <p>Nothing planned for this day</p>
+      </div>
+    </div>
+  </div>
+</div>

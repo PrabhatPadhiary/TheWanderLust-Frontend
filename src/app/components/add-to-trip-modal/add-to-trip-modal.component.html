@@ -1,0 +1,95 @@
+<div class="add-to-trip-modal">
+  <!-- Header -->
+  <div class="att-header">
+    <div class="att-header-title">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#2d5a27" stroke-width="2">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+        <line x1="16" y1="2" x2="16" y2="6"/>
+        <line x1="8" y1="2" x2="8" y2="6"/>
+        <line x1="3" y1="10" x2="21" y2="10"/>
+        <line x1="12" y1="14" x2="12" y2="18"/>
+        <line x1="10" y1="16" x2="14" y2="16"/>
+      </svg>
+      <span>Add to a trip</span>
+    </div>
+    <button class="att-close" (click)="cancel()">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Place preview -->
+  <div class="att-place-preview">
+    <div class="att-place-thumb">
+      <img *ngIf="data.place.photos.length" [src]="data.place.photos[0].url" [alt]="data.place.name">
+      <div *ngIf="!data.place.photos.length" class="att-place-thumb-placeholder">📍</div>
+    </div>
+    <div class="att-place-info">
+      <strong>{{ data.place.name }}</strong>
+      <span>{{ data.category | titlecase }} · {{ data.destinationName }}
+        <span *ngIf="data.place.rating"> · <svg viewBox="0 0 24 24" width="10" height="10" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> {{ data.place.rating }}</span>
+      </span>
+    </div>
+  </div>
+
+  <div class="att-divider"></div>
+
+  <!-- Trip list -->
+  <div class="att-body">
+    <p class="att-section-label">Choose trip</p>
+
+    <div class="att-loading" *ngIf="tripsLoading">
+      <div class="att-spinner"></div>
+    </div>
+
+    <div class="att-trips" *ngIf="!tripsLoading">
+      <button
+        class="att-trip-row"
+        *ngFor="let trip of allTrips"
+        [class.att-trip-row--active]="selectedTripId === trip.id"
+        [class.att-trip-row--disabled]="isTripDisabled(trip.id)"
+        [disabled]="isTripDisabled(trip.id)"
+        (click)="selectTrip(trip)">
+        <span class="att-trip-dot" [class.att-trip-dot--active]="selectedTripId === trip.id"></span>
+        <span class="att-trip-name">{{ trip.name }}</span>
+        <span class="att-trip-added" *ngIf="isTripDisabled(trip.id)">Added</span>
+        <span class="att-trip-dates" *ngIf="(trip.startDate || trip.endDate) && !isTripDisabled(trip.id)">
+          {{ trip.startDate | date:'MMM d' }}<span *ngIf="trip.endDate"> – {{ trip.endDate | date:'MMM d' }}</span>
+        </span>
+      </button>
+
+      <button class="att-trip-row att-trip-row--create" (click)="createNewTrip()">
+        <span class="att-create-icon">+</span>
+        <span>Create new trip</span>
+      </button>
+    </div>
+
+    <!-- Destination picker -->
+    <ng-container *ngIf="selectedTripId && selectedTripDestinations.length > 0">
+      <div class="att-divider"></div>
+      <p class="att-section-label" style="text-transform: none; margin-top: 16px;">Choose destination</p>
+      <div class="att-dest-pills">
+        <button
+          class="att-dest-pill"
+          *ngFor="let dest of selectedTripDestinations; let i = index"
+          [class.att-dest-pill--active]="selectedDestinationIndex === i"
+          (click)="selectedDestinationIndex = i">
+          {{ dest.name }}
+        </button>
+      </div>
+    </ng-container>
+  </div>
+
+  <div class="att-divider"></div>
+
+  <!-- Footer -->
+  <div class="att-footer">
+    <button class="att-cancel" (click)="cancel()">Cancel</button>
+    <button class="att-confirm"
+      [disabled]="!selectedTripId || !selectedTripDestinations[selectedDestinationIndex]?.id || addingToTrip"
+      (click)="confirm()">
+      {{ addingToTrip ? 'Adding...' : 'Add to ' + (selectedTripDestinations[selectedDestinationIndex]?.name || 'Trip') }}
+    </button>
+  </div>
+</div>

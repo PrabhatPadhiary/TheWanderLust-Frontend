@@ -283,16 +283,16 @@
       width: 38px;
       height: 38px;
       border-radius: 50%;
-      border: none;
-      background: #4caf50;
-      color: #fff;
+      border: 1.5px solid #e0e0e0;
+      background: #fff;
+      color: #555;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
       font-family: 'Poppins', sans-serif;
       transition: all 0.15s;
-      &:hover { transform: scale(1.08); }
+      &:hover { border-color: #2d5a27; color: #2d5a27; }
     }
 
     .user-dropdown {
@@ -334,4 +334,52 @@
   .navbar-brand .brand-name { display: none; }
   .navbar-search { max-width: none; }
   .navbar-actions .nav-action-btn { display: none; }
+}
+
+// ===== COMPACT NAVBAR (Trip Planner) =====
+.app-navbar--compact {
+  height: 44px !important;
+  padding: 0 20px !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(245, 246, 250, 0.75) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  left: 240px !important;
+  width: calc(100% - 240px) !important;
+
+  .navbar-brand {
+    .brand-icon {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .nav-action-btn {
+    width: 30px;
+    height: 30px;
+    svg { width: 15px; height: 15px; }
+  }
+
+  .user-avatar-btn {
+    width: 28px;
+    height: 28px;
+    background: none !important;
+    border: 1px solid #e0e0e0 !important;
+    svg { width: 14px; height: 14px; }
+  }
+}
+
+.navbar-trip-name {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
 }

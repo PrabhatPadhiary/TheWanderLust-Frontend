@@ -5,7 +5,7 @@ import { AuthService, UserResponse } from '../../services/auth.service';
 import { DestinationService } from '../../services/destination.service';
 import { PlaceCategoriesResponse, PlaceDto } from '../../models/destination.model';
 import { FavouritesService, FavouriteItem } from '../../services/favourites.service';
-import { TripService, CreateTripDestinationDto } from '../../services/trip.service';
+import { TripService, CreateTripDestinationDto, TripMemberResponse, TripPlaceDetailResponse } from '../../services/trip.service';
 import { LoaderService } from '../../services/loader.service';
 import { AddPlaceModalComponent, AddPlaceModalData } from './modals/add-place-modal/add-place-modal.component';
 import { AddDestinationDialogComponent, AddDestinationDialogData, AddDestinationDialogResult } from './modals/add-destination-dialog/add-destination-dialog.component';
@@ -35,8 +35,12 @@ export class TripPlannerComponent implements OnInit {
   travellers: number = 0;
 
   // Destinations list (primary + added)
-  destinations: { id?: string; name: string; startDate: string | null; endDate: string | null; latitude?: number; longitude?: number }[] = [];
+  destinations: { id?: string; name: string; startDate: string | null; endDate: string | null; latitude?: number; longitude?: number; places?: TripPlaceDetailResponse[] }[] = [];
   primaryPlaceId: string = ''; // for back-to-destination nav
+
+  // Trip members
+  members: TripMemberResponse[] = [];
+  showMembersDropdown = false;
 
   // Destination data
   destinationData: PlaceCategoriesResponse | null = null;
@@ -55,7 +59,7 @@ export class TripPlannerComponent implements OnInit {
   activeDestTab: 'stays' | 'food' | 'activities' = 'stays';
   managingDestinations = false;
   // Sidebar tab
-  activeTab: 'overview' | 'itinerary' | 'budget' | 'checklist' | 'travellers' | 'favourites' = 'overview';
+  activeTab: 'overview' | 'itinerary' | 'budget' | 'checklist' | 'travellers' = 'overview';
   expandedFavId: string | null = null;
 
   favStackIndex: number = 0;
@@ -108,6 +112,7 @@ export class TripPlannerComponent implements OnInit {
             this.fromDate = trip.startDate || null;
             this.toDate = trip.endDate || null;
             this.travellers = trip.travelersCount || 0;
+            this.members = trip.members || [];
             this.destination = this.destination || trip.primaryDestination || '';
 
             if (trip.destinations && trip.destinations.length > 0) {
@@ -119,7 +124,8 @@ export class TripPlannerComponent implements OnInit {
                   latitude: d.latitude,
                   longitude: d.longitude,
                   startDate: d.startDate || (i === 0 ? (trip.startDate || null) : null),
-                  endDate: d.endDate || (i === 0 ? (trip.endDate || null) : null)
+                  endDate: d.endDate || (i === 0 ? (trip.endDate || null) : null),
+                  places: d.places || []
                 }));
               // Capture primary destination placeId for back navigation
               if (!this.primaryPlaceId && trip.destinations[0]?.googlePlaceId) {
@@ -207,6 +213,13 @@ export class TripPlannerComponent implements OnInit {
     return this.getUserName().charAt(0).toUpperCase();
   }
 
+  getMemberInitial(name: string): string {
+    if (!name) return '?';
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
+    return parts[0][0].toUpperCase();
+  }
+
   addToItinerary(place: PlaceDto): void {
     if (!this.itinerary.find(p => p.placeId === place.placeId)) {
       this.itinerary.push(place);
@@ -226,7 +239,7 @@ export class TripPlannerComponent implements OnInit {
     return '⭐'.repeat(Math.round(rating));
   }
 
-  setActiveTab(tab: 'overview' | 'itinerary' | 'budget' | 'checklist' | 'travellers' | 'favourites'): void {
+  setActiveTab(tab: 'overview' | 'itinerary' | 'budget' | 'checklist' | 'travellers'): void {
     this.activeTab = tab;
   }
 
@@ -239,21 +252,42 @@ export class TripPlannerComponent implements OnInit {
     return ['stays', 'food', 'activities'].indexOf(this.activeDestTab);
   }
 
+  getPlacesForActiveTab(): TripPlaceDetailResponse[] {
+    const dest = this.destinations[this.activeDestIndex];
+    if (!dest?.places) return [];
+    const categoryMap: Record<string, string> = { stays: 'stay', food: 'food', activities: 'activity' };
+    const cat = categoryMap[this.activeDestTab];
+    return dest.places.filter(p => p.category === cat);
+  }
+
+  getAllPlaces(): TripPlaceDetailResponse[] {
+    return this.destinations.reduce((acc, dest) => {
+      if (dest.places) acc.push(...dest.places);
+      return acc;
+    }, [] as TripPlaceDetailResponse[]);
+  }
+
   openAddPlaceModal(): void {
     const dest = this.destinations[this.activeDestIndex];
+    if (!dest?.id || !this.tripId) return;
+
     const dialogRef = this.dialog.open(AddPlaceModalComponent, {
       panelClass: 'custom-dialog-container',
       data: {
-        destinationName: dest?.name || '',
+        tripId: this.tripId,
+        destinationId: dest.id,
+        destinationName: dest.name || '',
         activeTab: this.activeDestTab,
-        latitude: dest?.latitude,
-        longitude: dest?.longitude
+        latitude: dest.latitude,
+        longitude: dest.longitude
       } as AddPlaceModalData
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        // Handle the result (prediction or custom name)
+      if (result?.place) {
+        // Add the new place to the local destinations list so it appears immediately
+        if (!dest.places) dest.places = [];
+        dest.places.push(result.place);
       }
     });
   }
@@ -422,6 +456,7 @@ export class TripPlannerComponent implements OnInit {
   @HostListener('document:click')
   onDocumentClick(): void {
     if (this.showTripMenu) this.showTripMenu = false;
+    if (this.showMembersDropdown) this.showMembersDropdown = false;
   }
 
   openDeleteTripConfirm(): void {

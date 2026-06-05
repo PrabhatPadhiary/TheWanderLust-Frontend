@@ -2,10 +2,13 @@ import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
+import { TripService, CreateTripPlaceDto, TripPlaceDetailResponse } from '../../../../services/trip.service';
 
 declare var google: any;
 
 export interface AddPlaceModalData {
+  tripId: string;
+  destinationId: string;
   destinationName: string;
   activeTab: 'stays' | 'food' | 'activities';
   latitude?: number;
@@ -13,9 +16,7 @@ export interface AddPlaceModalData {
 }
 
 export interface AddPlaceModalResult {
-  prediction?: any;
-  customName?: string;
-  notes?: string;
+  place: TripPlaceDetailResponse;
 }
 
 @Component({
@@ -28,15 +29,15 @@ export class AddPlaceModalComponent {
   addPlaceSearch = '';
   addPlacePredictions: any[] = [];
   addPlaceShowDropdown = false;
-  addPlaceCustomName = '';
-  addPlaceNotes = '';
+  addingPlaceId: string | null = null;
 
   private addPlaceSubject = new Subject<string>();
   private initialized = false;
 
   constructor(
     public dialogRef: MatDialogRef<AddPlaceModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: AddPlaceModalData
+    @Inject(MAT_DIALOG_DATA) public data: AddPlaceModalData,
+    private tripService: TripService
   ) {
     this.initAutocomplete();
   }
@@ -49,6 +50,12 @@ export class AddPlaceModalComponent {
       distinctUntilChanged(),
       filter(v => v.length >= 2)
     ).subscribe(value => this.runSearch(value));
+  }
+
+  private getCategoryForTab(): string {
+    if (this.data.activeTab === 'stays') return 'stay';
+    if (this.data.activeTab === 'food') return 'food';
+    return 'activity';
   }
 
   private getPlaceTypeForTab(): string {
@@ -72,6 +79,9 @@ export class AddPlaceModalComponent {
           place_id: r.place_id,
           name: r.name,
           rating: r.rating,
+          user_ratings_total: r.user_ratings_total,
+          vicinity: r.vicinity || r.formatted_address || '',
+          photos: r.photos,
           types: r.types,
           structured_formatting: {
             main_text: r.name,
@@ -101,18 +111,44 @@ export class AddPlaceModalComponent {
     setTimeout(() => { this.addPlaceShowDropdown = false; }, 200);
   }
 
-  selectPrediction(prediction: any): void {
-    this.addPlacePredictions = [];
-    this.addPlaceShowDropdown = false;
-    this.addPlaceSearch = prediction.structured_formatting.main_text;
-    this.dialogRef.close({ prediction } as AddPlaceModalResult);
-  }
+  addPlace(prediction: any): void {
+    if (this.addingPlaceId) return;
+    this.addingPlaceId = prediction.place_id;
 
-  confirm(): void {
-    this.dialogRef.close({
-      customName: this.addPlaceCustomName,
-      notes: this.addPlaceNotes
-    } as AddPlaceModalResult);
+    const photoUrl = prediction.photos?.[0]?.getUrl?.({ maxWidth: 400 }) || null;
+
+    const dto: CreateTripPlaceDto = {
+      placeId: prediction.place_id,
+      placeName: prediction.name,
+      vicinity: prediction.vicinity || prediction.structured_formatting.secondary_text || null,
+      rating: prediction.rating || null,
+      userRatingsTotal: prediction.user_ratings_total || null,
+      photoUrl,
+      category: this.getCategoryForTab(),
+      notes: null
+    };
+
+    this.tripService.addPlace(this.data.tripId, this.data.destinationId, dto).subscribe({
+      next: (res) => {
+        this.addingPlaceId = null;
+        // Return the added place so the parent can update the list
+        const addedPlace: TripPlaceDetailResponse = {
+          id: res.id,
+          placeId: dto.placeId,
+          placeName: dto.placeName,
+          vicinity: dto.vicinity,
+          rating: dto.rating,
+          userRatingsTotal: dto.userRatingsTotal,
+          photoUrl: dto.photoUrl,
+          category: dto.category,
+          notes: null
+        };
+        this.dialogRef.close({ place: addedPlace } as AddPlaceModalResult);
+      },
+      error: () => {
+        this.addingPlaceId = null;
+      }
+    });
   }
 
   cancel(): void {
