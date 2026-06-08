@@ -361,9 +361,9 @@
     .section-badge {
       background: #fff3cd;
       color: #856404;
-      font-size: 0.72rem;
-      padding: 4px 10px;
-      border-radius: 12px;
+      font-size: 0.82rem;
+      padding: 7px 16px;
+      border-radius: 20px;
       font-weight: 600;
       display: inline-flex;
       align-items: center;
@@ -1074,11 +1074,16 @@
   flex-shrink: 0;
 }
 
-// ===== MEMBER AVATARS =====
+
 .members-stack {
   display: flex;
   align-items: center;
   align-self: center;
+  cursor: pointer;
+}
+
+.members-stack:hover{
+  cursor: pointer;
 }
 
 .member-avatar {
@@ -1095,7 +1100,7 @@
   border: 2px solid #fff;
   margin-left: -8px;
   position: relative;
-  cursor: default;
+  cursor: pointer;
 
   &:first-child {
     margin-left: 0;

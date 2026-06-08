@@ -263,6 +263,11 @@ export class TripPlannerComponent implements OnInit {
     return dest.places.filter(p => p.category === cat);
   }
 
+  getPlacesForActiveDest(): TripPlaceDetailResponse[] {
+    const dest = this.destinations[this.activeDestIndex];
+    return dest?.places || [];
+  }
+
   getAllPlaces(): TripPlaceDetailResponse[] {
     return this.destinations.reduce((acc, dest) => {
       if (dest.places) acc.push(...dest.places);

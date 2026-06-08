@@ -81,6 +81,8 @@ export class AddPlaceModalComponent {
           rating: r.rating,
           user_ratings_total: r.user_ratings_total,
           vicinity: r.vicinity || r.formatted_address || '',
+          latitude: r.geometry?.location?.lat() ?? null,
+          longitude: r.geometry?.location?.lng() ?? null,
           photos: r.photos,
           types: r.types,
           structured_formatting: {
@@ -125,7 +127,9 @@ export class AddPlaceModalComponent {
       userRatingsTotal: prediction.user_ratings_total || null,
       photoUrl,
       category: this.getCategoryForTab(),
-      notes: null
+      notes: null,
+      latitude: prediction.latitude || null,
+      longitude: prediction.longitude || null
     };
 
     this.tripService.addPlace(this.data.tripId, this.data.destinationId, dto).subscribe({
@@ -141,7 +145,9 @@ export class AddPlaceModalComponent {
           userRatingsTotal: dto.userRatingsTotal,
           photoUrl: dto.photoUrl,
           category: dto.category,
-          notes: null
+          notes: null,
+          latitude: dto.latitude,
+          longitude: dto.longitude
         };
         this.dialogRef.close({ place: addedPlace } as AddPlaceModalResult);
       },

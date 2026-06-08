@@ -212,6 +212,13 @@
         </div>
       </div>
 
+      <!-- Map -->
+      <app-trip-map *ngIf="getPlacesForActiveDest().length > 0"
+        [places]="getPlacesForActiveDest()"
+        [destinationLat]="destinations[activeDestIndex]?.latitude || null"
+        [destinationLng]="destinations[activeDestIndex]?.longitude || null">
+      </app-trip-map>
+
       <!-- Destination detail panel -->
       <div class="dest-detail-panel" *ngIf="!tripLoading && destinations.length > 0">
         <div class="dest-detail-header">

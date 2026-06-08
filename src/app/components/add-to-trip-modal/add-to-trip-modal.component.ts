@@ -100,7 +100,9 @@ export class AddToTripModalComponent {
       userRatingsTotal: this.data.place.userRatingsTotal,
       photoUrl: this.data.place.photos[0]?.url || null,
       category: this.data.category,
-      notes: null
+      notes: null,
+      latitude: this.data.place.geometry?.latitude || null,
+      longitude: this.data.place.geometry?.longitude || null
     };
 
     this.addingToTrip = true;

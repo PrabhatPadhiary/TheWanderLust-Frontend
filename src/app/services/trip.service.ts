@@ -13,6 +13,8 @@ export interface CreateTripPlaceDto {
   photoUrl?: string | null;
   category: string;
   notes?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 export interface TripPlaceResponse {
@@ -56,6 +58,8 @@ export interface TripPlaceDetailResponse {
   photoUrl?: string | null;
   category: string;
   notes?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
   createdAt?: string;
 }
 
