@@ -34,6 +34,7 @@ import { JoinTripComponent } from './components/join-trip/join-trip.component';
 import { AddToTripBtnComponent } from './components/add-to-trip-btn/add-to-trip-btn.component';
 import { AddToTripModalComponent } from './components/add-to-trip-modal/add-to-trip-modal.component';
 import { ItineraryTabComponent } from './components/trip-planner/itinerary-tab/itinerary-tab.component';
+import { EditTripModalComponent } from './components/trip-planner/modals/edit-trip-modal/edit-trip-modal.component';
 
 @NgModule({
   declarations: [
@@ -57,6 +58,7 @@ import { ItineraryTabComponent } from './components/trip-planner/itinerary-tab/i
     AddToTripBtnComponent,
     AddToTripModalComponent,
     ItineraryTabComponent,
+    EditTripModalComponent,
   ],
   imports: [
     FormsModule,

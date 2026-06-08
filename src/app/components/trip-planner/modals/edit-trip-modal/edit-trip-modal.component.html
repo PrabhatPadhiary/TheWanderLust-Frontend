@@ -1,0 +1,53 @@
+<div class="edit-trip-modal">
+  <div class="etm-header">
+    <h4>Edit Trip</h4>
+    <button class="etm-close" (click)="cancel()">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="etm-body">
+    <!-- Trip name -->
+    <div class="etm-field">
+      <label>Trip name</label>
+      <input type="text" [(ngModel)]="tripName" placeholder="My trip...">
+    </div>
+
+    <!-- Dates -->
+    <div class="etm-field">
+      <label>Start date</label>
+      <mat-form-field appearance="outline" class="date-field">
+        <input matInput [matDatepicker]="startPicker" [(ngModel)]="startDate" placeholder="Start">
+        <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+    <div class="etm-field">
+      <label>End date</label>
+      <mat-form-field appearance="outline" class="date-field">
+        <input matInput [matDatepicker]="endPicker" [(ngModel)]="endDate" [min]="startDate" placeholder="End">
+        <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- Travellers -->
+    <div class="etm-field">
+      <label>Travellers</label>
+      <div class="etm-stepper">
+        <button class="etm-stepper-btn" (click)="decrement()" [disabled]="travellers <= 1">−</button>
+        <span class="etm-stepper-value">{{ travellers }}</span>
+        <button class="etm-stepper-btn" (click)="increment()" [disabled]="travellers >= 20">+</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="etm-footer">
+    <button class="etm-cancel" (click)="cancel()">Cancel</button>
+    <button class="etm-save" [disabled]="saving || !tripName.trim()" (click)="save()">
+      {{ saving ? 'Saving...' : 'Save' }}
+    </button>
+  </div>
+</div>

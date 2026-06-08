@@ -1,6 +1,7 @@
 import { Component, OnInit, HostListener } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
+import { ToastrService } from 'ngx-toastr';
 import { AuthService, UserResponse } from '../../services/auth.service';
 import { DestinationService } from '../../services/destination.service';
 import { PlaceCategoriesResponse, PlaceDto } from '../../models/destination.model';
@@ -12,6 +13,7 @@ import { AddDestinationDialogComponent, AddDestinationDialogData, AddDestination
 import { DeleteTripConfirmComponent, DeleteTripConfirmData } from './modals/delete-trip-confirm/delete-trip-confirm.component';
 import { DeleteDestinationConfirmComponent, DeleteDestinationConfirmData } from './modals/delete-destination-confirm/delete-destination-confirm.component';
 import { InviteModalComponent, InviteModalData } from './modals/invite-modal/invite-modal.component';
+import { EditTripModalComponent, EditTripModalData, EditTripModalResult } from './modals/edit-trip-modal/edit-trip-modal.component';
 
 @Component({
   selector: 'app-trip-planner',
@@ -79,6 +81,7 @@ export class TripPlannerComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private dialog: MatDialog,
+    private toastr: ToastrService,
     private destinationService: DestinationService,
     private authService: AuthService,
     public favouritesService: FavouritesService,
@@ -267,6 +270,20 @@ export class TripPlannerComponent implements OnInit {
     }, [] as TripPlaceDetailResponse[]);
   }
 
+  removePlace(place: TripPlaceDetailResponse): void {
+    const dest = this.destinations[this.activeDestIndex];
+    if (!place.id) return;
+
+    // Remove from local immediately
+    if (dest?.places) {
+      dest.places = dest.places.filter(p => p.id !== place.id);
+    }
+
+    // Call backend to delete
+    this.tripService.deletePlace(place.id).subscribe();
+    this.toastr.success(`${place.placeName} removed`);
+  }
+
   openAddPlaceModal(): void {
     const dest = this.destinations[this.activeDestIndex];
     if (!dest?.id || !this.tripId) return;
@@ -288,6 +305,7 @@ export class TripPlannerComponent implements OnInit {
         // Add the new place to the local destinations list so it appears immediately
         if (!dest.places) dest.places = [];
         dest.places.push(result.place);
+        this.toastr.success(`${result.place.placeName} added`);
       }
     });
   }
@@ -372,6 +390,7 @@ export class TripPlannerComponent implements OnInit {
       next: (res) => {
         this.destinations.push({ id: res.id, ...entry, latitude: res.latitude, longitude: res.longitude });
         this.loaderService.hide();
+        this.toastr.success(`${entry.name} added to trip`);
       },
       error: () => {
         this.destinations.push(entry);
@@ -406,6 +425,7 @@ export class TripPlannerComponent implements OnInit {
 
   private performDeleteDest(index: number): void {
     const dest = this.destinations[index];
+    const destName = dest.name;
     if (dest.id && this.tripId) {
       this.deletingDestId = dest.id;
       this.loaderService.show('Removing destination...');
@@ -414,6 +434,7 @@ export class TripPlannerComponent implements OnInit {
           this.destinations.splice(index, 1);
           this.deletingDestId = null;
           this.loaderService.hide();
+          this.toastr.success(`${destName} removed`);
         },
         error: () => {
           this.destinations.splice(index, 1);
@@ -423,6 +444,7 @@ export class TripPlannerComponent implements OnInit {
       });
     } else {
       this.destinations.splice(index, 1);
+      this.toastr.success(`${destName} removed`);
     }
   }
 
@@ -476,6 +498,30 @@ export class TripPlannerComponent implements OnInit {
     this.dialog.open(InviteModalComponent, {
       panelClass: 'custom-dialog-container',
       data: { tripId: this.tripId, tripName: this.tripName || this.destination } as InviteModalData
+    });
+  }
+
+  openEditTripModal(): void {
+    const dialogRef = this.dialog.open(EditTripModalComponent, {
+      panelClass: 'custom-dialog-container',
+      data: {
+        tripId: this.tripId,
+        name: this.tripName,
+        startDate: this.fromDate,
+        endDate: this.toDate,
+        travelersCount: this.travellers,
+        status: this.tripStatus
+      } as EditTripModalData
+    });
+
+    dialogRef.afterClosed().subscribe((result: EditTripModalResult | null) => {
+      if (result) {
+        this.tripName = result.name;
+        this.fromDate = result.startDate;
+        this.toDate = result.endDate;
+        this.travellers = result.travelersCount;
+        this.tripStatus = result.status;
+      }
     });
   }
 

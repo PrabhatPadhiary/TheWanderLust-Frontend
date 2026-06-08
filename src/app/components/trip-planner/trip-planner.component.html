@@ -37,7 +37,7 @@
       </div>
       <div class="greeting-row">
         <div class="greeting-section">
-          <h1>{{ greeting }}, <strong>{{ getUserName() }}</strong> 👋</h1>
+          <h1>{{ greeting }}, <strong>{{ getUserName() }}</strong></h1>
           <p *ngIf="destination">Plan your trip to <strong>{{ destination }}</strong></p>
           <p *ngIf="!destination">Start planning your next adventure</p>
         </div>
@@ -116,6 +116,15 @@
         <div class="section-card-header">
           <h3>{{ tripName || destination }}</h3>
           <div class="section-options">
+            <button class="invite-btn" (click)="openInviteModal()">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <line x1="19" y1="8" x2="19" y2="14"/>
+                <line x1="22" y1="11" x2="16" y2="11"/>
+              </svg>
+              Invite
+            </button>
             <span class="section-badge" [ngClass]="'status-' + getStatusClass(tripStatus)">{{ tripStatus }}</span>
             <div class="trip-menu-wrap">
               <button class="trip-menu-btn" (click)="showTripMenu = !showTripMenu; $event.stopPropagation()">
@@ -124,7 +133,7 @@
                 </svg>
               </button>
               <div class="trip-menu-dropdown" *ngIf="showTripMenu">
-                <button class="trip-menu-item" (click)="showTripMenu = false">
+                <button class="trip-menu-item" (click)="showTripMenu = false; openEditTripModal()">
                   <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
@@ -179,15 +188,6 @@
                 </div>
               </div>
             </div>
-            <button class="invite-btn" (click)="openInviteModal()">
-              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                <circle cx="9" cy="7" r="4"/>
-                <line x1="19" y1="8" x2="19" y2="14"/>
-                <line x1="22" y1="11" x2="16" y2="11"/>
-              </svg>
-              Invite
-            </button>
           </div>
 
           <!-- Destination capsules -->
@@ -285,6 +285,7 @@
                 <span class="dest-place-rating" *ngIf="place.rating"><svg class="star-icon" viewBox="0 0 24 24" width="12" height="12" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> {{ place.rating }}<span *ngIf="place.userRatingsTotal"> · {{ place.userRatingsTotal }} reviews</span></span>
                 <span class="dest-place-notes" *ngIf="place.notes">{{ place.notes }}</span>
               </div>
+              <button class="dest-place-remove" (click)="removePlace(place)">−</button>
             </div>
           </div>
           <!-- Empty state -->

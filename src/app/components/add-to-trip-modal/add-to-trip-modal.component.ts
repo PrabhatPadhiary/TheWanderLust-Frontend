@@ -1,5 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { ToastrService } from 'ngx-toastr';
 import { TripService, TripResponse, CreateTripPlaceDto } from '../../services/trip.service';
 import { PlaceDto } from '../../models/destination.model';
 
@@ -31,7 +32,8 @@ export class AddToTripModalComponent {
   constructor(
     public dialogRef: MatDialogRef<AddToTripModalComponent>,
     @Inject(MAT_DIALOG_DATA) public data: AddToTripModalData,
-    private tripService: TripService
+    private tripService: TripService,
+    private toastr: ToastrService
   ) {
     this.loadTrips();
   }
@@ -106,6 +108,8 @@ export class AddToTripModalComponent {
       next: () => {
         this.addingToTrip = false;
         this.tripService.addPlaceIdToTrip(this.selectedTripId, this.data.place.placeId);
+        const tripName = this.allTrips.find(t => t.id === this.selectedTripId)?.name || 'trip';
+        this.toastr.success(`Added to ${tripName}`);
         this.dialogRef.close({ tripId: this.selectedTripId, placeId: this.data.place.placeId } as AddToTripModalResult);
       },
       error: () => {
