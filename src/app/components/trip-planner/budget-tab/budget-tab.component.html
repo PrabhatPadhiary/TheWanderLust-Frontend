@@ -10,7 +10,7 @@
         <span *ngIf="travellers"> · {{ travellers }} {{ travellers === 1 ? 'person' : 'people' }}</span>
       </p>
     </div>
-    <button class="add-expense-btn" (click)="openAddExpense()" [disabled]="loadingExpenses">
+    <button class="add-expense-btn" (click)="openAddExpense()" [disabled]="loadingExpenses" *ngIf="canEdit">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
         <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
       </svg>
@@ -65,7 +65,7 @@
         <span class="metric-label">Total Budget</span>
         <span class="metric-value" *ngIf="totalBudget > 0">{{ currency }}{{ totalBudget | number }}</span>
         <span class="metric-value metric-value--empty" *ngIf="!totalBudget">—</span>
-        <button class="metric-set-btn" (click)="openBudgetPanel()">
+        <button class="metric-set-btn" (click)="openBudgetPanel()" *ngIf="isOwner">
           {{ totalBudget > 0 ? 'Edit' : 'Set budget' }}
         </button>
       </div>
@@ -118,7 +118,7 @@
         <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
       </svg>
       <p>No expenses yet</p>
-      <button class="add-expense-btn" (click)="openAddExpense()">+ Add first expense</button>
+      <button class="add-expense-btn" (click)="openAddExpense()" *ngIf="canEdit">+ Add first expense</button>
     </div>
 
     <!-- Two column layout: categories + expense log -->
@@ -214,7 +214,7 @@
               <span class="expense-notes" *ngIf="exp.notes">{{ exp.notes }}</span>
             </div>
             <span class="expense-amount">{{ currency }}{{ exp.amount | number }}</span>
-            <div class="expense-actions">
+            <div class="expense-actions" *ngIf="canEditExpense(exp)">
               <button class="exp-action-btn" (click)="editExpense(exp)">
                 <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>

@@ -6,6 +6,7 @@ import {
   TripMemberResponse,
   TripExpenseResponse
 } from '../../../services/trip.service';
+import { AuthService } from '../../../services/auth.service';
 import { AddExpenseModalComponent } from './add-expense-modal/add-expense-modal.component';
 
 export interface BudgetExpense {
@@ -34,7 +35,21 @@ export class BudgetTabComponent implements OnInit, OnChanges {
   @Input() members: TripMemberResponse[] = [];
   @Input() initialBudget: number | null = null;
   @Input() initialCurrency: string | null = null;
+  @Input() userRole: 'owner' | 'member' | 'viewer' = 'viewer';
   @Output() budgetChanged = new EventEmitter<{ totalBudget: number; currency: string }>();
+
+  get isOwner(): boolean { return this.userRole === 'owner'; }
+  get canEdit(): boolean { return this.userRole === 'owner' || this.userRole === 'member'; }
+
+  canEditExpense(exp: BudgetExpense): boolean {
+    if (this.userRole === 'owner') return true;
+    if (this.userRole === 'member') {
+      // Editor can only edit/delete their own expenses
+      const currentUserId = this.authService.currentUser?.id;
+      return !!currentUserId && exp.paidByMemberId === currentUserId;
+    }
+    return false;
+  }
 
   currency: string = '₹';
 
@@ -75,7 +90,8 @@ export class BudgetTabComponent implements OnInit, OnChanges {
   constructor(
     private dialog: MatDialog,
     private tripService: TripService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private authService: AuthService
   ) {}
 
   readonly categories: BudgetExpense['category'][] = ['stay', 'food', 'activity', 'transport', 'other'];

@@ -64,7 +64,14 @@ export class TripPlannerComponent implements OnInit {
   activeDestTab: 'stays' | 'food' | 'activities' = 'stays';
   managingDestinations = false;
   // Sidebar tab
-  activeTab: 'overview' | 'itinerary' | 'budget' | 'checklist' | 'travellers' = 'overview';  expandedFavId: string | null = null;
+  activeTab: 'overview' | 'itinerary' | 'budget' | 'checklist' | 'travellers' = 'overview';
+
+  // Current user's role in this trip
+  currentUserRole: 'owner' | 'member' | 'viewer' = 'viewer';
+
+  get isOwner(): boolean { return this.currentUserRole === 'owner'; }
+  get canEdit(): boolean { return this.currentUserRole === 'owner' || this.currentUserRole === 'member'; }
+  get canInvite(): boolean { return this.currentUserRole === 'owner' || this.currentUserRole === 'member'; }  expandedFavId: string | null = null;
 
   favStackIndex: number = 0;
   isFavAnimating: boolean = false;
@@ -127,6 +134,13 @@ export class TripPlannerComponent implements OnInit {
             this.tripTotalBudget = trip.totalBudget ?? null;
             this.tripCurrency = trip.currency || localStorage.getItem(`trip_currency_${tripId}`) || '₹';
             this.destination = this.destination || trip.primaryDestination || '';
+
+            // Determine current user's role
+            const currentUserId = this.authService.currentUser?.id;
+            if (currentUserId && this.members.length > 0) {
+              const me = this.members.find(m => m.userId === currentUserId);
+              this.currentUserRole = (me?.role as any) || 'viewer';
+            }
 
             if (trip.destinations && trip.destinations.length > 0) {
               this.destinations = trip.destinations
