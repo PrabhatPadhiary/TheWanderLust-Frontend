@@ -28,6 +28,7 @@ import { InviteModalComponent } from './components/trip-planner/modals/invite-mo
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FavouritesComponent } from './components/favourites/favourites.component';
 import { SafePipe } from './pipes/safe.pipe';
+import { WlNamePipe } from './pipes/wl-name.pipe';
 import { TripPlanModalComponent } from './components/trip-planner/modals/trip-plan-modal/trip-plan-modal.component';
 import { MyTripsComponent } from './components/my-trips/my-trips.component';
 import { JoinTripComponent } from './components/join-trip/join-trip.component';
@@ -36,6 +37,8 @@ import { AddToTripModalComponent } from './components/add-to-trip-modal/add-to-t
 import { ItineraryTabComponent } from './components/trip-planner/itinerary-tab/itinerary-tab.component';
 import { EditTripModalComponent } from './components/trip-planner/modals/edit-trip-modal/edit-trip-modal.component';
 import { TripMapComponent } from './components/trip-planner/trip-map/trip-map.component';
+import { BudgetTabComponent } from './components/trip-planner/budget-tab/budget-tab.component';
+import { AddExpenseModalComponent } from './components/trip-planner/budget-tab/add-expense-modal/add-expense-modal.component';
 
 @NgModule({
   declarations: [
@@ -53,6 +56,7 @@ import { TripMapComponent } from './components/trip-planner/trip-map/trip-map.co
     NavbarComponent,
     FavouritesComponent,
     SafePipe,
+    WlNamePipe,
     TripPlanModalComponent,
     MyTripsComponent,
     JoinTripComponent,
@@ -61,6 +65,8 @@ import { TripMapComponent } from './components/trip-planner/trip-map/trip-map.co
     ItineraryTabComponent,
     EditTripModalComponent,
     TripMapComponent,
+    BudgetTabComponent,
+    AddExpenseModalComponent,
   ],
   imports: [
     FormsModule,

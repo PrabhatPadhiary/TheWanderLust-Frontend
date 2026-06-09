@@ -87,9 +87,9 @@
   <div class="att-footer">
     <button class="att-cancel" (click)="cancel()">Cancel</button>
     <button class="att-confirm"
-      [disabled]="!selectedTripId || !selectedTripDestinations[selectedDestinationIndex]?.id || addingToTrip"
+      [disabled]="!selectedTripId || !selectedDestination?.id || addingToTrip"
       (click)="confirm()">
-      {{ addingToTrip ? 'Adding...' : 'Add to ' + (selectedTripDestinations[selectedDestinationIndex]?.name || 'Trip') }}
+      {{ addingToTrip ? 'Adding...' : 'Add to ' + (selectedDestination?.name || 'Trip') }}
     </button>
   </div>
 </div>

@@ -42,6 +42,8 @@ export class TripPlannerComponent implements OnInit {
 
   // Trip members
   members: TripMemberResponse[] = [];
+  tripTotalBudget: number | null = null;
+  tripCurrency: string = '₹';
   showMembersDropdown = false;
 
   // Destination data
@@ -61,8 +63,7 @@ export class TripPlannerComponent implements OnInit {
   activeDestTab: 'stays' | 'food' | 'activities' = 'stays';
   managingDestinations = false;
   // Sidebar tab
-  activeTab: 'overview' | 'itinerary' | 'budget' | 'checklist' | 'travellers' = 'overview';
-  expandedFavId: string | null = null;
+  activeTab: 'overview' | 'itinerary' | 'budget' | 'checklist' | 'travellers' = 'overview';  expandedFavId: string | null = null;
 
   favStackIndex: number = 0;
   isFavAnimating: boolean = false;
@@ -100,6 +101,13 @@ export class TripPlannerComponent implements OnInit {
     this.isGuest = state?.isGuest || false;
     this.greeting = this.getGreeting();
 
+    // Restore active tab from URL query param (survives refresh)
+    const tabParam = this.route.snapshot.queryParamMap.get('tab');
+    const validTabs = ['overview', 'itinerary', 'budget', 'checklist', 'travellers'];
+    if (tabParam && validTabs.includes(tabParam)) {
+      this.activeTab = tabParam as typeof this.activeTab;
+    }
+
     // If tripId in URL, load from API (handles back navigation / bookmarks)
     const tripId = routeTripId || state?.tripId;
     if (tripId) {
@@ -116,6 +124,8 @@ export class TripPlannerComponent implements OnInit {
             this.toDate = trip.endDate || null;
             this.travellers = trip.travelersCount || 0;
             this.members = trip.members || [];
+            this.tripTotalBudget = trip.totalBudget ?? null;
+            this.tripCurrency = trip.currency || localStorage.getItem(`trip_currency_${tripId}`) || '₹';
             this.destination = this.destination || trip.primaryDestination || '';
 
             if (trip.destinations && trip.destinations.length > 0) {
@@ -244,6 +254,20 @@ export class TripPlannerComponent implements OnInit {
 
   setActiveTab(tab: 'overview' | 'itinerary' | 'budget' | 'checklist' | 'travellers'): void {
     this.activeTab = tab;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { tab },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
+  }
+
+  getActivityCount(): number {
+    return this.getAllPlaces().filter(p => p.category === 'activity').length;
+  }
+
+  get activeDest(): typeof this.destinations[0] | undefined {
+    return this.destinations[this.activeDestIndex];
   }
 
   selectDest(index: number): void {

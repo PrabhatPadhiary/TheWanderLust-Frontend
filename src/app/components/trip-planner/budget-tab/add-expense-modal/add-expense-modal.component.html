@@ -1,0 +1,148 @@
+<div class="exp-modal">
+  <div class="exp-modal-header">
+    <span>{{ isEditing ? 'Edit expense' : 'Add expense' }}</span>
+    <button class="exp-close-btn" (click)="cancel()">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="exp-modal-body">
+    <!-- Title -->
+    <div class="exp-field">
+      <label>Title</label>
+      <input type="text" [(ngModel)]="title" placeholder="e.g. Grand Hyatt Goa">
+    </div>
+
+    <!-- Amount + Date -->
+    <div class="exp-field-row">
+      <div class="exp-field">
+        <label>Amount ({{ data.currency }})</label>
+        <input type="number" [(ngModel)]="amount" placeholder="0" min="0">
+      </div>
+      <div class="exp-field">
+        <label>Date</label>
+        <mat-form-field appearance="outline" class="date-field exp-date-field">
+          <input matInput [matDatepicker]="expDatePicker" [(ngModel)]="dateObj" placeholder="Pick a date">
+          <mat-datepicker-toggle matIconSuffix [for]="expDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #expDatePicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Category -->
+    <div class="exp-field">
+      <label>Category</label>
+      <div class="exp-cat-pills">
+
+        <!-- Stay -->
+        <button class="exp-cat-pill" [class.active]="category === 'stay'" [style.--cat-color]="categoryColors['stay']" (click)="category = 'stay'">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+          Stays
+        </button>
+
+        <!-- Food -->
+        <button class="exp-cat-pill" [class.active]="category === 'food'" [style.--cat-color]="categoryColors['food']" (click)="category = 'food'">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+            <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+            <line x1="6" y1="1" x2="6" y2="4"/>
+            <line x1="10" y1="1" x2="10" y2="4"/>
+            <line x1="14" y1="1" x2="14" y2="4"/>
+          </svg>
+          Food
+        </button>
+
+        <!-- Activities -->
+        <button class="exp-cat-pill" [class.active]="category === 'activity'" [style.--cat-color]="categoryColors['activity']" (click)="category = 'activity'">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polygon points="10 8 16 12 10 16 10 8"/>
+          </svg>
+          Activities
+        </button>
+
+        <!-- Transport -->
+        <button class="exp-cat-pill" [class.active]="category === 'transport'" [style.--cat-color]="categoryColors['transport']" (click)="category = 'transport'">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="1" y="3" width="15" height="13" rx="2"/>
+            <path d="M16 8h4l3 4v3h-7V8z"/>
+            <circle cx="5.5" cy="18.5" r="2.5"/>
+            <circle cx="18.5" cy="18.5" r="2.5"/>
+          </svg>
+          Transport
+        </button>
+
+        <!-- Other -->
+        <button class="exp-cat-pill" [class.active]="category === 'other'" [style.--cat-color]="categoryColors['other']" (click)="category = 'other'">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Other
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Paid by -->
+    <div class="exp-field">
+      <label>Paid by</label>
+      <div class="member-dropdown-wrap" (click)="$event.stopPropagation()">
+        <button class="member-dropdown-trigger"
+                [class.open]="memberDropdownOpen"
+                (click)="memberDropdownOpen = !memberDropdownOpen"
+                type="button">
+          <div class="member-trigger-left">
+            <div class="member-avatar-sm" *ngIf="paidByMemberId">
+              {{ getMemberInitial(getSelectedMemberName()) }}
+            </div>
+            <span class="member-trigger-name" *ngIf="paidByMemberId">{{ getSelectedMemberName() | wlName }}</span>
+            <span class="member-trigger-placeholder" *ngIf="!paidByMemberId">Select a member</span>
+          </div>
+          <svg class="member-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+
+        <div class="member-dropdown-list" *ngIf="memberDropdownOpen">
+          <button
+            class="member-dropdown-item"
+            *ngFor="let m of data.members"
+            [class.selected]="paidByMemberId === m.userId"
+            (click)="paidByMemberId = m.userId; memberDropdownOpen = false"
+            type="button">
+            <div class="member-avatar-sm" [class.active]="paidByMemberId === m.userId">
+              {{ getMemberInitial(m.name) }}
+            </div>
+            <span>{{ m.name | wlName }}</span>
+            <svg *ngIf="paidByMemberId === m.userId" class="member-check" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </button>
+          <p class="no-members-hint" *ngIf="data.members.length === 0">
+            No members found. Add members to your trip first.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes -->
+    <div class="exp-field">
+      <label>Notes <span class="optional">(optional)</span></label>
+      <input type="text" [(ngModel)]="notes" placeholder="Any additional details...">
+    </div>
+  </div>
+
+  <div class="exp-modal-footer">
+    <button class="exp-cancel-btn" (click)="cancel()">Cancel</button>
+    <button class="exp-save-btn" [disabled]="!isValid" (click)="save()">
+      {{ isEditing ? 'Save changes' : 'Add expense' }}
+    </button>
+  </div>
+</div>

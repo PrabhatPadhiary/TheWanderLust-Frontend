@@ -246,3 +246,14 @@ body.no-scroll {
 .custom-dialog-container .mat-mdc-dialog-container {
   padding: 0 !important;
 }
+
+/* ===== Google Maps tile fix ===== */
+.gm-style img,
+.gm-style canvas {
+  max-width: none !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  object-fit: initial !important;
+  display: inline !important;
+}

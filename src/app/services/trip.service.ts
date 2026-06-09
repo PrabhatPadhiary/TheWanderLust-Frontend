@@ -90,6 +90,36 @@ export interface TripMemberResponse {
   joinedAt: string;
 }
 
+export interface TripExpenseResponse {
+  id: string;
+  title: string;
+  amount: number;
+  category: 'stay' | 'food' | 'activity' | 'transport' | 'other';
+  date: string;
+  paidByMemberId: string;
+  paidByName: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateTripExpenseDto {
+  title: string;
+  amount: number;
+  category: string;
+  date: string;
+  paidByMemberId: string;
+  paidByName: string;
+  notes?: string;
+}
+
+export interface UpdateTripExpenseDto extends CreateTripExpenseDto {}
+
+export interface SetTripBudgetDto {
+  totalBudget: number;
+  currency?: string;
+}
+
 export interface TripResponse {
   id: string;
   name: string;
@@ -101,6 +131,8 @@ export interface TripResponse {
   description?: string;
   coverPhotoUrl?: string | null;
   createdAt?: string;
+  totalBudget?: number | null;
+  currency?: string | null;
   destinations?: TripDestinationResponse[];
   members?: TripMemberResponse[];
   placeIds?: string[];
@@ -312,6 +344,65 @@ export class TripService {
             next: (res) => { observer.next(res); observer.complete(); },
             error: (err) => observer.error(err)
           });
+      });
+    });
+  }
+
+  // ===== EXPENSES =====
+
+  getExpenses(tripId: string): Observable<TripExpenseResponse[]> {
+    return new Observable(observer => {
+      this.authService.getFirebaseToken().then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.get<TripExpenseResponse[]>(`${environment.apiUrl}/Trips/${tripId}/expenses`, { headers })
+          .subscribe({ next: res => { observer.next(res); observer.complete(); }, error: err => observer.error(err) });
+      });
+    });
+  }
+
+  addExpense(tripId: string, dto: CreateTripExpenseDto): Observable<TripExpenseResponse> {
+    return new Observable(observer => {
+      this.authService.getFirebaseToken().then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.post<TripExpenseResponse>(`${environment.apiUrl}/Trips/${tripId}/expenses`, dto, { headers })
+          .subscribe({ next: res => { observer.next(res); observer.complete(); }, error: err => observer.error(err) });
+      });
+    });
+  }
+
+  updateExpense(tripId: string, expenseId: string, dto: UpdateTripExpenseDto): Observable<TripExpenseResponse> {
+    return new Observable(observer => {
+      this.authService.getFirebaseToken().then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.put<TripExpenseResponse>(`${environment.apiUrl}/Trips/${tripId}/expenses/${expenseId}`, dto, { headers })
+          .subscribe({ next: res => { observer.next(res); observer.complete(); }, error: err => observer.error(err) });
+      });
+    });
+  }
+
+  deleteExpense(tripId: string, expenseId: string): Observable<void> {
+    return new Observable(observer => {
+      this.authService.getFirebaseToken().then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.delete<void>(`${environment.apiUrl}/Trips/${tripId}/expenses/${expenseId}`, { headers })
+          .subscribe({ next: res => { observer.next(res); observer.complete(); }, error: err => observer.error(err) });
+      });
+    });
+  }
+
+  // ===== BUDGET =====
+
+  setBudget(tripId: string, dto: SetTripBudgetDto): Observable<{ totalBudget: number; currency?: string }> {
+    return new Observable(observer => {
+      this.authService.getFirebaseToken().then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.put<{ totalBudget: number; currency?: string }>(`${environment.apiUrl}/Trips/${tripId}/budget`, dto, { headers })
+          .subscribe({ next: res => { observer.next(res); observer.complete(); }, error: err => observer.error(err) });
       });
     });
   }

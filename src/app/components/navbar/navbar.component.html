@@ -103,7 +103,7 @@
         </button>
         <div class="user-dropdown" *ngIf="showUserMenu">
           <div class="user-dropdown-header">
-            <strong>{{ authService.currentUser?.name }}</strong>
+            <strong>{{ authService.currentUser?.name | wlName }}</strong>
             <span>{{ authService.currentUser?.email }}</span>
           </div>
           <div class="user-dropdown-divider"></div>

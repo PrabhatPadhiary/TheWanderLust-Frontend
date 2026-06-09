@@ -13,6 +13,7 @@ export class TripMapComponent implements AfterViewInit, OnChanges {
   @Input() places: TripPlaceDetailResponse[] = [];
   @Input() destinationLat: number | null = null;
   @Input() destinationLng: number | null = null;
+  @Input() activeTab: string = 'stays';
 
   @ViewChild('mapContainer', { static: false }) mapContainer!: ElementRef;
 
@@ -71,8 +72,13 @@ export class TripMapComponent implements AfterViewInit, OnChanges {
       ]
     });
 
-    this.mapReady = true;
-    this.updateMarkers();
+    // Force resize after paint so tiles render correctly
+    setTimeout(() => {
+      google.maps.event.trigger(this.map, 'resize');
+      this.map.setCenter(this.getCenter());
+      this.mapReady = true;
+      this.updateMarkers();
+    }, 200);
   }
 
   private getCenter(): { lat: number; lng: number } {

@@ -124,6 +124,10 @@ export class AddToTripModalComponent {
     this.dialogRef.close('create-new');
   }
 
+  get selectedDestination(): { id?: string; name: string } | undefined {
+    return this.selectedTripDestinations[this.selectedDestinationIndex];
+  }
+
   cancel(): void {
     this.dialogRef.close(null);
   }

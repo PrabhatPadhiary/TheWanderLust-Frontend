@@ -37,7 +37,7 @@
       </div>
       <div class="greeting-row">
         <div class="greeting-section">
-          <h1>{{ greeting }}, <strong>{{ getUserName() }}</strong></h1>
+          <h1>{{ greeting }}, <strong>{{ getUserName() | wlName }}</strong></h1>
           <p *ngIf="destination">Plan your trip to <strong>{{ destination }}</strong></p>
           <p *ngIf="!destination">Start planning your next adventure</p>
         </div>
@@ -66,12 +66,14 @@
         </div>
         <div class="stat-card">
           <div class="stat-card-icon">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-              <line x1="12" y1="1" x2="12" y2="23"/>
-              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+              <path d="M16 3H8a2 2 0 0 0-2 2v2h12V5a2 2 0 0 0-2-2z"/>
+              <circle cx="16" cy="14" r="1" fill="currentColor" stroke="none"/>
             </svg>
           </div>
-          <span class="stat-card-value stat-card-value--cta" (click)="setActiveTab('budget')">Set up</span>
+          <span class="stat-card-value stat-card-value--cta" *ngIf="!tripTotalBudget" (click)="setActiveTab('budget')">Set up</span>
+          <span class="stat-card-value" *ngIf="tripTotalBudget" (click)="setActiveTab('budget')">{{ tripCurrency }}{{ tripTotalBudget | number }}</span>
           <span class="stat-card-label">Budget</span>
         </div>
         <div class="stat-card">
@@ -83,8 +85,8 @@
               <line x1="3" y1="10" x2="21" y2="10"/>
             </svg>
           </div>
-          <span class="stat-card-value">{{ itinerary.length }}</span>
-          <span class="stat-card-label">Activit{{ itinerary.length !== 1 ? 'ies' : 'y' }}</span>
+          <span class="stat-card-value">{{ getActivityCount() }}</span>
+          <span class="stat-card-label">Activit{{ getActivityCount() !== 1 ? 'ies' : 'y' }}</span>
         </div>
         <div class="stat-card" [class.stat-card--soon]="getDaysLeft() !== null && getDaysLeft()! <= 7 && getDaysLeft()! >= 0">
           <div class="stat-card-icon">
@@ -182,7 +184,7 @@
                 <div class="members-dropdown-item" *ngFor="let m of members">
                   <div class="members-dropdown-avatar">{{ getMemberInitial(m.name) }}</div>
                   <div class="members-dropdown-info">
-                    <span class="members-dropdown-name">{{ m.name }}</span>
+                    <span class="members-dropdown-name">{{ m.name | wlName }}</span>
                     <span class="members-dropdown-role">{{ m.role === 'owner' ? 'Owner' : 'Member' }}</span>
                   </div>
                 </div>
@@ -212,27 +214,24 @@
         </div>
       </div>
 
-      <!-- Map -->
-      <app-trip-map *ngIf="getPlacesForActiveDest().length > 0"
-        [places]="getPlacesForActiveDest()"
-        [destinationLat]="destinations[activeDestIndex]?.latitude || null"
-        [destinationLng]="destinations[activeDestIndex]?.longitude || null">
-      </app-trip-map>
+      <!-- Side-by-side: detail panel (left) + map (right) -->
+      <div class="dest-split-layout" *ngIf="!tripLoading && destinations.length > 0">
 
-      <!-- Destination detail panel -->
-      <div class="dest-detail-panel" *ngIf="!tripLoading && destinations.length > 0">
+        <!-- Left: destination detail panel -->
+        <div class="dest-split-left">
+          <div class="dest-detail-panel">
         <div class="dest-detail-header">
           <div class="dest-detail-title">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#2d5a27" stroke-width="2">
               <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
               <circle cx="12" cy="10" r="3"/>
             </svg>
-            <strong>{{ destinations[activeDestIndex]?.name }}</strong>
+            <strong>{{ activeDest?.name }}</strong>
           </div>
           <div class="dest-detail-header-right">
-            <span class="dest-detail-dates" *ngIf="destinations[activeDestIndex]?.startDate || destinations[activeDestIndex]?.endDate">
-              {{ destinations[activeDestIndex]?.startDate | date:'MMM d' }}
-              <span *ngIf="destinations[activeDestIndex]?.endDate"> → {{ destinations[activeDestIndex]?.endDate | date:'MMM d' }}</span>
+            <span class="dest-detail-dates" *ngIf="activeDest?.startDate || activeDest?.endDate">
+              {{ activeDest?.startDate | date:'MMM d' }}
+              <span *ngIf="activeDest?.endDate"> → {{ activeDest?.endDate | date:'MMM d' }}</span>
             </span>
             <button class="dest-hdr-btn" title="Edit" (click)="openEditDestDialog(activeDestIndex)" *ngIf="activeDestIndex > 0">
               <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -297,16 +296,28 @@
           </div>
           <!-- Empty state -->
           <div class="dest-detail-empty" *ngIf="getPlacesForActiveTab().length === 0">
-            <p [hidden]="activeDestTab !== 'stays'">No stays added yet for <strong>{{ destinations[activeDestIndex]?.name }}</strong>.</p>
-            <p [hidden]="activeDestTab !== 'food'">No restaurants added yet for <strong>{{ destinations[activeDestIndex]?.name }}</strong>.</p>
-            <p [hidden]="activeDestTab !== 'activities'">No activities added yet for <strong>{{ destinations[activeDestIndex]?.name }}</strong>.</p>
+            <p [hidden]="activeDestTab !== 'stays'">No stays added yet for <strong>{{ activeDest?.name }}</strong>.</p>
+            <p [hidden]="activeDestTab !== 'food'">No restaurants added yet for <strong>{{ activeDest?.name }}</strong>.</p>
+            <p [hidden]="activeDestTab !== 'activities'">No activities added yet for <strong>{{ activeDest?.name }}</strong>.</p>
           </div>
           <button class="dest-detail-add-btn" (click)="openAddPlaceModal()">+ Add</button>
         </div>
       </div>
+        </div><!-- end dest-split-left -->
 
+        <!-- Right: sticky map -->
+        <div class="dest-split-right">
+          <app-trip-map
+            [places]="getPlacesForActiveTab()"
+            [destinationLat]="activeDest?.latitude || null"
+            [destinationLng]="activeDest?.longitude || null"
+            [activeTab]="activeDestTab">
+          </app-trip-map>
+        </div>
 
-    </div>
+      </div><!-- end dest-split-layout -->
+
+    </div><!-- end overview tab-content -->
 
     <!-- Itinerary Tab -->
     <div class="tab-content" *ngIf="!loading && activeTab === 'itinerary'">
@@ -319,12 +330,17 @@
 
     <!-- Budget Tab -->
     <div class="tab-content" *ngIf="!loading && activeTab === 'budget'">
-      <div class="section-card">
-        <div class="empty-state">
-          <h3>Budget Tracker</h3>
-          <p>Track your trip expenses and set budgets. Coming soon.</p>
-        </div>
-      </div>
+      <app-budget-tab
+        [tripId]="tripId"
+        [tripName]="tripName"
+        [fromDate]="fromDate"
+        [toDate]="toDate"
+        [travellers]="travellers"
+        [members]="members"
+        [initialBudget]="tripTotalBudget"
+        [initialCurrency]="tripCurrency"
+        (budgetChanged)="tripTotalBudget = $event.totalBudget; tripCurrency = $event.currency">
+      </app-budget-tab>
     </div>
 
     <!-- Checklist Tab -->
