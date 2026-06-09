@@ -359,6 +359,12 @@
   align-items: flex-start;
 }
 
+.budget-left-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .budget-section-header {
   display: flex;
   align-items: center;
@@ -446,7 +452,21 @@
   transition: width 0.4s ease;
 }
 
+.categories-empty-hint {
+  font-size: 0.75rem;
+  color: #999;
+  font-style: italic;
+  margin: 12px 0 0;
+}
+
 // ===== PER PERSON =====
+.budget-per-person-card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 14px;
+  padding: 18px;
+}
+
 .person-row {
   display: flex;
   align-items: center;

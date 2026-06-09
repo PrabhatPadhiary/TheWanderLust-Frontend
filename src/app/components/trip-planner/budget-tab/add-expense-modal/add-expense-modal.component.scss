@@ -79,6 +79,12 @@
   letter-spacing: 0;
 }
 
+.exp-field-error {
+  font-size: 0.72rem;
+  color: #dc2626;
+  margin-top: -3px;
+}
+
 // Amount + Date row
 .exp-field-row {
   display: flex;

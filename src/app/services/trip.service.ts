@@ -120,6 +120,26 @@ export interface SetTripBudgetDto {
   currency?: string;
 }
 
+export interface InvitationResponse {
+  id: string;
+  tripId: string;
+  role: string;
+  expiresAt: string;
+}
+
+export interface InvitationPreviewResponse {
+  id: string;
+  role: string;
+  expiresAt: string;
+  trip: {
+    id: string;
+    name: string;
+    description?: string;
+    primaryDestination?: string;
+    coverPhotoUrl?: string | null;
+  };
+}
+
 export interface TripResponse {
   id: string;
   name: string;
@@ -320,12 +340,46 @@ export class TripService {
     });
   }
 
-  joinTrip(tripId: string): Observable<TripResponse> {
+  joinTrip(inviteId: string): Observable<TripResponse> {
     return new Observable(observer => {
-      this.authService.getFirebaseToken().then(token => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
         if (!token) { observer.error('Not authenticated'); return; }
         const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
-        this.http.post<TripResponse>(`${environment.apiUrl}/Trips/${tripId}/join`, {}, { headers })
+        this.http.post<TripResponse>(`${environment.apiUrl}/join/${inviteId}`, {}, { headers })
+          .subscribe({
+            next: (res) => { observer.next(res); observer.complete(); },
+            error: (err) => observer.error(err)
+          });
+      });
+    });
+  }
+
+  getInvitation(inviteId: string): Observable<InvitationPreviewResponse> {
+    return new Observable(observer => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.get<InvitationPreviewResponse>(`${environment.apiUrl}/join/${inviteId}`, { headers })
+          .subscribe({
+            next: (res) => { observer.next(res); observer.complete(); },
+            error: (err) => observer.error(err)
+          });
+      });
+    });
+  }
+
+  createInvitation(tripId: string, role: string, expiresInHours: number = 48): Observable<InvitationResponse> {
+    return new Observable(observer => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.post<InvitationResponse>(`${environment.apiUrl}/trips/${tripId}/invitations`, { role, expiresInHours }, { headers })
           .subscribe({
             next: (res) => { observer.next(res); observer.complete(); },
             error: (err) => observer.error(err)
@@ -352,7 +406,9 @@ export class TripService {
 
   getExpenses(tripId: string): Observable<TripExpenseResponse[]> {
     return new Observable(observer => {
-      this.authService.getFirebaseToken().then(token => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
         if (!token) { observer.error('Not authenticated'); return; }
         const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
         this.http.get<TripExpenseResponse[]>(`${environment.apiUrl}/Trips/${tripId}/expenses`, { headers })
@@ -363,7 +419,9 @@ export class TripService {
 
   addExpense(tripId: string, dto: CreateTripExpenseDto): Observable<TripExpenseResponse> {
     return new Observable(observer => {
-      this.authService.getFirebaseToken().then(token => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
         if (!token) { observer.error('Not authenticated'); return; }
         const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
         this.http.post<TripExpenseResponse>(`${environment.apiUrl}/Trips/${tripId}/expenses`, dto, { headers })
@@ -374,7 +432,9 @@ export class TripService {
 
   updateExpense(tripId: string, expenseId: string, dto: UpdateTripExpenseDto): Observable<TripExpenseResponse> {
     return new Observable(observer => {
-      this.authService.getFirebaseToken().then(token => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
         if (!token) { observer.error('Not authenticated'); return; }
         const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
         this.http.put<TripExpenseResponse>(`${environment.apiUrl}/Trips/${tripId}/expenses/${expenseId}`, dto, { headers })
@@ -385,7 +445,9 @@ export class TripService {
 
   deleteExpense(tripId: string, expenseId: string): Observable<void> {
     return new Observable(observer => {
-      this.authService.getFirebaseToken().then(token => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
         if (!token) { observer.error('Not authenticated'); return; }
         const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
         this.http.delete<void>(`${environment.apiUrl}/Trips/${tripId}/expenses/${expenseId}`, { headers })
@@ -398,7 +460,9 @@ export class TripService {
 
   setBudget(tripId: string, dto: SetTripBudgetDto): Observable<{ totalBudget: number; currency?: string }> {
     return new Observable(observer => {
-      this.authService.getFirebaseToken().then(token => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
         if (!token) { observer.error('Not authenticated'); return; }
         const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
         this.http.put<{ totalBudget: number; currency?: string }>(`${environment.apiUrl}/Trips/${tripId}/budget`, dto, { headers })

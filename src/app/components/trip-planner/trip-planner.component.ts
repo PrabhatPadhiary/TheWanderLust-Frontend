@@ -14,6 +14,7 @@ import { DeleteTripConfirmComponent, DeleteTripConfirmData } from './modals/dele
 import { DeleteDestinationConfirmComponent, DeleteDestinationConfirmData } from './modals/delete-destination-confirm/delete-destination-confirm.component';
 import { InviteModalComponent, InviteModalData } from './modals/invite-modal/invite-modal.component';
 import { EditTripModalComponent, EditTripModalData, EditTripModalResult } from './modals/edit-trip-modal/edit-trip-modal.component';
+import { TripPlanModalComponent, TripPlanModalData } from './modals/trip-plan-modal/trip-plan-modal.component';
 
 @Component({
   selector: 'app-trip-planner',
@@ -94,19 +95,18 @@ export class TripPlannerComponent implements OnInit {
     const state = history.state;
     const routeTripId = this.route.snapshot.paramMap.get('tripId');
 
+    // Restore active tab from query param
+    const tabParam = this.route.snapshot.queryParamMap.get('tab');
+    if (tabParam && ['overview', 'itinerary', 'budget', 'checklist', 'travellers'].includes(tabParam)) {
+      this.activeTab = tabParam as any;
+    }
+
     this.user = state?.user || this.authService.currentUser;
     this.destination = state?.destination || '';
     this.placeId = state?.placeId || '';
     this.primaryPlaceId = this.placeId;
     this.isGuest = state?.isGuest || false;
     this.greeting = this.getGreeting();
-
-    // Restore active tab from URL query param (survives refresh)
-    const tabParam = this.route.snapshot.queryParamMap.get('tab');
-    const validTabs = ['overview', 'itinerary', 'budget', 'checklist', 'travellers'];
-    if (tabParam && validTabs.includes(tabParam)) {
-      this.activeTab = tabParam as typeof this.activeTab;
-    }
 
     // If tripId in URL, load from API (handles back navigation / bookmarks)
     const tripId = routeTripId || state?.tripId;
@@ -578,5 +578,31 @@ export class TripPlannerComponent implements OnInit {
     } else {
       this.router.navigate(['/']);
     }
+  }
+
+  openNewTripFlow(): void {
+    const dialogRef = this.dialog.open(AddDestinationDialogComponent, {
+      panelClass: 'custom-dialog-container',
+      data: {
+        editMode: false,
+        fromDate: null,
+        toDate: null
+      } as AddDestinationDialogData
+    });
+
+    dialogRef.afterClosed().subscribe((result: AddDestinationDialogResult | null) => {
+      if (!result) return;
+      const destName = result.prediction.structured_formatting.main_text;
+      this.dialog.open(TripPlanModalComponent, {
+        panelClass: 'custom-dialog-container',
+        data: {
+          destination: destName,
+          placeId: result.prediction.place_id,
+          latitude: result.prediction.latitude ?? null,
+          longitude: result.prediction.longitude ?? null,
+          photoUrl: result.prediction.photoUrl ?? null
+        } as TripPlanModalData
+      });
+    });
   }
 }

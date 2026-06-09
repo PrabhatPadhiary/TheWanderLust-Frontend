@@ -3,6 +3,24 @@
     <!-- Loading -->
     <div class="join-state" *ngIf="status === 'loading'">
       <div class="join-spinner"></div>
+      <p>Loading invitation...</p>
+    </div>
+
+    <!-- Preview — show trip info and confirm -->
+    <div class="join-state" *ngIf="status === 'preview' && invitation">
+      <span class="join-icon">🌍</span>
+      <h3>You've been invited!</h3>
+      <div class="join-trip-info">
+        <p class="join-trip-name">{{ invitation.trip.name }}</p>
+        <p class="join-trip-dest" *ngIf="invitation.trip.primaryDestination">{{ invitation.trip.primaryDestination }}</p>
+        <span class="join-role-badge">Joining as <strong>{{ roleLabel }}</strong></span>
+      </div>
+      <button class="join-confirm-btn" (click)="joinTrip()">Join this trip</button>
+    </div>
+
+    <!-- Joining -->
+    <div class="join-state" *ngIf="status === 'joining'">
+      <div class="join-spinner"></div>
       <p>Joining trip...</p>
     </div>
 

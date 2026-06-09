@@ -4,11 +4,9 @@ import { ToastrService } from 'ngx-toastr';
 import {
   TripService,
   TripMemberResponse,
-  TripExpenseResponse,
-  CreateTripExpenseDto,
-  UpdateTripExpenseDto
+  TripExpenseResponse
 } from '../../../services/trip.service';
-import { AddExpenseModalComponent, AddExpenseModalResult } from './add-expense-modal/add-expense-modal.component';
+import { AddExpenseModalComponent } from './add-expense-modal/add-expense-modal.component';
 
 export interface BudgetExpense {
   id: string;
@@ -168,23 +166,28 @@ export class BudgetTabComponent implements OnInit, OnChanges {
     return this.expenses.filter(e => e.category === cat).reduce((s, e) => s + e.amount, 0);
   }
 
-  getCategoryBudget(cat: BudgetExpense['category']): number {
+  getCategoryPercent(cat: BudgetExpense['category']): number {
     if (!this.totalBudget) return 0;
-    const weights: Record<BudgetExpense['category'], number> = {
-      stay: 0.4, food: 0.25, activity: 0.15, transport: 0.1, other: 0.1
-    };
-    return Math.round(this.totalBudget * weights[cat]);
+    return Math.round((this.getCategorySpent(cat) / this.totalBudget) * 100);
+  }
+
+  getCategorySpendPercent(cat: BudgetExpense['category']): number {
+    if (!this.totalSpent) return 0;
+    return Math.round((this.getCategorySpent(cat) / this.totalSpent) * 100);
+  }
+
+  getActiveCategories(): BudgetExpense['category'][] {
+    return this.categories.filter(cat => this.getCategorySpent(cat) > 0);
   }
 
   getCategoryBarPercent(cat: BudgetExpense['category']): number {
-    const budget = this.getCategoryBudget(cat);
-    if (!budget) return 0;
-    return Math.min((this.getCategorySpent(cat) / budget) * 100, 100);
+    if (!this.totalBudget) return 0;
+    return Math.min((this.getCategorySpent(cat) / this.totalBudget) * 100, 100);
   }
 
   getSegmentWidth(cat: BudgetExpense['category']): number {
-    if (!this.totalSpent) return 0;
-    return (this.getCategorySpent(cat) / this.totalSpent) * 100;
+    if (!this.totalBudget) return 0;
+    return (this.getCategorySpent(cat) / this.totalBudget) * 100;
   }
 
   getPersonTotal(name: string): number {
@@ -255,28 +258,15 @@ export class BudgetTabComponent implements OnInit, OnChanges {
       data: {
         members: this.members,
         currency: this.currency,
-        fromDate: this.fromDate
+        fromDate: this.fromDate,
+        tripId: this.tripId
       } as import('./add-expense-modal/add-expense-modal.component').AddExpenseModalData
     });
 
-    dialogRef.afterClosed().subscribe((result: AddExpenseModalResult | undefined) => {
-      if (!result || !this.tripId) return;
-      const dto: CreateTripExpenseDto = {
-        title: result.title,
-        amount: result.amount,
-        category: result.category,
-        date: result.date,
-        paidByMemberId: result.paidByMemberId,
-        paidByName: result.paidByName,
-        notes: result.notes
-      };
-      this.tripService.addExpense(this.tripId, dto).subscribe({
-        next: (res) => {
-          this.expenses.push(this.mapExpense(res));
-          this.toastr.success('Expense added');
-        },
-        error: () => this.toastr.error('Could not add expense')
-      });
+    dialogRef.afterClosed().subscribe((result: { expense: any; action: string } | undefined) => {
+      if (!result) return;
+      this.expenses.push(this.mapExpense(result.expense));
+      this.toastr.success('Expense added');
     });
   }
 
@@ -287,29 +277,16 @@ export class BudgetTabComponent implements OnInit, OnChanges {
         members: this.members,
         currency: this.currency,
         fromDate: this.fromDate,
+        tripId: this.tripId,
         expense: exp
       } as import('./add-expense-modal/add-expense-modal.component').AddExpenseModalData
     });
 
-    dialogRef.afterClosed().subscribe((result: AddExpenseModalResult | undefined) => {
-      if (!result || !this.tripId) return;
-      const dto: UpdateTripExpenseDto = {
-        title: result.title,
-        amount: result.amount,
-        category: result.category,
-        date: result.date,
-        paidByMemberId: result.paidByMemberId,
-        paidByName: result.paidByName,
-        notes: result.notes
-      };
-      this.tripService.updateExpense(this.tripId, exp.id, dto).subscribe({
-        next: (res) => {
-          const idx = this.expenses.findIndex(e => e.id === exp.id);
-          if (idx > -1) this.expenses[idx] = this.mapExpense(res);
-          this.toastr.success('Expense updated');
-        },
-        error: () => this.toastr.error('Could not update expense')
-      });
+    dialogRef.afterClosed().subscribe((result: { expense: any; action: string } | undefined) => {
+      if (!result) return;
+      const idx = this.expenses.findIndex(e => e.id === exp.id);
+      if (idx > -1) this.expenses[idx] = this.mapExpense(result.expense);
+      this.toastr.success('Expense updated');
     });
   }
 
@@ -318,6 +295,9 @@ export class BudgetTabComponent implements OnInit, OnChanges {
     // Optimistic removal
     this.expenses = this.expenses.filter(e => e.id !== exp.id);
     this.tripService.deleteExpense(this.tripId, exp.id).subscribe({
+      next: () => {
+        this.toastr.success(`${exp.title} removed`);
+      },
       error: () => {
         // Restore on failure
         this.expenses.push(exp);

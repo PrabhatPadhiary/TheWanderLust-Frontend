@@ -19,7 +19,7 @@
       <a class="nav-item" [class.active]="activeTab === 'checklist'" (click)="setActiveTab('checklist')">Checklist</a>
       <a class="nav-item" [class.active]="activeTab === 'travellers'" (click)="setActiveTab('travellers')">Travellers</a>
     </nav>
-    <button class="new-trip-btn">+ New Trip</button>
+    <button class="new-trip-btn" (click)="openNewTripFlow()">+ New Trip</button>
   </aside>
 
   <!-- Main Content -->

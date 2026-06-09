@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { TripMemberResponse } from '../../../../services/trip.service';
+import { TripMemberResponse, TripService, CreateTripExpenseDto, UpdateTripExpenseDto, TripExpenseResponse } from '../../../../services/trip.service';
 import { BudgetExpense } from '../budget-tab.component';
 
 export interface AddExpenseModalData {
@@ -8,6 +8,7 @@ export interface AddExpenseModalData {
   expense?: BudgetExpense; // present when editing
   currency: string;
   fromDate: string | null;
+  tripId: string;
 }
 
 export interface AddExpenseModalResult {
@@ -34,6 +35,7 @@ export class AddExpenseModalComponent {
   paidByMemberId: string = '';
   notes: string = '';
   memberDropdownOpen = false;
+  saving = false;
 
   readonly categories: BudgetExpense['category'][] = ['stay', 'food', 'activity', 'transport', 'other'];
 
@@ -55,7 +57,8 @@ export class AddExpenseModalComponent {
 
   constructor(
     public dialogRef: MatDialogRef<AddExpenseModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: AddExpenseModalData
+    @Inject(MAT_DIALOG_DATA) public data: AddExpenseModalData,
+    private tripService: TripService
   ) {
     this.dateObj = data.fromDate ? new Date(data.fromDate) : new Date();
 
@@ -88,19 +91,50 @@ export class AddExpenseModalComponent {
   }
 
   save(): void {
-    if (!this.isValid) return;
+    if (!this.isValid || this.saving) return;
+    this.saving = true;
     const member = this.data.members.find(m => m.userId === this.paidByMemberId);
     const fmt = (d: Date | null) => d ? d.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
-    const result: AddExpenseModalResult = {
-      title: this.title.trim(),
-      category: this.category,
-      amount: this.amount!,
-      date: fmt(this.dateObj),
-      paidByMemberId: this.paidByMemberId,
-      paidByName: member?.name ?? '',
-      notes: this.notes.trim()
-    };
-    this.dialogRef.close(result);
+
+    if (this.isEditing) {
+      const dto: UpdateTripExpenseDto = {
+        title: this.title.trim(),
+        amount: this.amount!,
+        category: this.category,
+        date: fmt(this.dateObj),
+        paidByMemberId: this.paidByMemberId,
+        paidByName: member?.name ?? '',
+        notes: this.notes.trim()
+      };
+      this.tripService.updateExpense(this.data.tripId, this.data.expense!.id, dto).subscribe({
+        next: (res) => {
+          this.saving = false;
+          this.dialogRef.close({ expense: res, action: 'updated' });
+        },
+        error: () => {
+          this.saving = false;
+        }
+      });
+    } else {
+      const dto: CreateTripExpenseDto = {
+        title: this.title.trim(),
+        amount: this.amount!,
+        category: this.category,
+        date: fmt(this.dateObj),
+        paidByMemberId: this.paidByMemberId,
+        paidByName: member?.name ?? '',
+        notes: this.notes.trim()
+      };
+      this.tripService.addExpense(this.data.tripId, dto).subscribe({
+        next: (res) => {
+          this.saving = false;
+          this.dialogRef.close({ expense: res, action: 'added' });
+        },
+        error: () => {
+          this.saving = false;
+        }
+      });
+    }
   }
 
   cancel(): void {

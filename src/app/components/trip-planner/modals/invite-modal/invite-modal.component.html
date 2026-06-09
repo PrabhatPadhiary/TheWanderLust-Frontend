@@ -9,21 +9,54 @@
   </div>
 
   <div class="invite-body">
-    <p class="invite-desc">Share this link with friends to invite them to your trip.</p>
+    <p class="invite-desc">Choose a role and generate a shareable invite link.</p>
 
-    <label class="invite-label">Invite link</label>
-    <div class="invite-link-row">
-      <input type="text" class="invite-link-input" [value]="inviteUrl" readonly (click)="selectInput($event)">
-      <button class="invite-copy-btn" [class.copied]="copied" (click)="copyLink()">
-        <svg *ngIf="!copied" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+    <!-- Role selector -->
+    <label class="invite-label">Invite as</label>
+    <div class="invite-role-selector">
+      <button class="invite-role-btn" [class.active]="selectedRole === 'member'" (click)="selectedRole = 'member'">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
         </svg>
-        <svg *ngIf="copied" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
-          <polyline points="20 6 9 17 4 12"/>
-        </svg>
-        {{ copied ? 'Copied!' : 'Copy' }}
+        Editor
+        <span class="role-hint">Can add and edit content</span>
       </button>
+      <button class="invite-role-btn" [class.active]="selectedRole === 'viewer'" (click)="selectedRole = 'viewer'">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+          <circle cx="12" cy="12" r="3"/>
+        </svg>
+        Viewer
+        <span class="role-hint">Can only view the trip</span>
+      </button>
+    </div>
+
+    <!-- Generate button -->
+    <button class="invite-generate-btn" (click)="generateLink()" [disabled]="generating" *ngIf="!inviteUrl">
+      {{ generating ? 'Generating...' : 'Generate invite link' }}
+    </button>
+
+    <!-- Error -->
+    <p class="invite-error" *ngIf="error">{{ error }}</p>
+
+    <!-- Generated link -->
+    <div *ngIf="inviteUrl">
+      <label class="invite-label">Invite link ({{ roleLabel }})</label>
+      <div class="invite-link-row">
+        <input type="text" class="invite-link-input" [value]="inviteUrl" readonly (click)="selectInput($event)">
+        <button class="invite-copy-btn" [class.copied]="copied" (click)="copyLink()">
+          <svg *ngIf="!copied" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+          <svg *ngIf="copied" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          {{ copied ? 'Copied!' : 'Copy' }}
+        </button>
+      </div>
+      <p class="invite-expires">Link expires in 48 hours</p>
     </div>
   </div>
 </div>

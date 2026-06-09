@@ -20,6 +20,7 @@
       <div class="exp-field">
         <label>Amount ({{ data.currency }})</label>
         <input type="number" [(ngModel)]="amount" placeholder="0" min="0">
+        <span class="exp-field-error" *ngIf="amount !== null && amount <= 0">Amount must be greater than zero</span>
       </div>
       <div class="exp-field">
         <label>Date</label>
@@ -140,9 +141,9 @@
   </div>
 
   <div class="exp-modal-footer">
-    <button class="exp-cancel-btn" (click)="cancel()">Cancel</button>
-    <button class="exp-save-btn" [disabled]="!isValid" (click)="save()">
-      {{ isEditing ? 'Save changes' : 'Add expense' }}
+    <button class="exp-cancel-btn" (click)="cancel()" [disabled]="saving">Cancel</button>
+    <button class="exp-save-btn" [disabled]="!isValid || saving" (click)="save()">
+      {{ saving ? 'Saving...' : (isEditing ? 'Save changes' : 'Add expense') }}
     </button>
   </div>
 </div>
