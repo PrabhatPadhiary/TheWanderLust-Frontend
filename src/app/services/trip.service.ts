@@ -140,6 +140,42 @@ export interface InvitationPreviewResponse {
   };
 }
 
+export interface PendingInvitationResponse {
+  id: string;
+  tripId: string;
+  role: string;
+  expiresAt: string;
+  usedBy: string | null;
+  createdAt: string;
+}
+
+export interface ChecklistItemResponse {
+  id: string;
+  title: string;
+  category: string;
+  dueDate: string | null;
+  assignedToUserId: string | null;
+  assignedToName: string | null;
+  isCompleted: boolean;
+  completedAt: string | null;
+  createdAt: string;
+  order: number;
+}
+
+export interface CreateChecklistItemDto {
+  title: string;
+  category?: string;
+  dueDate?: string | null;
+  assignedToUserId?: string | null;
+}
+
+export interface UpdateChecklistItemDto {
+  title?: string;
+  category?: string;
+  dueDate?: string | null;
+  assignedToUserId?: string | null;
+}
+
 export interface TripResponse {
   id: string;
   name: string;
@@ -467,6 +503,127 @@ export class TripService {
         const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
         this.http.put<{ totalBudget: number; currency?: string }>(`${environment.apiUrl}/Trips/${tripId}/budget`, dto, { headers })
           .subscribe({ next: res => { observer.next(res); observer.complete(); }, error: err => observer.error(err) });
+      });
+    });
+  }
+
+  // ===== CHECKLIST =====
+
+  getChecklist(tripId: string): Observable<ChecklistItemResponse[]> {
+    return new Observable(observer => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.get<ChecklistItemResponse[]>(`${environment.apiUrl}/Trips/${tripId}/checklist`, { headers })
+          .subscribe({ next: res => { observer.next(res); observer.complete(); }, error: err => observer.error(err) });
+      });
+    });
+  }
+
+  addChecklistItem(tripId: string, dto: CreateChecklistItemDto): Observable<ChecklistItemResponse> {
+    return new Observable(observer => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.post<ChecklistItemResponse>(`${environment.apiUrl}/Trips/${tripId}/checklist`, dto, { headers })
+          .subscribe({ next: res => { observer.next(res); observer.complete(); }, error: err => observer.error(err) });
+      });
+    });
+  }
+
+  updateChecklistItem(tripId: string, itemId: string, dto: UpdateChecklistItemDto): Observable<ChecklistItemResponse> {
+    return new Observable(observer => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.put<ChecklistItemResponse>(`${environment.apiUrl}/Trips/${tripId}/checklist/${itemId}`, dto, { headers })
+          .subscribe({ next: res => { observer.next(res); observer.complete(); }, error: err => observer.error(err) });
+      });
+    });
+  }
+
+  toggleChecklistItem(tripId: string, itemId: string): Observable<ChecklistItemResponse> {
+    return new Observable(observer => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.patch<ChecklistItemResponse>(`${environment.apiUrl}/Trips/${tripId}/checklist/${itemId}/toggle`, {}, { headers })
+          .subscribe({ next: res => { observer.next(res); observer.complete(); }, error: err => observer.error(err) });
+      });
+    });
+  }
+
+  deleteChecklistItem(tripId: string, itemId: string): Observable<void> {
+    return new Observable(observer => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.delete<void>(`${environment.apiUrl}/Trips/${tripId}/checklist/${itemId}`, { headers })
+          .subscribe({ next: () => { observer.next(); observer.complete(); }, error: err => observer.error(err) });
+      });
+    });
+  }
+
+  // ===== MEMBERS =====
+
+  getInvitations(tripId: string): Observable<PendingInvitationResponse[]> {
+    return new Observable(observer => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.get<PendingInvitationResponse[]>(`${environment.apiUrl}/trips/${tripId}/invitations`, { headers })
+          .subscribe({ next: res => { observer.next(res); observer.complete(); }, error: err => observer.error(err) });
+      });
+    });
+  }
+
+  revokeInvitation(tripId: string, inviteId: string): Observable<void> {
+    return new Observable(observer => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.delete<void>(`${environment.apiUrl}/trips/${tripId}/invitations/${inviteId}`, { headers })
+          .subscribe({ next: () => { observer.next(); observer.complete(); }, error: err => observer.error(err) });
+      });
+    });
+  }
+
+  updateMemberRole(tripId: string, userId: string, role: string): Observable<void> {
+    return new Observable(observer => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.put<void>(`${environment.apiUrl}/Trips/${tripId}/members/${userId}/role`, { role }, { headers })
+          .subscribe({ next: () => { observer.next(); observer.complete(); }, error: err => observer.error(err) });
+      });
+    });
+  }
+
+  removeMember(tripId: string, userId: string): Observable<void> {
+    return new Observable(observer => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.delete<void>(`${environment.apiUrl}/Trips/${tripId}/members/${userId}`, { headers })
+          .subscribe({ next: () => { observer.next(); observer.complete(); }, error: err => observer.error(err) });
       });
     });
   }

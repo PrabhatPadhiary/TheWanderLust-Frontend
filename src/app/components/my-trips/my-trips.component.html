@@ -7,8 +7,18 @@
       </svg>
       Back
     </button>
-    <h1>My Trips</h1>
-    <p>All your planned adventures in one place</p>
+    <div class="page-header-top">
+      <div>
+        <h1>My Trips</h1>
+        <p>All your planned adventures in one place</p>
+      </div>
+      <button class="new-trip-btn" (click)="openNewTrip()">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        New Trip
+      </button>
+    </div>
   </div>
 
   <!-- Loading -->

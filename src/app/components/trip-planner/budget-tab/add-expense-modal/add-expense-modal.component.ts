@@ -94,7 +94,13 @@ export class AddExpenseModalComponent {
     if (!this.isValid || this.saving) return;
     this.saving = true;
     const member = this.data.members.find(m => m.userId === this.paidByMemberId);
-    const fmt = (d: Date | null) => d ? d.toISOString().split('T')[0] : new Date().toISOString().split('T')[0];
+    const fmt = (d: Date | null) => {
+      if (!d) d = new Date();
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    };
 
     if (this.isEditing) {
       const dto: UpdateTripExpenseDto = {

@@ -346,22 +346,30 @@
 
     <!-- Checklist Tab -->
     <div class="tab-content" *ngIf="!loading && activeTab === 'checklist'">
-      <div class="section-card">
-        <div class="empty-state">
-          <h3>Trip Checklist</h3>
-          <p>Keep track of everything you need before and during your trip. Coming soon.</p>
-        </div>
-      </div>
+      <app-checklist-tab
+        [tripId]="tripId"
+        [tripName]="tripName"
+        [destination]="destination"
+        [fromDate]="fromDate"
+        [toDate]="toDate"
+        [members]="members"
+        [userRole]="currentUserRole">
+      </app-checklist-tab>
     </div>
 
     <!-- Travellers Tab -->
     <div class="tab-content" *ngIf="!loading && activeTab === 'travellers'">
-      <div class="section-card">
-        <div class="empty-state">
-          <h3>Travellers</h3>
-          <p>Invite and manage your travel companions. Coming soon.</p>
-        </div>
-      </div>
+      <app-travellers-tab
+        [tripId]="tripId"
+        [tripName]="tripName"
+        [destination]="destination"
+        [members]="members"
+        [travellers]="travellers"
+        [userRole]="currentUserRole"
+        [currency]="tripCurrency"
+        [totalBudget]="tripTotalBudget"
+        (membersChanged)="members = $event">
+      </app-travellers-tab>
     </div>
 
 

@@ -1,0 +1,284 @@
+<div class="checklist-tab">
+
+  <!-- ===== SKELETON ===== -->
+  <ng-container *ngIf="loading">
+    <div class="cl-header">
+      <div class="cl-header-left">
+        <div class="sk-line sk-title"></div>
+        <div class="sk-line sk-meta"></div>
+      </div>
+      <div class="sk-line sk-btn"></div>
+    </div>
+    <div class="cl-progress-card sk-progress">
+      <div class="sk-circle"></div>
+      <div class="sk-progress-info">
+        <div class="sk-line sk-name"></div>
+        <div class="sk-line sk-sub"></div>
+      </div>
+    </div>
+    <div class="sk-filters">
+      <div class="sk-line sk-pill" *ngFor="let i of [1,2,3,4]"></div>
+    </div>
+    <div class="sk-item-card" *ngFor="let i of [1,2,3,4,5]">
+      <div class="sk-checkbox"></div>
+      <div class="sk-item-info">
+        <div class="sk-line sk-name"></div>
+        <div class="sk-line sk-sub"></div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ===== REAL CONTENT ===== -->
+  <ng-container *ngIf="!loading">
+
+    <!-- Header -->
+    <div class="cl-header">
+      <div class="cl-header-left">
+        <h2>Checklist</h2>
+        <p class="cl-meta">{{ tripName }} · {{ destination }} <span *ngIf="fromDate"> · {{ fromDate | date:'MMM d' }}<span *ngIf="toDate">–{{ toDate | date:'MMM d' }}</span></span></p>
+      </div>
+      <button class="cl-add-btn" (click)="openAddModal()" *ngIf="canEdit">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Add Item
+      </button>
+    </div>
+
+    <!-- Progress card -->
+    <div class="cl-progress-card">
+      <div class="cl-progress-ring">
+        <svg viewBox="0 0 36 36" width="56" height="56">
+          <path class="cl-ring-bg" d="M18 2.0845a 15.9155 15.9155 0 0 1 0 31.831a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#eee" stroke-width="3"/>
+          <path class="cl-ring-fill" d="M18 2.0845a 15.9155 15.9155 0 0 1 0 31.831a 15.9155 15.9155 0 0 1 0 -31.831"
+                fill="none" stroke="#2d5a27" stroke-width="3"
+                [style.strokeDasharray]="progressPercent + ', 100'"/>
+        </svg>
+        <span class="cl-ring-text">{{ progressPercent }}%</span>
+      </div>
+      <div class="cl-progress-info">
+        <strong>{{ completedItems }} of {{ totalItems }} items done</strong>
+        <span class="cl-progress-sub">
+          <span *ngIf="daysLeft !== null">Trip is in {{ daysLeft }} day{{ daysLeft !== 1 ? 's' : '' }} · </span>
+          {{ getTrackStatus() }}
+        </span>
+        <span class="cl-progress-stats">
+          Remaining {{ remainingItems }}
+          <span class="cl-stat-overdue" *ngIf="overdueItems.length > 0"> · Overdue {{ overdueItems.length }}</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="cl-filters">
+      <div class="cl-filter-row">
+        <button class="cl-filter-pill" [class.active]="activeFilter === 'all'" (click)="setFilter('all')">All</button>
+        <button class="cl-filter-pill" [class.active]="activeFilter === 'todo'" (click)="setFilter('todo')">To do</button>
+        <button class="cl-filter-pill" [class.active]="activeFilter === 'done'" (click)="setFilter('done')">Done</button>
+        <button class="cl-filter-pill cl-filter-pill--overdue" [class.active]="activeFilter === 'overdue'" (click)="setFilter('overdue')" *ngIf="overdueItems.length > 0">
+          Overdue
+        </button>
+        <span class="cl-filter-divider"></span>
+        <button class="cl-filter-pill cl-filter-pill--cat"
+                *ngFor="let cat of categories"
+                [class.active]="activeCategoryFilter === cat"
+                [style.--cat-color]="categoryColors[cat]"
+                (click)="setCategoryFilter(cat)">
+          {{ categoryLabels[cat] }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Overdue section -->
+    <div class="cl-section" *ngIf="overdueList.length > 0 && activeFilter !== 'done'">
+      <div class="cl-section-header cl-section-header--overdue">
+        <span class="cl-section-dot cl-section-dot--overdue"></span>
+        <span>Overdue</span>
+        <span class="cl-section-count">{{ overdueList.length }}</span>
+      </div>
+      <div class="cl-item cl-item--overdue" *ngFor="let item of overdueList">
+        <button class="cl-checkbox" [class.checked]="item.isCompleted" (click)="toggleItem(item)" [disabled]="!canEdit">
+          <svg *ngIf="item.isCompleted" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        <div class="cl-item-info">
+          <span class="cl-item-title" [class.done]="item.isCompleted">{{ item.title }}</span>
+          <div class="cl-item-meta">
+            <span class="cl-cat-badge" [style.background]="categoryColors[item.category] + '18'" [style.color]="categoryColors[item.category]">{{ categoryLabels[item.category] || item.category }}</span>
+            <span class="cl-due cl-due--overdue" *ngIf="item.dueDate">Was due {{ item.dueDate | date:'MMM d' }}</span>
+            <span class="cl-assignee" *ngIf="item.assignedToName && members.length > 1"><span class="cl-assignee-avatar">{{ getMemberInitial(item.assignedToName) }}</span></span>
+          </div>
+        </div>
+        <div class="cl-item-actions" *ngIf="canEdit">
+          <button class="cl-action-btn" (click)="editItem(item)">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="cl-action-btn cl-action-btn--del" (click)="deleteItem(item)">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- To Do section -->
+    <div class="cl-section" *ngIf="todoList.length > 0 && activeFilter !== 'done'">
+      <div class="cl-section-header">
+        <span class="cl-section-dot"></span>
+        <span>To do</span>
+        <span class="cl-section-count">{{ todoList.length }}</span>
+      </div>
+      <div class="cl-item" *ngFor="let item of todoList">
+        <button class="cl-checkbox" [class.checked]="item.isCompleted" (click)="toggleItem(item)" [disabled]="!canEdit">
+          <svg *ngIf="item.isCompleted" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        <div class="cl-item-info">
+          <span class="cl-item-title">{{ item.title }}</span>
+          <div class="cl-item-meta">
+            <span class="cl-cat-badge" [style.background]="categoryColors[item.category] + '18'" [style.color]="categoryColors[item.category]">{{ categoryLabels[item.category] || item.category }}</span>
+            <span class="cl-due" *ngIf="item.dueDate">Due {{ item.dueDate | date:'MMM d' }}</span>
+            <span class="cl-assignee" *ngIf="item.assignedToName && members.length > 1"><span class="cl-assignee-avatar">{{ getMemberInitial(item.assignedToName) }}</span></span>
+          </div>
+        </div>
+        <div class="cl-item-actions" *ngIf="canEdit">
+          <button class="cl-action-btn" (click)="editItem(item)">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="cl-action-btn cl-action-btn--del" (click)="deleteItem(item)">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add item inline -->
+    <div class="cl-add-inline" *ngIf="canEdit">
+      <!-- Trigger row (always visible) -->
+      <div class="cl-add-trigger" [class.cl-add-trigger--open]="inlineExpanded" (click)="inlineExpanded = !inlineExpanded">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        <span>Add item to To do</span>
+        <svg class="cl-add-chevron" [class.cl-add-chevron--open]="inlineExpanded" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+
+      <!-- Expandable panel -->
+      <div class="cl-add-panel" [class.cl-add-panel--open]="inlineExpanded">
+        <div class="cl-add-panel-inner">
+          <!-- Title -->
+          <div class="cl-add-field">
+            <input #addItemInput type="text" class="cl-add-title-input" [(ngModel)]="newItemTitle" placeholder="e.g. Pack sunscreen and beach gear" (keydown.enter)="addItem()">
+          </div>
+
+          <!-- Category pills -->
+          <div class="cl-add-field">
+            <label class="cl-add-label">Category</label>
+            <div class="cl-add-cats">
+              <button class="cl-add-cat-pill" *ngFor="let cat of categories"
+                      [class.active]="newItemCategory === cat"
+                      [style.--cat-color]="categoryColors[cat]"
+                      (click)="newItemCategory = cat">
+                {{ categoryLabels[cat] }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Due date + Assignee row -->
+          <div class="cl-add-field cl-add-field-row">
+            <div class="cl-add-option">
+              <label class="cl-add-label">Due date</label>
+              <mat-form-field appearance="outline" class="cl-add-date-field">
+                <input matInput [matDatepicker]="inlineDuePicker" [(ngModel)]="newItemDueDate" placeholder="Optional">
+                <mat-datepicker-toggle matIconSuffix [for]="inlineDuePicker"></mat-datepicker-toggle>
+                <mat-datepicker #inlineDuePicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+            <div class="cl-add-option" *ngIf="members.length > 0">
+              <label class="cl-add-label">Assign to</label>
+              <div class="cl-assign-wrap">
+                <div class="cl-assign-pills">
+                  <div class="cl-assign-pill" *ngFor="let m of members.slice(0, 3)"
+                       [class.cl-assign-pill--selected]="newItemAssignee === m.userId"
+                       (click)="newItemAssignee = newItemAssignee === m.userId ? '' : m.userId; $event.stopPropagation()">
+                    <span class="cl-assign-pill-avatar">{{ getMemberInitial(m.name) }}</span>
+                    {{ m.name.split(' ')[0] }}
+                  </div>
+                  <div class="cl-assign-pill cl-assign-pill--more" *ngIf="members.length > 3"
+                       (click)="assignDropdownOpen = !assignDropdownOpen; $event.stopPropagation()">
+                    +{{ members.length - 3 }} more
+                  </div>
+                </div>
+                <!-- Dropdown only for >3 members -->
+                <div class="cl-assign-dropdown" *ngIf="assignDropdownOpen && members.length > 3">
+                  <button class="cl-assign-option" [class.active]="!newItemAssignee" (click)="newItemAssignee = ''; assignDropdownOpen = false; $event.stopPropagation()">
+                    <span class="cl-assign-opt-avatar cl-assign-opt-avatar--none">?</span>
+                    <span>Unassigned</span>
+                  </button>
+                  <button class="cl-assign-option" *ngFor="let m of members"
+                          [class.active]="newItemAssignee === m.userId"
+                          (click)="newItemAssignee = m.userId; assignDropdownOpen = false; $event.stopPropagation()">
+                    <span class="cl-assign-opt-avatar">{{ getMemberInitial(m.name) }}</span>
+                    <span>{{ m.name }}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <div class="cl-add-submit-row">
+            <button class="cl-add-cancel" (click)="inlineExpanded = false">Cancel</button>
+            <button class="cl-add-submit" [disabled]="!newItemTitle.trim() || addingItem" (click)="addItem()">
+              {{ addingItem ? 'Adding...' : 'Add item' }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Done section -->
+    <div class="cl-section" *ngIf="doneList.length > 0 && activeFilter !== 'todo'">
+      <div class="cl-section-header cl-section-header--done">
+        <span class="cl-section-dot cl-section-dot--done"></span>
+        <span>Done</span>
+        <span class="cl-section-count">{{ doneList.length }}</span>
+      </div>
+      <div class="cl-item cl-item--done" *ngFor="let item of visibleDoneList">
+        <button class="cl-checkbox checked" (click)="toggleItem(item)" [disabled]="!canEdit">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </button>
+        <div class="cl-item-info">
+          <span class="cl-item-title done">{{ item.title }}</span>
+          <div class="cl-item-meta">
+            <span class="cl-cat-badge" [style.background]="categoryColors[item.category] + '18'" [style.color]="categoryColors[item.category]">{{ categoryLabels[item.category] || item.category }}</span>
+            <span class="cl-due" *ngIf="item.completedAt">Done {{ item.completedAt | date:'MMM d' }}</span>
+            <span class="cl-assignee" *ngIf="item.assignedToName && members.length > 1"><span class="cl-assignee-avatar">{{ getMemberInitial(item.assignedToName) }}</span></span>
+          </div>
+        </div>
+        <div class="cl-item-actions" *ngIf="canEdit">
+          <button class="cl-action-btn" (click)="editItem(item)">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="cl-action-btn cl-action-btn--del" (click)="deleteItem(item)">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+          </button>
+        </div>
+      </div>
+      <button class="cl-show-more" *ngIf="doneList.length > 2 && !showAllCompleted" (click)="showAllCompleted = true">
+        + Show {{ doneList.length - 2 }} more completed items
+      </button>
+    </div>
+
+    <!-- Empty state -->
+    <div class="cl-empty" *ngIf="totalItems === 0">
+      <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#ccc" stroke-width="1.5">
+        <path d="M9 11l3 3L22 4"/>
+        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+      </svg>
+      <p>No checklist items yet</p>
+      <p class="cl-empty-sub">Add items to track what needs to be done before your trip.</p>
+    </div>
+
+  </ng-container>
+
+</div>

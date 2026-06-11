@@ -1,0 +1,10 @@
+<div class="confirm-dialog">
+  <h4>Remove Member</h4>
+  <p class="dialog-hint">Are you sure you want to remove <strong>{{ data.memberName }}</strong> from this trip? They will lose access immediately.</p>
+  <div class="dialog-actions">
+    <button class="dialog-cancel" (click)="cancel()">Cancel</button>
+    <button class="dialog-confirm dialog-confirm--danger" [disabled]="removing" (click)="confirm()">
+      {{ removing ? 'Removing...' : 'Remove' }}
+    </button>
+  </div>
+</div>

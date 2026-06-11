@@ -2,10 +2,13 @@ import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { Location } from '@angular/common';
 import { Subscription } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
 import { TripService, TripResponse } from '../../services/trip.service';
 import { AuthService } from '../../services/auth.service';
 import { NavHistoryService } from '../../services/nav-history.service';
 import { LoaderService } from '../../services/loader.service';
+import { AddDestinationDialogComponent, AddDestinationDialogData, AddDestinationDialogResult } from '../trip-planner/modals/add-destination-dialog/add-destination-dialog.component';
+import { TripPlanModalComponent, TripPlanModalData } from '../trip-planner/modals/trip-plan-modal/trip-plan-modal.component';
 
 @Component({
   selector: 'app-my-trips',
@@ -29,7 +32,8 @@ export class MyTripsComponent implements OnInit, OnDestroy {
     private router: Router,
     private location: Location,
     private navHistory: NavHistoryService,
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
+    private dialog: MatDialog
   ) {}
 
   @HostListener('document:click')
@@ -126,5 +130,31 @@ export class MyTripsComponent implements OnInit, OnDestroy {
 
   getStatusClass(status: string): string {
     return status?.toLowerCase().replace('_', '-') || '';
+  }
+
+  openNewTrip(): void {
+    const dialogRef = this.dialog.open(AddDestinationDialogComponent, {
+      panelClass: 'custom-dialog-container',
+      data: {
+        editMode: false,
+        fromDate: null,
+        toDate: null
+      } as AddDestinationDialogData
+    });
+
+    dialogRef.afterClosed().subscribe((result: AddDestinationDialogResult | null) => {
+      if (!result) return;
+      const destName = result.prediction.structured_formatting.main_text;
+      this.dialog.open(TripPlanModalComponent, {
+        panelClass: 'custom-dialog-container',
+        data: {
+          destination: destName,
+          placeId: result.prediction.place_id,
+          latitude: result.prediction.latitude ?? null,
+          longitude: result.prediction.longitude ?? null,
+          photoUrl: result.prediction.photoUrl ?? null
+        } as TripPlanModalData
+      });
+    });
   }
 }

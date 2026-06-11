@@ -1,0 +1,78 @@
+<div class="cl-modal">
+  <div class="cl-modal-header">
+    <span>{{ isEditing ? 'Edit checklist item' : 'Add checklist item' }}</span>
+    <button class="cl-modal-close" (click)="cancel()">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="cl-modal-body">
+    <!-- Title -->
+    <div class="cl-field">
+      <label>What needs to be done?</label>
+      <input type="text" [(ngModel)]="title" placeholder="e.g. Book hotel in Goa" autofocus (keydown.enter)="save()">
+    </div>
+
+    <!-- Category -->
+    <div class="cl-field">
+      <label>Category</label>
+      <div class="cl-cat-pills">
+        <button class="cl-cat-pill" *ngFor="let cat of categories"
+                [class.active]="category === cat"
+                [style.--cat-color]="categoryColors[cat]"
+                (click)="category = cat">
+          {{ categoryLabels[cat] }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Due date -->
+    <div class="cl-field">
+      <label>Due date <span class="cl-optional"></span></label>
+      <mat-form-field appearance="outline" class="cl-date-field">
+        <input matInput [matDatepicker]="duePicker" [(ngModel)]="dueDate" placeholder="Pick a date">
+        <mat-datepicker-toggle matIconSuffix [for]="duePicker"></mat-datepicker-toggle>
+        <mat-datepicker #duePicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <!-- Assign to -->
+    <div class="cl-field" *ngIf="data.members.length > 0">
+      <label>Assign to <span class="cl-optional"></span></label>
+      <div class="cl-assign-pills">
+        <div class="cl-assign-pill" *ngFor="let m of data.members.slice(0, 3)"
+             [class.cl-assign-pill--selected]="assignedToUserId === m.userId"
+             (click)="assignedToUserId = assignedToUserId === m.userId ? '' : m.userId">
+          <span class="cl-assign-pill-avatar">{{ getMemberInitial(m.name) }}</span>
+          {{ m.name.split(' ')[0] }}
+        </div>
+        <div class="cl-assign-pill cl-assign-pill--more" *ngIf="data.members.length > 3"
+             (click)="modalAssignDropdown = !modalAssignDropdown; $event.stopPropagation()">
+          +{{ data.members.length - 3 }} more
+        </div>
+      </div>
+      <!-- Dropdown for >3 members -->
+      <div class="cl-assign-dropdown-modal" *ngIf="modalAssignDropdown && data.members.length > 3">
+        <button class="cl-assign-option" [class.active]="!assignedToUserId" (click)="assignedToUserId = ''; modalAssignDropdown = false">
+          <span class="cl-assign-opt-avatar cl-assign-opt-avatar--none">?</span>
+          <span>Unassigned</span>
+        </button>
+        <button class="cl-assign-option" *ngFor="let m of data.members"
+                [class.active]="assignedToUserId === m.userId"
+                (click)="assignedToUserId = m.userId; modalAssignDropdown = false">
+          <span class="cl-assign-opt-avatar">{{ getMemberInitial(m.name) }}</span>
+          <span>{{ m.name }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="cl-modal-footer">
+    <button class="cl-cancel-btn" (click)="cancel()" [disabled]="saving">Cancel</button>
+    <button class="cl-save-btn" [disabled]="!isValid || saving" (click)="save()">
+      {{ saving ? 'Saving...' : (isEditing ? 'Save changes' : 'Add item') }}
+    </button>
+  </div>
+</div>

@@ -38,6 +38,10 @@ import { ItineraryTabComponent } from './components/trip-planner/itinerary-tab/i
 import { EditTripModalComponent } from './components/trip-planner/modals/edit-trip-modal/edit-trip-modal.component';
 import { TripMapComponent } from './components/trip-planner/trip-map/trip-map.component';
 import { BudgetTabComponent } from './components/trip-planner/budget-tab/budget-tab.component';
+import { TravellersTabComponent } from './components/trip-planner/travellers-tab/travellers-tab.component';
+import { RemoveMemberConfirmComponent } from './components/trip-planner/modals/remove-member-confirm/remove-member-confirm.component';
+import { ChecklistTabComponent } from './components/trip-planner/checklist-tab/checklist-tab.component';
+import { AddChecklistItemModalComponent } from './components/trip-planner/checklist-tab/add-checklist-item-modal/add-checklist-item-modal.component';
 import { AddExpenseModalComponent } from './components/trip-planner/budget-tab/add-expense-modal/add-expense-modal.component';
 
 @NgModule({
@@ -67,6 +71,10 @@ import { AddExpenseModalComponent } from './components/trip-planner/budget-tab/a
     TripMapComponent,
     BudgetTabComponent,
     AddExpenseModalComponent,
+    TravellersTabComponent,
+    RemoveMemberConfirmComponent,
+    ChecklistTabComponent,
+    AddChecklistItemModalComponent,
   ],
   imports: [
     FormsModule,
