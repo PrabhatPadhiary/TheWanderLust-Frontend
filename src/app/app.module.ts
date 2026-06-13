@@ -43,6 +43,7 @@ import { RemoveMemberConfirmComponent } from './components/trip-planner/modals/r
 import { ChecklistTabComponent } from './components/trip-planner/checklist-tab/checklist-tab.component';
 import { AddChecklistItemModalComponent } from './components/trip-planner/checklist-tab/add-checklist-item-modal/add-checklist-item-modal.component';
 import { AddExpenseModalComponent } from './components/trip-planner/budget-tab/add-expense-modal/add-expense-modal.component';
+import { LandingPageV2Component } from './components/landing-page-v2/landing-page-v2.component';
 
 @NgModule({
   declarations: [
@@ -75,6 +76,7 @@ import { AddExpenseModalComponent } from './components/trip-planner/budget-tab/a
     RemoveMemberConfirmComponent,
     ChecklistTabComponent,
     AddChecklistItemModalComponent,
+    LandingPageV2Component,
   ],
   imports: [
     FormsModule,
