@@ -28,13 +28,11 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
   loading = true;
   error: string | null = null;
   placeId: string = '';
-  heroImages: string[] = [];
-  currentSlide = 0;
   tripCardTab: 'stays' | 'food' | 'explore' = 'stays';
   checkinDate: Date | null = null;
   checkoutDate: Date | null = null;
   reservationDate: Date | null = null;
-  private slideInterval: any;
+  private slideInterval: any; // kept for future use
 
   // Chip definitions
   foodChips = ['All', 'Fine Dining', 'Cafes', 'Street Food', 'Bars', 'Rooftop'];
@@ -111,8 +109,6 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.placeId) {
         // Reset everything on destination change
         this.destination = null;
-        this.heroImages = [];
-        this.currentSlide = 0;
         this.loading = true;
         this.existingTrip = null;
         this.categoryCache = {};
@@ -280,26 +276,6 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
     if (!state && !this.destMap) {
       this.waitForGoogleMapsAndInit();
     }
-  }
-
-  private loadHeroImage(): void {
-    this.destinationService.getHeroImage(this.placeId).subscribe({
-      next: (data) => {
-        this.heroImages = data.imageUrls || [];
-        if (this.heroImages.length > 1) {
-          this.startSlideshow();
-        }
-      },
-      error: () => {
-        this.heroImages = [];
-      }
-    });
-  }
-
-  private startSlideshow(): void {
-    this.slideInterval = setInterval(() => {
-      this.currentSlide = (this.currentSlide + 1) % this.heroImages.length;
-    }, 7000);
   }
 
   // ===== CHIP HANDLERS =====
@@ -566,7 +542,7 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
         placeId: this.placeId,
         latitude: this.destination?.geometry?.latitude || null,
         longitude: this.destination?.geometry?.longitude || null,
-        photoUrl: this.heroImages[0] || null
+        photoUrl: null
       },
       panelClass: 'auth-gate-dialog',
       maxWidth: '500px',
