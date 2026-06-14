@@ -590,8 +590,12 @@ export class TripPlannerComponent implements OnInit {
     if (this.primaryPlaceId) {
       this.router.navigate(['/destination', this.primaryPlaceId]);
     } else {
-      this.router.navigate(['/']);
+      this.router.navigate(['/my-trips']);
     }
+  }
+
+  goToMyTrips(): void {
+    this.router.navigate(['/my-trips']);
   }
 
   openNewTripFlow(): void {
