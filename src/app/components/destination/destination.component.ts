@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { DestinationService } from '../../services/destination.service';
@@ -46,10 +46,41 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
   activeStaysChip = 'All';
   activeTourismChip = 'All';
 
-  // Section loading
+  // Active content tab
+  activeSection: 'stays' | 'food' | 'attractions' = 'stays';
+
+  // Per-category loading flags
   foodLoading = false;
   staysLoading = false;
   tourismLoading = false;
+
+  // Cache: stores the base (All) results per category so chip "All" never re-fetches
+  private categoryCache: Partial<Record<'stays' | 'food' | 'attractions', PlaceDto[]>> = {};
+
+  // ===== MAP =====
+  @ViewChild('destMapContainer', { static: false }) destMapContainer!: ElementRef;
+  private destMap: any = null;
+  private destMarkers: any[] = [];
+  private destMapReady = false;
+
+  get tabInkTransform(): string {
+    const index = { stays: 0, food: 1, attractions: 2 }[this.activeSection];
+    return `translateX(${index * 100}%)`;
+  }
+
+  /** Places currently visible in the active tab — used to pin map markers */
+  get activePlaces(): PlaceDto[] {
+    if (!this.destination) return [];
+    if (this.activeSection === 'stays') return this.destination.lodging;
+    if (this.activeSection === 'food') return this.destination.restaurants;
+    return this.destination.touristAttractions;
+  }
+
+  setActiveSection(tab: 'stays' | 'food' | 'attractions'): void {
+    this.activeSection = tab;
+    this.loadCategoryIfNeeded(tab);
+    // markers update after data loads — triggered from applyCategoryCache
+  }
 
   // Destination search
   destPredictions: any[] = [];
@@ -78,51 +109,177 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
     this.route.paramMap.subscribe(params => {
       this.placeId = params.get('placeId') || '';
       if (this.placeId) {
+        // Reset everything on destination change
         this.destination = null;
         this.heroImages = [];
         this.currentSlide = 0;
         this.loading = true;
         this.existingTrip = null;
-        this.loadDestination();
-        this.loadHeroImage();
+        this.categoryCache = {};
+        this.activeSection = 'stays';
+        this.activeFoodChip = 'All';
+        this.activeStaysChip = 'All';
+        this.activeTourismChip = 'All';
+
+        this.loadDestinationMeta();
       }
     });
   }
 
-  loadDestination(): void {
+  /** Bootstraps the destination from router state (name) + lazy place fetching. No /search call needed. */
+  loadDestinationMeta(): void {
     this.loading = true;
     this.error = null;
+
+    // Name comes from router state when navigating via autocomplete — free, no API call
+    const nav = window.history.state;
+    const nameFromState: string = nav?.destinationName || '';
+
+    // Build a minimal destination object immediately so the header renders without waiting
+    this.destination = {
+      placeId: this.placeId,
+      name: nameFromState,
+      formattedAddress: '',
+      geometry: { latitude: 0, longitude: 0 },
+      restaurants: [],
+      lodging: [],
+      touristAttractions: []
+    };
+
+    // If no name in state (direct URL / bookmark), resolve it from Google Places SDK
+    if (!nameFromState) {
+      this.resolveNameFromPlacesSDK();
+    }
+
     this.loaderService.show('Discovering this destination...');
 
-    this.destinationService.search(this.placeId).subscribe({
-      next: (data) => {
-        this.destination = data;
-        this.authService.authReady.then(() => {
-          if (!this.authService.isLoggedIn) { this.loading = false; this.loaderService.hide(); return; }
-          return this.authService.getFirebaseToken().then(token => {
-            if (!token) { this.loading = false; this.loaderService.hide(); return; }
+    this.authService.authReady.then(() => {
+      if (this.authService.isLoggedIn) {
+        this.authService.getFirebaseToken().then(token => {
+          if (token) {
             this.tripService.getTripByDestination(this.placeId).subscribe({
-              next: (trip) => { this.existingTrip = trip; this.loading = false; this.loaderService.hide(); },
-              error: () => { this.existingTrip = null; this.loading = false; this.loaderService.hide(); }
+              next: (trip) => { this.existingTrip = trip; },
+              error: () => { this.existingTrip = null; }
             });
-            // Load all trips to know which places are already added
             this.tripService.getAllTrips().subscribe({
               next: (trips) => { this.allTrips = trips.filter(t => t.status?.toLowerCase() !== 'completed'); }
             });
-          });
+          }
         });
-        setTimeout(() => {
-          this.initAnimations();
-          this.initDestSearch();
-        }, 50);
-      },
-      error: (err) => {
-        this.error = 'Failed to load destination details. Please try again.';
-        this.loading = false;
-        this.loaderService.hide();
-        console.error(err);
       }
     });
+
+    // Only one places call on load — the default tab (stays)
+    this.loadCategoryIfNeeded('stays');
+
+    this.loading = false;
+    this.loaderService.hide();
+
+    setTimeout(() => {
+      this.initAnimations();
+      this.initDestSearch();
+    }, 50);
+  }
+
+  /** Fallback: resolve destination name from Google Places SDK when no router state is available */
+  private resolveNameFromPlacesSDK(): void {
+    const tryResolve = () => {
+      if (typeof google === 'undefined' || !google.maps?.places) {
+        // SDK not ready yet — retry once after a short delay
+        setTimeout(() => tryResolve(), 500);
+        return;
+      }
+      const service = new google.maps.places.PlacesService(document.createElement('div'));
+      service.getDetails(
+        { placeId: this.placeId, fields: ['name'] },
+        (result: any, status: string) => {
+          if (status === google.maps.places.PlacesServiceStatus.OK && result?.name) {
+            if (this.destination) {
+              this.destination = { ...this.destination, name: result.name };
+            }
+          }
+        }
+      );
+    };
+    tryResolve();
+  }
+
+  /** Fetches a category only if not already cached; restores from cache on repeat visits */
+  private loadCategoryIfNeeded(tab: 'stays' | 'food' | 'attractions'): void {
+    if (this.categoryCache[tab]) {
+      this.applyCategoryCache(tab);
+      return;
+    }
+
+    const categoryParam = tab === 'stays' ? 'stays'
+      : tab === 'food' ? 'restaurants'
+      : 'attractions';
+
+    this.setTabLoading(tab, true);
+
+    this.destinationService.getPlacesByCategory(this.placeId, categoryParam as any).subscribe({
+      next: (places) => {
+        this.categoryCache[tab] = places;
+        this.applyCategoryCache(tab);
+        this.setTabLoading(tab, false);
+      },
+      error: () => { this.setTabLoading(tab, false); }
+    });
+  }
+
+  private applyCategoryCache(tab: 'stays' | 'food' | 'attractions'): void {
+    if (!this.destination) return;
+    const places = this.categoryCache[tab] ?? [];
+    if (tab === 'stays')       this.destination.lodging = places;
+    else if (tab === 'food')   this.destination.restaurants = places;
+    else                       this.destination.touristAttractions = places;
+
+    // If destination geometry is still 0,0 and we now have places with real coords, use them
+    if (
+      this.destination.geometry.latitude === 0 &&
+      this.destination.geometry.longitude === 0 &&
+      places.length > 0 &&
+      places[0].geometry?.latitude
+    ) {
+      this.destination = {
+        ...this.destination,
+        geometry: {
+          latitude: places[0].geometry.latitude,
+          longitude: places[0].geometry.longitude
+        }
+      };
+      // Re-center the map now that we have real coordinates
+      if (this.destMap) {
+        this.destMap.setCenter({
+          lat: places[0].geometry.latitude,
+          lng: places[0].geometry.longitude
+        });
+      }
+    }
+
+    // Update map markers whenever the displayed set changes
+    if (this.destMapReady) this.updateDestMarkers();
+  }
+  private setTabLoading(tab: 'stays' | 'food' | 'attractions', state: boolean): void {
+    if (tab === 'stays')       this.staysLoading = state;
+    else if (tab === 'food')   this.foodLoading = state;
+    else                       this.tourismLoading = state;
+
+    // When the first data batch finishes loading, the sticky band is now visible
+    // and the map container finally has real dimensions — force a resize + re-init.
+    if (!state && !this.destMapReady && this.destMap) {
+      setTimeout(() => {
+        google.maps.event.trigger(this.destMap, 'resize');
+        this.destMapReady = true;
+        this.updateDestMarkers();
+      }, 100);
+    }
+
+    // If map hasn't been initialised at all yet (e.g. Google SDK loaded after data),
+    // kick off init now that the container is guaranteed to have size.
+    if (!state && !this.destMap) {
+      this.waitForGoogleMapsAndInit();
+    }
   }
 
   private loadHeroImage(): void {
@@ -145,63 +302,37 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 7000);
   }
 
-  onFoodChipClick(chip: string): void {
-    this.activeFoodChip = chip;
-    if (chip === 'All') {
-      this.loadDestination();
-      return;
-    }
-    this.foodLoading = true;
-    this.destinationService.filter(this.placeId, chip.toLowerCase()).subscribe({
-      next: (data) => {
-        if (this.destination) {
-          this.destination.restaurants = data;
-        }
-        this.foodLoading = false;
-      },
-      error: () => {
-        this.foodLoading = false;
-      }
-    });
-  }
+  // ===== CHIP HANDLERS =====
+  // "All" restores the cached base result — no network call.
+  // Any other chip calls the filter endpoint within the category.
 
   onStaysChipClick(chip: string): void {
     this.activeStaysChip = chip;
-    if (chip === 'All') {
-      this.loadDestination();
-      return;
-    }
+    if (chip === 'All') { this.applyCategoryCache('stays'); return; }
     this.staysLoading = true;
     this.destinationService.filter(this.placeId, chip.toLowerCase()).subscribe({
-      next: (data) => {
-        if (this.destination) {
-          this.destination.lodging = data;
-        }
-        this.staysLoading = false;
-      },
-      error: () => {
-        this.staysLoading = false;
-      }
+      next: (data) => { if (this.destination) this.destination.lodging = data; this.staysLoading = false; },
+      error: () => { this.staysLoading = false; }
+    });
+  }
+
+  onFoodChipClick(chip: string): void {
+    this.activeFoodChip = chip;
+    if (chip === 'All') { this.applyCategoryCache('food'); return; }
+    this.foodLoading = true;
+    this.destinationService.filter(this.placeId, chip.toLowerCase()).subscribe({
+      next: (data) => { if (this.destination) this.destination.restaurants = data; this.foodLoading = false; },
+      error: () => { this.foodLoading = false; }
     });
   }
 
   onTourismChipClick(chip: string): void {
     this.activeTourismChip = chip;
-    if (chip === 'All') {
-      this.loadDestination();
-      return;
-    }
+    if (chip === 'All') { this.applyCategoryCache('attractions'); return; }
     this.tourismLoading = true;
     this.destinationService.filter(this.placeId, chip.toLowerCase()).subscribe({
-      next: (data) => {
-        if (this.destination) {
-          this.destination.touristAttractions = data;
-        }
-        this.tourismLoading = false;
-      },
-      error: () => {
-        this.tourismLoading = false;
-      }
+      next: (data) => { if (this.destination) this.destination.touristAttractions = data; this.tourismLoading = false; },
+      error: () => { this.tourismLoading = false; }
     });
   }
 
@@ -258,7 +389,9 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
   selectDestPlace(prediction: any): void {
     this.destPredictions = [];
     this.showDestDropdown = false;
-    this.router.navigate(['/destination', prediction.place_id]);
+    this.router.navigate(['/destination', prediction.place_id], {
+      state: { destinationName: prediction.structured_formatting?.main_text || prediction.description }
+    });
   }
 
   onDestBlur(): void {
@@ -479,14 +612,245 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   scrollToSection(sectionId: string): void {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // With the tabbed layout, switch to the right tab and scroll to top of content
+    if (sectionId === 'stays' || sectionId === 'food' || sectionId === 'attractions') {
+      this.activeSection = sectionId;
     }
+    // scroll to the tab bar so the content is visible
+    setTimeout(() => {
+      const el = document.querySelector('.section-tabs-bar');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   }
 
   ngAfterViewInit(): void {
     gsap.registerPlugin(ScrollTrigger);
+    this.waitForGoogleMapsAndInit();
+  }
+
+  // ===== MAP IMPLEMENTATION =====
+
+  private waitForGoogleMapsAndInit(): void {
+    if (typeof google !== 'undefined' && google.maps) {
+      setTimeout(() => this.initDestMap(), 100);
+    } else {
+      const interval = setInterval(() => {
+        if (typeof google !== 'undefined' && google.maps) {
+          clearInterval(interval);
+          this.initDestMap();
+        }
+      }, 200);
+    }
+  }
+
+  private initDestMap(): void {
+    if (typeof google === 'undefined' || !google.maps) return;
+    if (!this.destMapContainer?.nativeElement) return;
+
+    const el = this.destMapContainer.nativeElement;
+
+    // If the container has no size yet (still in loading state), retry after a tick
+    if (el.offsetWidth === 0 || el.offsetHeight === 0) {
+      setTimeout(() => this.initDestMap(), 150);
+      return;
+    }
+
+    const lat = this.destination?.geometry?.latitude || 48.8566;
+    const lng = this.destination?.geometry?.longitude || 2.3522;
+
+    this.destMap = new google.maps.Map(el, {
+      center: { lat, lng },
+      zoom: 13,
+      mapTypeId: 'roadmap',
+      disableDefaultUI: true,
+      zoomControl: false,
+      mapTypeControl: false,
+      streetViewControl: false,
+      fullscreenControl: false,
+      styles: [
+        // Only hide noisy POI icons and transit lines — keep all natural colours
+        { featureType: 'poi',                 stylers: [{ visibility: 'off' }] },
+        { featureType: 'transit',             stylers: [{ visibility: 'off' }] },
+        // Subtle road simplification — keep land/park/water at their natural Google colours
+        { featureType: 'road',         elementType: 'geometry.stroke', stylers: [{ color: '#d6d6d6' }] },
+        { featureType: 'road.highway', elementType: 'geometry',        stylers: [{ color: '#f5c542' }] },
+        { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ color: '#e0a800' }] },
+        // Clean up label contrast slightly
+        { elementType: 'labels.text.stroke',  stylers: [{ color: '#ffffff' }] },
+        { elementType: 'labels.text.fill',    stylers: [{ color: '#555555' }] }
+      ]
+    });
+
+    // Force tile re-render after first paint
+    setTimeout(() => {
+      google.maps.event.trigger(this.destMap, 'resize');
+      this.destMap.setCenter({ lat, lng });
+      this.destMapReady = true;
+      this.injectCustomZoomControls(el);
+      this.updateDestMarkers();
+    }, 200);
+  }
+
+  /** Injects styled +/- zoom buttons into the map container */
+  private injectCustomZoomControls(mapEl: HTMLElement): void {
+    // Remove existing custom controls if re-initialised
+    const existing = mapEl.querySelector('.dest-zoom-controls');
+    if (existing) existing.remove();
+
+    const wrap = document.createElement('div');
+    wrap.className = 'dest-zoom-controls';
+    wrap.innerHTML = `
+      <button class="dest-zoom-btn" id="dest-zoom-in"  title="Zoom in">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+      <div class="dest-zoom-divider"></div>
+      <button class="dest-zoom-btn" id="dest-zoom-out" title="Zoom out">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+      </button>
+    `;
+
+    // Inject styles once
+    if (!document.getElementById('dest-zoom-style')) {
+      const style = document.createElement('style');
+      style.id = 'dest-zoom-style';
+      style.textContent = `
+        .dest-zoom-controls {
+          position: absolute;
+          bottom: 24px;
+          right: 14px;
+          display: flex;
+          flex-direction: column;
+          background: #fff;
+          border-radius: 12px;
+          box-shadow: 0 4px 16px rgba(0,0,0,0.14);
+          overflow: hidden;
+          z-index: 10;
+          border: 1px solid rgba(0,0,0,0.07);
+        }
+        .dest-zoom-btn {
+          width: 36px;
+          height: 36px;
+          border: none;
+          background: transparent;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #333;
+          transition: background 0.15s;
+          padding: 0;
+        }
+        .dest-zoom-btn:hover { background: #f5f5f5; color: #e85d04; }
+        .dest-zoom-divider {
+          height: 1px;
+          background: rgba(0,0,0,0.08);
+          margin: 0 6px;
+        }
+      `;
+      document.head.appendChild(style);
+    }
+
+    mapEl.style.position = 'relative';
+    mapEl.appendChild(wrap);
+
+    wrap.querySelector('#dest-zoom-in')!.addEventListener('click', () => {
+      this.destMap.setZoom((this.destMap.getZoom() || 13) + 1);
+    });
+    wrap.querySelector('#dest-zoom-out')!.addEventListener('click', () => {
+      this.destMap.setZoom((this.destMap.getZoom() || 13) - 1);
+    });
+  }
+
+  updateDestMarkers(): void {
+    if (!this.destMap || !this.destMapReady) return;
+
+    // Clear existing markers
+    this.destMarkers.forEach((m: any) => m.setMap(null));
+    this.destMarkers = [];
+
+    const places = this.activePlaces.filter(
+      p => p.geometry?.latitude && p.geometry?.longitude
+    );
+
+    if (places.length === 0) return;
+
+    const bounds = new google.maps.LatLngBounds();
+
+    // Color + emoji per tab
+    const tabConfig: Record<string, { color: string; darkColor: string; emoji: string }> = {
+      stays:       { color: '#2563eb', darkColor: '#1d4ed8', emoji: '🏨' },
+      food:        { color: '#e85d04', darkColor: '#c0392b', emoji: '🍽' },
+      attractions: { color: '#16a34a', darkColor: '#15803d', emoji: '📍' }
+    };
+    const cfg = tabConfig[this.activeSection] || tabConfig['stays'];
+
+    places.forEach((place, index) => {
+      const position = {
+        lat: place.geometry.latitude,
+        lng: place.geometry.longitude
+      };
+
+      // Modern pill marker: colored background, white number, small tail
+      const num = index + 1;
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="36" height="44" viewBox="0 0 36 44">
+          <!-- Drop shadow -->
+          <ellipse cx="18" cy="43" rx="7" ry="2.5" fill="rgba(0,0,0,0.18)"/>
+          <!-- Pin body -->
+          <path d="M18 0C10 0 4 6.3 4 14c0 10.5 14 28 14 28s14-17.5 14-28C32 6.3 26 0 18 0z"
+                fill="${cfg.color}" stroke="${cfg.darkColor}" stroke-width="1"/>
+          <!-- White circle -->
+          <circle cx="18" cy="14" r="8" fill="white" opacity="0.95"/>
+          <!-- Number -->
+          <text x="18" y="18.5" text-anchor="middle"
+                font-family="Poppins,Arial,sans-serif"
+                font-size="9" font-weight="700"
+                fill="${cfg.color}">${num}</text>
+        </svg>`;
+
+      const marker = new google.maps.Marker({
+        position,
+        map: this.destMap,
+        title: place.name,
+        icon: {
+          url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+          scaledSize: new google.maps.Size(36, 44),
+          anchor: new google.maps.Point(18, 44)
+        },
+        zIndex: 100 - index   // first markers on top
+      });
+
+      const infoWindow = new google.maps.InfoWindow({
+        content: `
+          <div style="font-family:Poppins,Arial,sans-serif;padding:4px 2px;min-width:140px;max-width:200px">
+            <div style="font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:2px;line-height:1.3">${place.name}</div>
+            <div style="font-size:11px;color:#888;line-height:1.3">${place.vicinity || ''}</div>
+            ${place.rating ? `<div style="font-size:11px;color:#555;margin-top:4px">⭐ <strong>${place.rating}</strong>${place.userRatingsTotal ? ` · <span style="color:#aaa">${place.userRatingsTotal} reviews</span>` : ''}</div>` : ''}
+          </div>`
+      });
+
+      marker.addListener('click', () => {
+        infoWindow.open(this.destMap, marker);
+      });
+
+      this.destMarkers.push(marker);
+      bounds.extend(position);
+    });
+
+    // Fit map to markers
+    if (this.destMarkers.length > 1) {
+      this.destMap.fitBounds(bounds, { padding: 56 });
+      google.maps.event.addListenerOnce(this.destMap, 'idle', () => {
+        if (this.destMap.getZoom() > 15) this.destMap.setZoom(15);
+      });
+    } else if (this.destMarkers.length === 1) {
+      this.destMap.setCenter(this.destMarkers[0].getPosition());
+      this.destMap.setZoom(14);
+    }
   }
 
   private initAnimations(): void {

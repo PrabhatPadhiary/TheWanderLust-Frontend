@@ -1,44 +1,89 @@
+// ============================================================
+// UNIFIED NAVBAR
+// Two visual modes driven by CSS classes:
+//   default          → frosted glass, 64px, always visible (destination, my-trips, etc.)
+//   .app-navbar--landing  → transparent → frosted on scroll, 72px, section links
+//   .app-navbar--compact  → 44px, offset past sidebar (trip planner)
+// ============================================================
+
 .app-navbar {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   height: 64px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+  font-family: 'Poppins', sans-serif;
+  transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+
+  // Default: always frosted
   background: rgba(255, 255, 255, 0.92);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(0, 0, 0, 0.07);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-  display: flex;
-  align-items: center;
-  padding: 0 40px;
-  z-index: 1000;
-  font-family: 'Poppins', sans-serif;
+}
 
-  .nav-action-btn { color: #555; &:hover { background: rgba(0,0,0,0.05); color: #1a1a1a; } }
-  .sign-in-btn { background: #1a1a1a; color: #fff; &:hover { background: #333; } }
-  .user-avatar-btn { border-color: #1a1a1a; }
+// ===== LANDING MODE =====
+.app-navbar--landing {
+  height: 72px;
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  padding: 0 60px;
 
-  .split-search-bar {
-    background: rgba(255,255,255,0.7);
-    border-color: rgba(0,0,0,0.08);
-    .search-left, .search-right {
-      span { color: #888; }
-      input { color: #1a1a1a; &::placeholder { color: #999; } }
-    }
-    .search-divider { background: #ddd; }
+  &.app-navbar--scrolled {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.04);
   }
 }
 
+// ===== COMPACT MODE (Trip Planner) =====
+.app-navbar--compact {
+  height: 44px !important;
+  padding: 0 20px !important;
+  box-shadow: none !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background: rgba(245, 246, 250, 0.75) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  left: 240px !important;
+  width: calc(100% - 240px) !important;
+
+  .nav-action-btn {
+    width: 30px;
+    height: 30px;
+    svg { width: 15px; height: 15px; }
+  }
+
+  .user-avatar-btn {
+    width: 28px !important;
+    height: 28px !important;
+    background: none !important;
+    border: 1px solid #e0e0e0 !important;
+    svg { width: 14px; height: 14px; }
+  }
+}
+
+// ===== LOGO =====
 .navbar-brand {
   display: flex;
   align-items: center;
   gap: 10px;
   cursor: pointer;
   flex-shrink: 0;
+  text-decoration: none;
 
   .brand-logo-img {
-    height: 67px;
+    height: 44px;
     width: auto;
     display: block;
     object-fit: contain;
@@ -52,6 +97,89 @@
   }
 }
 
+// ===== SECTION LINKS (landing mode) =====
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+
+  li a {
+    padding: 8px 18px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #555;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    user-select: none;
+
+    &:hover {
+      color: #1a1a1a;
+      background: rgba(0, 0, 0, 0.04);
+    }
+
+    &.active {
+      color: #e85d04;
+      background: rgba(232, 93, 4, 0.08);
+      font-weight: 600;
+    }
+  }
+}
+
+// ===== DESTINATION MODE =====
+// Left-aligned to match 5% content edge. Logo-only. Single search.
+.app-navbar--destination {
+  padding: 0 5%;
+
+  .navbar-brand {
+    flex-shrink: 0;
+  }
+}
+
+// Single search bar (destination mode)
+.navbar-search--single {
+  flex: 1;
+  max-width: 360px;
+  margin: 0 24px 0 20px;
+  position: relative;
+
+  .single-search-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.07);
+    border-radius: 50px;
+    padding: 9px 18px;
+    transition: all 0.2s;
+
+    &:focus-within {
+      background: #fff;
+      border-color: #1a1a1a;
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .search-icon {
+      color: #999;
+      flex-shrink: 0;
+    }
+
+    input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 0.88rem;
+      font-family: 'Poppins', sans-serif;
+      color: #1a1a1a;
+      outline: none;
+      &::placeholder { color: #aaa; }
+    }
+  }
+}
 .navbar-search {
   flex: 1;
   max-width: 520px;
@@ -61,7 +189,7 @@
   .split-search-bar {
     display: flex;
     align-items: center;
-    background: rgba(255, 255, 255, 0.555);
+    background: rgba(255, 255, 255, 0.7);
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 50px;
     overflow: hidden;
@@ -85,7 +213,6 @@
         display: flex;
         align-items: center;
         flex-shrink: 0;
-        transition: color 0.3s;
         svg { width: 16px; height: 16px; }
       }
 
@@ -97,8 +224,7 @@
         font-family: 'Poppins', sans-serif;
         color: #1a1a1a;
         outline: none;
-        transition: color 0.3s;
-        &::placeholder { color: #3f3e3e; transition: color 0.3s; }
+        &::placeholder { color: #999; }
       }
     }
 
@@ -107,7 +233,6 @@
       height: 22px;
       background: #ddd;
       flex-shrink: 0;
-      transition: background 0.3s;
     }
   }
 
@@ -129,14 +254,29 @@
       padding: 11px 16px;
       cursor: pointer;
       transition: background 0.1s;
-      &:hover { background: #f4faf3; }
+      &:hover { background: #fff8f5; }
       .dropdown-main { font-size: 0.85rem; font-weight: 600; color: #1a1a1a; }
       .dropdown-secondary { font-size: 0.72rem; color: #888; }
     }
   }
 }
 
-// ===== ACTIONS (right) =====
+// ===== TRIP PLANNER: CENTER TITLE =====
+.navbar-trip-name {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+// ===== TRIP INDICATOR =====
 .trip-indicator {
   position: relative;
   width: 36px;
@@ -177,7 +317,7 @@
   padding: 10px 14px;
   min-width: 200px;
   max-width: 260px;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -221,161 +361,141 @@
   margin-top: 2px;
 }
 
-// ===== ACTIONS (right) =====
+// ===== RIGHT ACTIONS =====
 .navbar-actions {
   display: flex;
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
+}
+
+// In landing mode the nav-links use margin: 0 auto to center themselves,
+// so actions just sit naturally at the end.
+// In all other modes (no nav-links present), push actions to the far right.
+.app-navbar:not(.app-navbar--landing) .navbar-actions {
   margin-left: auto;
+}
 
-  .sign-in-btn {
-    padding: 8px 20px;
-    background: #1a1a1a;
-    color: #fff;
-    border: none;
-    border-radius: 50px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: 'Poppins', sans-serif;
-    transition: all 0.2s;
-    white-space: nowrap;
-    &:hover { background: #333; }
+.sign-in-btn {
+  padding: 10px 24px;
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background: #333;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
+}
 
-  .nav-action-btn {
-    height: 42px;
-    border-radius: 22px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #555;
-    transition: all 0.15s;
-    padding: 0 10px;
-    svg { width: 22px; height: 22px; flex-shrink: 0; }
-    &:hover { background: rgba(0,0,0,0.05); color: #1a1a1a; }
+.nav-action-btn {
+  height: 42px;
+  border-radius: 22px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #555;
+  transition: all 0.15s;
+  padding: 0 10px;
 
-    &.with-label {
-      gap: 8px;
-      padding: 0 16px;
-      span {
-        font-size: 0.92rem;
-        font-weight: 600;
-        font-family: 'Poppins', sans-serif;
-        white-space: nowrap;
-      }
-    }
-  }
+  svg { width: 22px; height: 22px; flex-shrink: 0; }
 
-  .user-menu-wrapper {
-    position: relative;
-    margin-left: 4px;
+  &:hover { background: rgba(0, 0, 0, 0.05); color: #1a1a1a; }
 
-    .user-avatar-btn {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      border: 1.5px solid #e0e0e0;
-      background: #fff;
-      color: #555;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+  &.with-label {
+    gap: 8px;
+    padding: 0 16px;
+    span {
+      font-size: 0.92rem;
+      font-weight: 600;
       font-family: 'Poppins', sans-serif;
-      transition: all 0.15s;
-      &:hover { border-color: #2d5a27; color: #2d5a27; }
-    }
-
-    .user-dropdown {
-      position: absolute;
-      top: calc(100% + 10px);
-      right: 0;
-      width: 220px;
-      background: #fff;
-      border-radius: 12px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-      border: 1px solid #eee;
-      overflow: hidden;
-      z-index: 200;
-
-      .user-dropdown-header {
-        padding: 14px 16px;
-        strong { display: block; font-size: 0.88rem; color: #1a1a1a; }
-        span { font-size: 0.75rem; color: #888; }
-      }
-      .user-dropdown-divider { height: 1px; background: #f0f0f0; }
-      .user-dropdown-item {
-        display: block; width: 100%; padding: 10px 16px;
-        border: none; background: none; text-align: left;
-        font-size: 0.85rem; color: #333; cursor: pointer;
-        font-family: 'Poppins', sans-serif; transition: background 0.1s;
-        &:hover { background: #f8f8f8; }
-        &.logout { color: #e74c3c; &:hover { background: #fef2f2; } }
-      }
+      white-space: nowrap;
     }
   }
 }
 
+.user-menu-wrapper {
+  position: relative;
+  margin-left: 4px;
+}
+
+.user-avatar-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid #e0e0e0;
+  background: #fff;
+  color: #555;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.15s;
+
+  &:hover { border-color: #e85d04; color: #e85d04; }
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 220px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+  border: 1px solid #eee;
+  overflow: hidden;
+  z-index: 200;
+}
+
+.user-dropdown-header {
+  padding: 14px 16px;
+  strong { display: block; font-size: 0.88rem; color: #1a1a1a; }
+  span { font-size: 0.75rem; color: #888; }
+}
+
+.user-dropdown-divider { height: 1px; background: #f0f0f0; }
+
+.user-dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: none;
+  text-align: left;
+  font-size: 0.85rem;
+  color: #333;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  transition: background 0.1s;
+
+  &:hover { background: #f8f8f8; }
+  &.logout { color: #e74c3c; &:hover { background: #fef2f2; } }
+}
+
+// ===== RESPONSIVE =====
 @media (max-width: 1200px) {
   .app-navbar { padding: 0 24px; }
+  .app-navbar--landing { padding: 0 32px; }
 }
 
 @media (max-width: 768px) {
   .app-navbar { padding: 0 16px; height: 56px; }
+  .app-navbar--landing { padding: 0 20px; height: 64px; }
   .navbar-brand .brand-name { display: none; }
   .navbar-search { max-width: none; }
-  .navbar-actions .nav-action-btn { display: none; }
-}
-
-// ===== COMPACT NAVBAR (Trip Planner) =====
-.app-navbar--compact {
-  height: 44px !important;
-  padding: 0 20px !important;
-  box-shadow: none !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  background: rgba(245, 246, 250, 0.75) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  left: 240px !important;
-  width: calc(100% - 240px) !important;
-
-  .navbar-brand {
-    .brand-icon {
-      width: 18px;
-      height: 18px;
-    }
-  }
-
-  .nav-action-btn {
-    width: 30px;
-    height: 30px;
-    svg { width: 15px; height: 15px; }
-  }
-
-  .user-avatar-btn {
-    width: 28px;
-    height: 28px;
-    background: none !important;
-    border: 1px solid #e0e0e0 !important;
-    svg { width: 14px; height: 14px; }
-  }
-}
-
-.navbar-trip-name {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  font-family: 'Poppins', sans-serif;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #1a1a1a;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 300px;
+  .nav-action-btn { display: none; }
+  .nav-links { display: none; }
 }

@@ -19,6 +19,12 @@ export class DestinationService {
     });
   }
 
+  getPlacesByCategory(placeId: string, category: 'restaurants' | 'stays' | 'attractions'): Observable<PlaceDto[]> {
+    return this.http.get<PlaceDto[]>(`${this.baseUrl}/places`, {
+      params: { placeId, category }
+    });
+  }
+
   getHeroImage(placeId: string): Observable<{ imageUrls: string[] }> {
     return this.http.get<{ imageUrls: string[] }>(`${this.baseUrl}/hero-image`, {
       params: { placeId }

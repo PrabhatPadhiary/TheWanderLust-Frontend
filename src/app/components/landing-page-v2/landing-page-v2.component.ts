@@ -1,8 +1,6 @@
 import { Component, ElementRef, HostListener, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../services/auth.service';
-import { AuthGateModalComponent } from '../auth-gate-modal/auth-gate-modal.component';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 
@@ -16,10 +14,8 @@ declare var google: any;
 })
 export class LandingPageV2Component implements OnInit, AfterViewInit {
   @ViewChild('demoVideo') demoVideo!: ElementRef<HTMLVideoElement>;
-  navScrolled = false;
-  activeSection = 'explore';
 
-  // Search
+  // Hero search
   predictions: any[] = [];
   showDropdown = false;
   selectedPlace: any = null;
@@ -29,8 +25,7 @@ export class LandingPageV2Component implements OnInit, AfterViewInit {
 
   constructor(
     public authService: AuthService,
-    private router: Router,
-    private dialog: MatDialog
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -43,32 +38,7 @@ export class LandingPageV2Component implements OnInit, AfterViewInit {
     }
   }
 
-  @HostListener('window:scroll')
-  onWindowScroll(): void {
-    this.navScrolled = window.scrollY > 50;
-  }
-
-  scrollTo(section: string): void {
-    this.activeSection = section;
-    const el = document.getElementById(section);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }
-
-  onSignIn(): void {
-    if (this.authService.isLoggedIn) {
-      this.router.navigate(['/my-trips']);
-    } else {
-      this.dialog.open(AuthGateModalComponent, {
-        panelClass: 'auth-gate-dialog',
-        maxWidth: '500px',
-        width: '500px'
-      });
-    }
-  }
-
-  // ===== Search =====
+  // ===== Hero Search =====
   private initPlacesAutocomplete(): void {
     if (typeof google !== 'undefined' && google.maps?.places) {
       this.autocompleteService = new google.maps.places.AutocompleteService();
@@ -119,7 +89,9 @@ export class LandingPageV2Component implements OnInit, AfterViewInit {
     this.selectedPlace = prediction;
     this.predictions = [];
     this.showDropdown = false;
-    this.router.navigate(['/destination', prediction.place_id]);
+    this.router.navigate(['/destination', prediction.place_id], {
+      state: { destinationName: prediction.structured_formatting?.main_text || prediction.description }
+    });
   }
 
   onExplore(): void {

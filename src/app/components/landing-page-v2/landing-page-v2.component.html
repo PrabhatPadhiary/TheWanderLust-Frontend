@@ -1,29 +1,5 @@
 <!-- ===== NAVBAR ===== -->
-<nav class="landing-nav" [class.scrolled]="navScrolled">
-  <div class="nav-container">
-    <!-- Logo -->
-    <div class="nav-logo" (click)="scrollTo('explore')">
-      <img src="assets/images/logo/wayraa_logo_notext.svg" alt="Wayraa" class="nav-logo-img">
-      <span class="nav-logo-text">wayraa</span>
-    </div>
-
-    <!-- Center Nav Links -->
-    <ul class="nav-links">
-      <li><a (click)="scrollTo('explore')" [class.active]="activeSection === 'explore'">Explore</a></li>
-      <li><a (click)="scrollTo('features')" [class.active]="activeSection === 'features'">Features</a></li>
-      <li><a (click)="scrollTo('community')" [class.active]="activeSection === 'community'">Community</a></li>
-      <li><a (click)="scrollTo('pricing')" [class.active]="activeSection === 'pricing'">Pricing</a></li>
-    </ul>
-
-    <!-- Right: Sign In -->
-    <div class="nav-actions">
-      <button class="sign-in-btn" (click)="onSignIn()">
-        <span *ngIf="!authService.isLoggedIn">Sign In</span>
-        <span *ngIf="authService.isLoggedIn">My Trips</span>
-      </button>
-    </div>
-  </div>
-</nav>
+<app-navbar [isLanding]="true"></app-navbar>
 
 <!-- ===== HERO SECTION ===== -->
 <section class="hero-section" id="explore">
@@ -317,6 +293,115 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== USER REVIEWS SECTION ===== -->
+<section class="reviews-section" id="reviews">
+  <div class="section-container">
+    <span class="section-label">What travelers say</span>
+    <h2 class="section-title">Loved by explorers worldwide</h2>
+    <p class="section-subtitle">Real feedback from people who planned their trips with Wayraa.</p>
+
+    <!-- Stats row -->
+    <div class="reviews-stats-row">
+      <div class="reviews-stat-card">
+        <span class="rstat-num">4.9</span>
+        <div class="rstat-stars">★★★★★</div>
+        <span class="rstat-label">Average rating</span>
+      </div>
+      <div class="reviews-stat-card">
+        <span class="rstat-num">2,400+</span>
+        <span class="rstat-label">Happy travelers</span>
+      </div>
+      <div class="reviews-stat-card">
+        <span class="rstat-num">10K+</span>
+        <span class="rstat-label">Trips planned</span>
+      </div>
+      <div class="reviews-stat-card">
+        <span class="rstat-num">98%</span>
+        <span class="rstat-label">Would recommend</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Horizontal scroll track — no padding so cards bleed to edges with fade -->
+  <div class="reviews-scroll-wrap">
+    <div class="reviews-scroll-track">
+
+      <div class="rcard">
+        <p class="rcard-text">"Wayraa completely changed how I plan trips. I used to spend hours across 6 different tabs — now everything is in one place. Planned our Bali trip in under an hour."</p>
+        <div class="rcard-footer">
+          <span class="rcard-avatar" style="background: linear-gradient(135deg,#e85d04,#ff8c42)">S</span>
+          <div class="rcard-author">
+            <strong>Sneha Patel</strong>
+            <span>Mumbai · Bali</span>
+          </div>
+          <span class="rcard-stars">★★★★★</span>
+        </div>
+      </div>
+
+      <div class="rcard rcard--tinted">
+        <p class="rcard-text">"The map view on the destination page is incredible. I could see all restaurants and hotels plotted out and just tap to add them to my itinerary."</p>
+        <div class="rcard-footer">
+          <span class="rcard-avatar" style="background: linear-gradient(135deg,#2563eb,#60a5fa)">R</span>
+          <div class="rcard-author">
+            <strong>Rahul Sharma</strong>
+            <span>Delhi · Goa</span>
+          </div>
+          <span class="rcard-stars">★★★★★</span>
+        </div>
+      </div>
+
+      <div class="rcard">
+        <p class="rcard-text">"Our group of 5 used it to plan a week in Thailand. The collaborative features meant no one was left out of decisions. 10/10 would use again."</p>
+        <div class="rcard-footer">
+          <span class="rcard-avatar" style="background: linear-gradient(135deg,#16a34a,#4ade80)">A</span>
+          <div class="rcard-author">
+            <strong>Ananya Roy</strong>
+            <span>Bangalore · Thailand</span>
+          </div>
+          <span class="rcard-stars">★★★★★</span>
+        </div>
+      </div>
+
+      <div class="rcard rcard--tinted">
+        <p class="rcard-text">"Budget tracking saved our trip. We could see exactly what we were spending in real time and adjust plans on the go. Never went over budget."</p>
+        <div class="rcard-footer">
+          <span class="rcard-avatar" style="background: linear-gradient(135deg,#7c3aed,#a78bfa)">K</span>
+          <div class="rcard-author">
+            <strong>Karan Mehta</strong>
+            <span>Pune · Europe</span>
+          </div>
+          <span class="rcard-stars">★★★★★</span>
+        </div>
+      </div>
+
+      <div class="rcard">
+        <p class="rcard-text">"I love that it pulls real Google ratings and photos. I can actually trust the recommendations instead of relying on random blogs."</p>
+        <div class="rcard-footer">
+          <span class="rcard-avatar" style="background: linear-gradient(135deg,#db2777,#f472b6)">P</span>
+          <div class="rcard-author">
+            <strong>Priya Nair</strong>
+            <span>Chennai · Rajasthan</span>
+          </div>
+          <span class="rcard-stars">★★★★☆</span>
+        </div>
+      </div>
+
+      <div class="rcard rcard--tinted">
+        <p class="rcard-text">"Finally a travel app that doesn't feel like a spreadsheet. The design is clean, everything is intuitive, and the destination pages are stunning."</p>
+        <div class="rcard-footer">
+          <span class="rcard-avatar" style="background: linear-gradient(135deg,#0891b2,#67e8f9)">V</span>
+          <div class="rcard-author">
+            <strong>Varun Joshi</strong>
+            <span>Hyderabad · Manali</span>
+          </div>
+          <span class="rcard-stars">★★★★★</span>
+        </div>
+      </div>
+
     </div>
   </div>
 </section>

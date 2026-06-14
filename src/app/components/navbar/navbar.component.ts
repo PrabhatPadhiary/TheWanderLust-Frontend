@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../services/auth.service';
@@ -16,13 +16,16 @@ declare var google: any;
   styleUrls: ['./navbar.component.scss'],
   standalone: false
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit {
   @Input() destinationName: string = '';
   @Input() tripName: string = '';
-  @Input() solid: boolean = false;
   @Input() existingTrip: TripResponse | null = null;
   @Input() isTripPlanner: boolean = false;
   @Input() primaryDestinationPlaceId: string = '';
+  /** Landing mode: transparent navbar that frosts on scroll, shows section links */
+  @Input() isLanding: boolean = false;
+  /** Destination mode: logo-only brand, single search bar, left-aligned to match content */
+  @Input() isDestination: boolean = false;
   @Output() localSearchInput = new EventEmitter<string>();
 
   predictions: any[] = [];
@@ -30,6 +33,8 @@ export class NavbarComponent {
   showUserMenu = false;
   searchActive = false;
   showTripTooltip = false;
+  scrolled = false;
+  landingSection = 'explore';
   private searchSubject = new Subject<string>();
   private autocompleteService: any;
   private blurTimeout: any;
@@ -42,9 +47,11 @@ export class NavbarComponent {
     private toastr: ToastrService
   ) {}
 
+  ngOnInit(): void {}
+
   @HostListener('window:scroll')
   onWindowScroll(): void {
-    // scroll tracking removed — navbar is always solid
+    this.scrolled = window.scrollY > 50;
   }
 
   private initAutocomplete(): void {
@@ -105,7 +112,9 @@ export class NavbarComponent {
     this.predictions = [];
     this.showDropdown = false;
     this.searchActive = false;
-    this.router.navigate(['/destination', prediction.place_id]);
+    this.router.navigate(['/destination', prediction.place_id], {
+      state: { destinationName: prediction.structured_formatting?.main_text || prediction.description }
+    });
   }
 
   onBlur(): void {
@@ -127,7 +136,11 @@ export class NavbarComponent {
   }
 
   onSignIn(): void {
-    this.openAuthModal();
+    if (this.authService.isLoggedIn) {
+      this.router.navigate(['/my-trips']);
+    } else {
+      this.openAuthModal();
+    }
   }
 
   toggleUserMenu(): void {
@@ -178,6 +191,12 @@ export class NavbarComponent {
 
   goHome(): void {
     this.router.navigate(['/']);
+  }
+
+  scrollToSection(section: string): void {
+    this.landingSection = section;
+    const el = document.getElementById(section);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   backToDestination(): void {

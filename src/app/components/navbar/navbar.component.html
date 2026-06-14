@@ -1,17 +1,52 @@
-<nav class="app-navbar" [class.app-navbar--compact]="isTripPlanner">
-  <!-- Left: Brand (hidden on trip planner - shown in sidebar instead) -->
+<nav class="app-navbar"
+     [class.app-navbar--landing]="isLanding"
+     [class.app-navbar--scrolled]="isLanding && scrolled"
+     [class.app-navbar--compact]="isTripPlanner"
+     [class.app-navbar--destination]="isDestination">
+
+  <!-- ===== LOGO ===== -->
   <div class="navbar-brand" *ngIf="!isTripPlanner" (click)="goHome()">
     <img src="assets/images/logo/wayraa_logo_notext.svg" alt="Wayraa" class="brand-logo-img">
-    <span class="brand-name">wayraa</span>
+    <span class="brand-name" *ngIf="!isDestination">wayraa</span>
   </div>
 
-  <!-- Center: Trip name (shown on trip planner) -->
+  <!-- ===== TRIP PLANNER: center trip name ===== -->
   <div class="navbar-trip-name" *ngIf="isTripPlanner">
     <span>{{ tripName || destinationName || 'Trip Planner' }}</span>
   </div>
 
-  <!-- Center: Split Search Bar (hidden on trip planner) -->
-  <div class="navbar-search" *ngIf="!isTripPlanner">
+  <!-- ===== LANDING: section links ===== -->
+  <ul class="nav-links" *ngIf="isLanding && !isTripPlanner">
+    <li><a (click)="scrollToSection('explore')" [class.active]="landingSection === 'explore'">Explore</a></li>
+    <li><a (click)="scrollToSection('features')" [class.active]="landingSection === 'features'">Features</a></li>
+    <li><a (click)="scrollToSection('community')" [class.active]="landingSection === 'community'">Community</a></li>
+    <li><a (click)="scrollToSection('pricing')" [class.active]="landingSection === 'pricing'">Pricing</a></li>
+  </ul>
+
+  <!-- ===== DESTINATION: single destination search ===== -->
+  <div class="navbar-search navbar-search--single" *ngIf="isDestination && !isTripPlanner">
+    <div class="single-search-bar">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" class="search-icon">
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="M21 21l-4.35-4.35"></path>
+      </svg>
+      <input type="text"
+             [value]="!searchActive ? destinationName : ''"
+             [placeholder]="destinationName || 'Search destination...'"
+             (input)="onSearchInput($event)"
+             (focus)="searchActive = true; showDropdown = predictions.length > 0"
+             (blur)="onBlur(); searchActive = false">
+    </div>
+    <div class="search-dropdown" *ngIf="showDropdown && predictions.length > 0">
+      <div class="dropdown-item" *ngFor="let prediction of predictions" (mousedown)="selectPlace(prediction)">
+        <span class="dropdown-main">{{ prediction.structured_formatting.main_text }}</span>
+        <span class="dropdown-secondary">{{ prediction.structured_formatting.secondary_text }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== APP: split search bar ===== -->
+  <div class="navbar-search" *ngIf="!isLanding && !isDestination && !isTripPlanner">
     <div class="split-search-bar">
       <div class="search-left">
         <span class="search-pin">
@@ -48,11 +83,11 @@
     </div>
   </div>
 
-  <!-- Right: Actions -->
+  <!-- ===== RIGHT ACTIONS ===== -->
   <div class="navbar-actions">
 
-    <!-- Active trip indicator (shown when on a destination page with an existing trip) -->
-    <div class="trip-indicator" *ngIf="existingTrip && !isTripPlanner"
+    <!-- Active trip indicator (destination page only) -->
+    <div class="trip-indicator" *ngIf="existingTrip && !isTripPlanner && !isLanding"
          (click)="navigateToTrip()"
          (mouseenter)="showTripTooltip = true"
          (mouseleave)="showTripTooltip = false">
@@ -67,51 +102,58 @@
       </div>
     </div>
 
-    <!-- Favourites -->
-    <button class="nav-action-btn" [class.with-label]="!isTripPlanner" (click)="onFavouritesClick()" title="Favourites">
+    <!-- Favourites (app mode only) -->
+    <button class="nav-action-btn" [class.with-label]="!isTripPlanner && !isLanding"
+            *ngIf="!isLanding"
+            (click)="onFavouritesClick()" title="Favourites">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
       </svg>
       <span *ngIf="!isTripPlanner">Favourites</span>
     </button>
 
-    <!-- Guest: Sign In -->
-    <ng-container *ngIf="!authService.isLoggedIn">
-      <button class="sign-in-btn" (click)="onSignIn()">Sign In</button>
-    </ng-container>
+    <!-- My Trips (app mode, logged in only) -->
+    <button class="nav-action-btn" [class.with-label]="!isTripPlanner && !isLanding"
+            *ngIf="!isLanding && authService.isLoggedIn"
+            (click)="onTripsClick()" title="My Trips">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+        <line x1="16" y1="2" x2="16" y2="6"></line>
+        <line x1="8" y1="2" x2="8" y2="6"></line>
+        <line x1="3" y1="10" x2="21" y2="10"></line>
+      </svg>
+      <span *ngIf="!isTripPlanner">My Trips</span>
+    </button>
 
-    <!-- Logged in: My Trips + profile dropdown -->
-    <ng-container *ngIf="authService.isLoggedIn">
-      <button class="nav-action-btn" [class.with-label]="!isTripPlanner" (click)="onTripsClick()" title="My Trips">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-          <line x1="16" y1="2" x2="16" y2="6"></line>
-          <line x1="8" y1="2" x2="8" y2="6"></line>
-          <line x1="3" y1="10" x2="21" y2="10"></line>
+    <!-- Landing Sign In / My Trips single button -->
+    <button class="sign-in-btn" *ngIf="isLanding" (click)="onSignIn()">
+      <span *ngIf="!authService.isLoggedIn">Sign In</span>
+      <span *ngIf="authService.isLoggedIn">My Trips</span>
+    </button>
+
+    <!-- App guest: Sign In -->
+    <button class="sign-in-btn" *ngIf="!isLanding && !authService.isLoggedIn" (click)="onSignIn()">Sign In</button>
+
+    <!-- App logged in: user avatar + dropdown -->
+    <div class="user-menu-wrapper" *ngIf="!isLanding && authService.isLoggedIn">
+      <button class="user-avatar-btn" (click)="toggleUserMenu()" (blur)="closeUserMenu()">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+          <circle cx="12" cy="7" r="4"></circle>
         </svg>
-        <span *ngIf="!isTripPlanner">My Trips</span>
       </button>
-
-      <div class="user-menu-wrapper">
-        <button class="user-avatar-btn" (click)="toggleUserMenu()" (blur)="closeUserMenu()">
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-        </button>
-        <div class="user-dropdown" *ngIf="showUserMenu">
-          <div class="user-dropdown-header">
-            <strong>{{ authService.currentUser?.name | wlName }}</strong>
-            <span>{{ authService.currentUser?.email }}</span>
-          </div>
-          <div class="user-dropdown-divider"></div>
-          <button class="user-dropdown-item" (mousedown)="onTripsClick()">My Trips</button>
-          <button class="user-dropdown-item" (mousedown)="onFavouritesClick()">Favourites</button>
-          <div class="user-dropdown-divider"></div>
-          <button class="user-dropdown-item logout" (mousedown)="logout()">Logout</button>
+      <div class="user-dropdown" *ngIf="showUserMenu">
+        <div class="user-dropdown-header">
+          <strong>{{ authService.currentUser?.name | wlName }}</strong>
+          <span>{{ authService.currentUser?.email }}</span>
         </div>
+        <div class="user-dropdown-divider"></div>
+        <button class="user-dropdown-item" (mousedown)="onTripsClick()">My Trips</button>
+        <button class="user-dropdown-item" (mousedown)="onFavouritesClick()">Favourites</button>
+        <div class="user-dropdown-divider"></div>
+        <button class="user-dropdown-item logout" (mousedown)="logout()">Logout</button>
       </div>
-    </ng-container>
+    </div>
 
   </div>
 </nav>
