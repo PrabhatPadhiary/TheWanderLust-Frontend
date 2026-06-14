@@ -3,10 +3,8 @@
   <div class="nav-container">
     <!-- Logo -->
     <div class="nav-logo" (click)="scrollTo('explore')">
-      <svg class="logo-icon" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
-      </svg>
-      <span class="logo-text">Wander<span class="logo-accent">Lust</span></span>
+      <img src="assets/images/logo/wayraa_logo_notext.svg" alt="Wayraa" class="nav-logo-img">
+      <span class="nav-logo-text">wayraa</span>
     </div>
 
     <!-- Center Nav Links -->
@@ -29,6 +27,13 @@
 
 <!-- ===== HERO SECTION ===== -->
 <section class="hero-section" id="explore">
+
+  <!-- Large watermark logo in background -->
+  <div class="hero-bg">
+    <div class="hero-gradient"></div>
+    <img src="assets/images/logo/wayraa_logo_notext.svg" alt="" class="hero-bg-logo" aria-hidden="true">
+  </div>
+
   <div class="hero-content">
     <h1 class="hero-title">
       Your next adventure<br>
@@ -97,10 +102,6 @@
     </div>
   </div>
 
-  <!-- Hero background visual -->
-  <div class="hero-bg">
-    <div class="hero-gradient"></div>
-  </div>
 </section>
 
 <!-- ===== HOW IT WORKS SECTION ===== -->
@@ -324,7 +325,10 @@
 <footer class="landing-footer">
   <div class="footer-container">
     <div class="footer-brand">
-      <span class="logo-text">Wander<span class="logo-accent">Lust</span></span>
+      <div class="footer-brand-row">
+        <img src="assets/images/logo/wayraa_logo_notext.svg" alt="Wayraa" class="footer-logo-img">
+        <span class="footer-logo-text">wayraa</span>
+      </div>
       <p>Plan your journeys, together.</p>
     </div>
     <div class="footer-copy">

@@ -42,20 +42,20 @@
   align-items: center;
   gap: 10px;
   cursor: pointer;
+  margin-left: -100px;
 
-  .logo-icon {
-    color: #2d5a27;
+  .nav-logo-img {
+    height: 67px;
+    width: auto;
+    display: block;
+    object-fit: contain;
   }
 
-  .logo-text {
+  .nav-logo-text {
+    font-family: 'Poppins', sans-serif;
     font-size: 1.5rem;
-    font-weight: 800;
-    color: #1a1a1a;
-    letter-spacing: -0.5px;
-
-    .logo-accent {
-      color: #2d5a27;
-    }
+    color: #02334a;
+    line-height: 1;
   }
 }
 
@@ -84,8 +84,8 @@
     }
 
     &.active {
-      color: #2d5a27;
-      background: rgba(45, 90, 39, 0.08);
+      color: #e85d04;
+      background: rgba(232, 93, 4, 0.08);
       font-weight: 600;
     }
   }
@@ -121,27 +121,45 @@
   justify-content: center;
   padding: 72px 60px 0;
   overflow: hidden;
+  isolation: isolate;
 }
 
 .hero-bg {
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
 
   .hero-gradient {
     position: absolute;
     inset: 0;
+    z-index: 0;
     background:
-      radial-gradient(ellipse at 20% 50%, rgba(45, 90, 39, 0.06) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 20%, rgba(45, 90, 39, 0.04) 0%, transparent 40%),
-      radial-gradient(ellipse at 50% 80%, rgba(255, 193, 7, 0.03) 0%, transparent 40%),
-      linear-gradient(180deg, #ffffff 0%, #fafffe 100%);
+      radial-gradient(ellipse at 20% 50%, rgba(232, 93, 4, 0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, rgba(245, 144, 0, 0.04) 0%, transparent 40%),
+      radial-gradient(ellipse at 50% 80%, rgba(2, 51, 74, 0.03) 0%, transparent 40%),
+      linear-gradient(180deg, #ffffff 0%, #fffbf8 100%);
   }
+}
+
+// Large watermark logo — centered behind hero text
+.hero-bg-logo {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 900px;
+  height: auto;
+  opacity: 0.1;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
 }
 
 .hero-content {
   text-align: center;
   max-width: 720px;
+  position: relative;
+  z-index: 1;
 }
 
 .hero-title {
@@ -153,7 +171,7 @@
   color: #1a1a1a;
 
   .hero-highlight {
-    background: linear-gradient(135deg, #2d5a27, #4caf50);
+    background: linear-gradient(135deg, #043247, #0685c0);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -188,8 +206,8 @@
   transition: all 0.3s ease;
 
   &:focus-within {
-    border-color: #2d5a27;
-    box-shadow: 0 12px 40px rgba(45, 90, 39, 0.1);
+    border-color: #e85d04;
+    box-shadow: 0 12px 40px rgba(232, 93, 4, 0.1);
     transform: translateY(-2px);
   }
 
@@ -215,7 +233,7 @@
   }
 
   .search-btn {
-    background: #2d5a27;
+    background: #e85d04;
     color: #fff;
     border: none;
     border-radius: 50px;
@@ -229,7 +247,7 @@
     flex-shrink: 0;
 
     &:hover {
-      background: #1e3d1a;
+      background: #c0392b;
       transform: translateY(-1px);
     }
   }
@@ -281,8 +299,8 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: #2d5a27;
-      background: rgba(45, 90, 39, 0.08);
+      color: #e85d04;
+      background: rgba(232, 93, 4, 0.08);
       padding: 4px 10px;
       border-radius: 12px;
       flex-shrink: 0;
@@ -355,7 +373,7 @@
     font-weight: 500;
 
     svg {
-      color: #2d5a27;
+      color: #e85d04;
     }
   }
 }
@@ -374,8 +392,8 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  color: #2d5a27;
-  background: rgba(45, 90, 39, 0.08);
+  color: #e85d04;
+  background: rgba(232, 93, 4, 0.08);
   padding: 6px 16px;
   border-radius: 50px;
   margin-bottom: 20px;
@@ -413,7 +431,7 @@
 // ===== HOW IT WORKS =====
 .how-it-works-section {
   padding: 80px 0;
-  background: linear-gradient(180deg, #f0f9f0 0%, #ffffff 100%);
+  background: linear-gradient(180deg, #fff8f3 0%, #ffffff 100%);
 }
 
 .steps-grid {
@@ -462,37 +480,37 @@
 
   // Step 1 — lightest / faded
   &.step-1 {
-    .step-number { background: rgba(45, 90, 39, 0.15); color: #2d5a27; }
+    .step-number { background: rgba(6, 133, 192, 0.12); color: #0685c0; }
     .step-icon {
-      background: linear-gradient(135deg, rgba(45, 90, 39, 0.3), rgba(76, 175, 80, 0.4));
-      box-shadow: 0 6px 16px rgba(45, 90, 39, 0.1);
+      background: linear-gradient(135deg, rgba(4, 50, 71, 0.2), rgba(6, 133, 192, 0.3));
+      box-shadow: 0 6px 16px rgba(6, 133, 192, 0.1);
     }
   }
 
   // Step 2 — medium light
   &.step-2 {
-    .step-number { background: rgba(45, 90, 39, 0.3); color: #fff; }
+    .step-number { background: rgba(6, 133, 192, 0.3); color: #fff; }
     .step-icon {
-      background: linear-gradient(135deg, rgba(45, 90, 39, 0.55), rgba(76, 175, 80, 0.65));
-      box-shadow: 0 8px 20px rgba(45, 90, 39, 0.15);
+      background: linear-gradient(135deg, rgba(4, 50, 71, 0.45), rgba(6, 133, 192, 0.55));
+      box-shadow: 0 8px 20px rgba(6, 133, 192, 0.15);
     }
   }
 
   // Step 3 — medium strong
   &.step-3 {
-    .step-number { background: rgba(45, 90, 39, 0.6); color: #fff; }
+    .step-number { background: rgba(6, 133, 192, 0.6); color: #fff; }
     .step-icon {
-      background: linear-gradient(135deg, rgba(45, 90, 39, 0.78), rgba(76, 175, 80, 0.85));
-      box-shadow: 0 8px 22px rgba(45, 90, 39, 0.2);
+      background: linear-gradient(135deg, rgba(4, 50, 71, 0.7), rgba(6, 133, 192, 0.82));
+      box-shadow: 0 8px 22px rgba(6, 133, 192, 0.2);
     }
   }
 
   // Step 4 — full intensity
   &.step-4 {
-    .step-number { background: #2d5a27; color: #fff; }
+    .step-number { background: #043247; color: #fff; }
     .step-icon {
-      background: linear-gradient(135deg, #2d5a27, #4caf50);
-      box-shadow: 0 10px 28px rgba(45, 90, 39, 0.3);
+      background: linear-gradient(135deg, #043247, #0685c0);
+      box-shadow: 0 10px 28px rgba(6, 133, 192, 0.35);
     }
   }
 
@@ -517,8 +535,8 @@
   height: 2px;
   background: repeating-linear-gradient(
     90deg,
-    #4caf50 0px,
-    #4caf50 6px,
+    #0685c0 0px,
+    #0685c0 6px,
     transparent 6px,
     transparent 12px
   );
@@ -618,19 +636,19 @@
   &:hover {
     transform: translateY(-4px);
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.06);
-    border-color: rgba(45, 90, 39, 0.15);
+    border-color: rgba(232, 93, 4, 0.15);
   }
 
   .feature-icon {
     width: 52px;
     height: 52px;
     border-radius: 14px;
-    background: rgba(45, 90, 39, 0.08);
+    background: rgba(232, 93, 4, 0.08);
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 18px;
-    color: #2d5a27;
+    color: #e85d04;
     transition: all 0.3s ease;
 
     &.icon-blue {
@@ -654,8 +672,8 @@
       color: #00897b;
     }
     &.icon-green {
-      background: rgba(76, 175, 80, 0.1);
-      color: #2e7d32;
+      background: rgba(232, 93, 4, 0.08);
+      color: #e85d04;
     }
   }
 
@@ -734,8 +752,8 @@
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.8px;
-      color: #2d5a27;
-      background: rgba(45, 90, 39, 0.08);
+      color: #e85d04;
+      background: rgba(232, 93, 4, 0.08);
       padding: 4px 10px;
       border-radius: 10px;
       margin-bottom: 12px;
@@ -810,20 +828,32 @@
 .footer-brand {
   margin-bottom: 20px;
 
-  .logo-text {
-    font-size: 1.4rem;
-    font-weight: 800;
-    color: #fff;
+  .footer-brand-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
 
-    .logo-accent {
-      color: #4caf50;
-    }
+  .footer-logo-img {
+    height: 67px;
+    width: auto;
+    display: block;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+  }
+
+  .footer-logo-text {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.5rem;
+    color: #fff;
+    line-height: 1;
   }
 
   p {
     color: #888;
     font-size: 0.85rem;
-    margin: 8px 0 0;
+    margin: 0;
   }
 }
 
@@ -869,8 +899,8 @@
     height: 30px;
     background: repeating-linear-gradient(
       180deg,
-      #4caf50 0px,
-      #4caf50 6px,
+      #0685c0 0px,
+      #0685c0 6px,
       transparent 6px,
       transparent 12px
     );

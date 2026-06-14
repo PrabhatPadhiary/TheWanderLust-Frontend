@@ -1,0 +1,30 @@
+<svg viewBox="100 100 480 480" role="img" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <clipPath id="circleClip">
+    <circle cx="340" cy="340" r="240"/>
+  </clipPath>
+</defs>
+<g clip-path="url(#circleClip)">
+  <path d="M 105,340 A 235,235 0 0,1 575,340" fill="none" stroke="#c0392b" stroke-width="8" stroke-linecap="round"/>
+  <path d="M 124,340 A 216,216 0 0,1 556,340" fill="none" stroke="#c73d28" stroke-width="8" stroke-linecap="round"/>
+  <path d="M 145,340 A 195,195 0 0,1 535,340" fill="none" stroke="#ce4225" stroke-width="8" stroke-linecap="round"/>
+  <path d="M 168,340 A 172,172 0 0,1 512,340" fill="none" stroke="#d54820" stroke-width="7.3" stroke-linecap="round"/>
+  <path d="M 194,340 A 146,146 0 0,1 486,340" fill="none" stroke="#dc501a" stroke-width="7.3" stroke-linecap="round"/>
+  <path d="M 222,340 A 118,118 0 0,1 458,340" fill="none" stroke="#e35a14" stroke-width="6.7" stroke-linecap="round"/>
+  <path d="M 252,340 A 88,88 0 0,1 428,340" fill="none" stroke="#ea660e" stroke-width="6.7" stroke-linecap="round"/>
+  <path d="M 282,340 A 58,58 0 0,1 398,340" fill="none" stroke="#f07808" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 306,340 A 34,34 0 0,1 374,340" fill="none" stroke="#f59000" stroke-width="5.3" stroke-linecap="round"/>
+  <path d="M 294,340 A 46,46 0 0,1 386,340 Z" fill="#e85d04"/>
+  <ellipse cx="340" cy="340" rx="32" ry="16" fill="#f4a020"/>
+  <path d="M 108,352 Q 160,342 214,354 Q 268,366 322,352 Q 376,338 430,352 Q 484,366 538,354 Q 562,348 572,351" fill="none" stroke="#5bc8e8" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 104,370 Q 158,358 214,372 Q 270,386 326,370 Q 382,354 436,370 Q 488,384 540,371 Q 564,364 572,367" fill="none" stroke="#4dbedd" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 100,390 Q 156,376 214,391 Q 272,406 330,390 Q 388,374 442,390 Q 492,404 540,391 Q 562,384 572,387" fill="none" stroke="#3db3d2" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 96,412 Q 154,396 214,412 Q 274,428 332,411 Q 390,394 446,411 Q 494,424 540,413 Q 562,405 572,408" fill="none" stroke="#2ea6c6" stroke-width="4.3" stroke-linecap="round"/>
+  <path d="M 96,436 Q 154,418 216,435 Q 278,452 336,435 Q 394,418 448,435 Q 496,448 540,437 Q 562,429 572,432" fill="none" stroke="#2097b8" stroke-width="4.3" stroke-linecap="round"/>
+  <path d="M 98,462 Q 156,442 220,460 Q 284,478 342,460 Q 400,442 452,459 Q 498,473 540,462 Q 562,454 572,457" fill="none" stroke="#1688aa" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M 104,490 Q 162,468 228,487 Q 294,506 352,487 Q 410,468 458,486 Q 500,500 540,489 Q 562,482 572,484" fill="none" stroke="#0e7898" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M 114,520 Q 172,496 240,516 Q 308,536 362,516 Q 418,496 464,514 Q 504,528 540,518 Q 562,510 572,513" fill="none" stroke="#085e7a" stroke-width="4.8" stroke-linecap="round"/>
+  <path d="M 130,552 Q 188,526 258,548 Q 328,570 376,548 Q 424,526 468,546 Q 506,560 540,550 Q 562,542 572,545" fill="none" stroke="#054a62" stroke-width="4.8" stroke-linecap="round"/>
+  <path d="M 154,578 Q 212,550 282,574 Q 352,598 394,574 Q 434,550 472,570 Q 508,584 540,575" fill="none" stroke="#02334a" stroke-width="5.1" stroke-linecap="round"/>
+</g>
+</svg>

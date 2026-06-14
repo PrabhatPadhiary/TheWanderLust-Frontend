@@ -1,10 +1,8 @@
 <nav class="app-navbar" [class.app-navbar--compact]="isTripPlanner">
   <!-- Left: Brand (hidden on trip planner - shown in sidebar instead) -->
   <div class="navbar-brand" *ngIf="!isTripPlanner" (click)="goHome()">
-    <svg class="brand-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
-    </svg>
-    <span class="brand-name">Wander<span class="brand-accent">Lust</span></span>
+    <img src="assets/images/logo/wayraa_logo_notext.svg" alt="Wayraa" class="brand-logo-img">
+    <span class="brand-name">wayraa</span>
   </div>
 
   <!-- Center: Trip name (shown on trip planner) -->

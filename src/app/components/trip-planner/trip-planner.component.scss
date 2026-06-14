@@ -1787,20 +1787,24 @@
 .sidebar-brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   padding: 4px 12px;
   margin-bottom: 24px;
   cursor: pointer;
 }
 
-.sidebar-brand-name {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #1a1a1a;
+.sidebar-logo-img {
+  height: 67px;
+  width: auto;
+  display: block;
+  object-fit: contain;
 }
 
-.sidebar-brand-accent {
-  color: #2d5a27;
+.sidebar-logo-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  color: #02334a;
+  line-height: 1;
 }
 
 // ===== PLACE REMOVE BUTTON =====

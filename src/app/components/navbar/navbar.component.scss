@@ -4,17 +4,17 @@
   left: 0;
   right: 0;
   height: 64px;
-  background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 50%, #fff8e1 100%);
-  border-bottom: 1px solid #ebebeb;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.36);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
   display: flex;
   align-items: center;
   padding: 0 40px;
   z-index: 1000;
   font-family: 'Poppins', sans-serif;
 
-  .brand-icon { color: #4caf50; }
-  .brand-name { color: #1a1a1a; .brand-accent { color: #4caf50; } }
   .nav-action-btn { color: #555; &:hover { background: rgba(0,0,0,0.05); color: #1a1a1a; } }
   .sign-in-btn { background: #1a1a1a; color: #fff; &:hover { background: #333; } }
   .user-avatar-btn { border-color: #1a1a1a; }
@@ -33,26 +33,22 @@
 .navbar-brand {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   cursor: pointer;
   flex-shrink: 0;
 
-  .brand-icon {
-    color: #4caf50;
-    flex-shrink: 0;
+  .brand-logo-img {
+    height: 67px;
+    width: auto;
+    display: block;
+    object-fit: contain;
   }
 
   .brand-name {
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: #1a1a1a;
-    letter-spacing: -0.5px;
     font-family: 'Poppins', sans-serif;
+    font-size: 1.5rem;
+    color: #02334a;
     line-height: 1;
-
-    .brand-accent {
-      color: #4caf50;
-    }
   }
 }
 
