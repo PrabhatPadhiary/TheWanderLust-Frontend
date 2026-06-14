@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { LandingpageComponent } from './components/landingpage/landingpage.component';
 import { LandingPageV2Component } from './components/landing-page-v2/landing-page-v2.component';
 import { DestinationComponent } from './components/destination/destination.component';
 import { TripPlannerComponent } from './components/trip-planner/trip-planner.component';
@@ -9,9 +8,9 @@ import { JoinTripComponent } from './components/join-trip/join-trip.component';
 import { MyTripsComponent } from './components/my-trips/my-trips.component';
 
 const routes: Routes = [
-  { path: '', component: LandingpageComponent },
+  { path: '', component: LandingPageV2Component },
+  { path: 'home', component: LandingPageV2Component },
   { path: 'v2', component: LandingPageV2Component },
-  { path: 'home', component: LandingpageComponent },
   { path: 'destination/:placeId', component: DestinationComponent },
   { path: 'trip-planner', component: TripPlannerComponent },
   { path: 'trip-planner/:tripId', component: TripPlannerComponent },

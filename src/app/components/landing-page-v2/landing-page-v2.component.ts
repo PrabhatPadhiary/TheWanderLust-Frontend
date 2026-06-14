@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../services/auth.service';
@@ -14,7 +14,8 @@ declare var google: any;
   styleUrls: ['./landing-page-v2.component.scss'],
   standalone: false
 })
-export class LandingPageV2Component implements OnInit {
+export class LandingPageV2Component implements OnInit, AfterViewInit {
+  @ViewChild('demoVideo') demoVideo!: ElementRef<HTMLVideoElement>;
   navScrolled = false;
   activeSection = 'explore';
 
@@ -34,6 +35,12 @@ export class LandingPageV2Component implements OnInit {
 
   ngOnInit(): void {
     this.initPlacesAutocomplete();
+  }
+
+  ngAfterViewInit(): void {
+    if (this.demoVideo?.nativeElement) {
+      this.demoVideo.nativeElement.playbackRate = 0.75;
+    }
   }
 
   @HostListener('window:scroll')

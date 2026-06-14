@@ -6,7 +6,6 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { LandingpageComponent } from './components/landingpage/landingpage.component';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -48,7 +47,6 @@ import { LandingPageV2Component } from './components/landing-page-v2/landing-pag
 @NgModule({
   declarations: [
     AppComponent,
-    LandingpageComponent,
     DestinationComponent,
     PlaceDetailPanelComponent,
     AuthGateModalComponent,
