@@ -1,0 +1,73 @@
+<app-navbar [isLanding]="true"></app-navbar>
+
+<!-- HERO -->
+<div class="pricing-hero">
+  <div class="pricing-hero-inner">
+    <div class="pricing-label">✦ Pricing</div>
+    <h1>Simple, transparent <span class="pricing-accent">pricing</span></h1>
+    <p>Start free. Upgrade when you need more. No hidden fees, ever.</p>
+
+    <!-- Billing toggle -->
+    <div class="billing-toggle">
+      <button [class.active]="billing === 'monthly'" (click)="billing = 'monthly'">Monthly</button>
+      <button [class.active]="billing === 'yearly'"  (click)="billing = 'yearly'">
+        Yearly
+        <span class="save-badge">Save 33%</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- PLANS -->
+<div class="pricing-plans">
+  <div class="plan-card" *ngFor="let p of plans" [class.plan-card--featured]="p.badge">
+    <div class="plan-badge" *ngIf="p.badge">{{ p.badge }}</div>
+    <div class="plan-name">{{ p.name }}</div>
+    <div class="plan-price">
+      <span class="price-num">{{ getPrice(p) }}</span>
+      <span class="price-per" *ngIf="p.price.monthly > 0">/mo</span>
+    </div>
+    <p class="plan-desc">{{ p.description }}</p>
+
+    <button class="plan-cta"
+            [class.plan-cta--primary]="p.ctaStyle === 'primary'"
+            [class.plan-cta--outline]="p.ctaStyle === 'outline'"
+            (click)="onCta(p)">
+      {{ p.cta }}
+    </button>
+
+    <div class="plan-divider"></div>
+
+    <ul class="plan-features">
+      <li *ngFor="let f of p.features" [class.included]="f.included" [class.excluded]="!f.included">
+        <svg *ngIf="f.included" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+        <svg *ngIf="!f.included" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+        {{ f.text }}
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- FAQ -->
+<div class="pricing-faq">
+  <div class="pricing-faq-inner">
+    <h2>Frequently asked questions</h2>
+    <div class="faq-list">
+      <div class="faq-item" *ngFor="let f of faqs; let i = index" (click)="toggleFaq(i)">
+        <div class="faq-q">
+          <span>{{ f.q }}</span>
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+               [style.transform]="openFaq === i ? 'rotate(180deg)' : 'rotate(0deg)'"
+               style="transition: transform 0.2s; flex-shrink:0">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </div>
+        <div class="faq-a" [class.open]="openFaq === i">{{ f.a }}</div>
+      </div>
+    </div>
+  </div>
+</div>

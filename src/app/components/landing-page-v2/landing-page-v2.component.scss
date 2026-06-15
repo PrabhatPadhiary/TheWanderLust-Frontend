@@ -704,6 +704,33 @@
   }
 }
 
+// ===== COMMUNITY CTA ROW =====
+.community-cta-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+.community-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 32px;
+  background: #043247;
+  color: #fff;
+  border-radius: 50px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.2s;
+
+  &:hover {
+    background: #065a7e;
+    transform: translateY(-2px);
+  }
+}
+
 // ===== FOOTER =====
 .landing-footer {
   padding: 60px 0 40px;

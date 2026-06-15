@@ -15,13 +15,18 @@
     <span>{{ tripName || destinationName || 'Trip Planner' }}</span>
   </div>
 
-  <!-- ===== LANDING: section links ===== -->
-  <ul class="nav-links" *ngIf="isLanding && !isTripPlanner">
-    <li><a (click)="scrollToSection('explore')" [class.active]="landingSection === 'explore'">Explore</a></li>
-    <li><a (click)="scrollToSection('features')" [class.active]="landingSection === 'features'">Features</a></li>
-    <li><a (click)="scrollToSection('community')" [class.active]="landingSection === 'community'">Community</a></li>
-    <li><a (click)="scrollToSection('pricing')" [class.active]="landingSection === 'pricing'">Pricing</a></li>
-  </ul>
+  <!-- ===== LANDING: section links with sliding pill ===== -->
+  <div class="nav-links" *ngIf="isLanding && !isTripPlanner">
+    <div class="nav-pill-track">
+      <div class="nav-pill-bg"
+           [style.transform]="pillTransform"
+           [style.transition]="pillReady ? 'transform 0.28s cubic-bezier(0.4,0,0.2,1)' : 'none'"></div>
+      <button class="nav-link" [class.active]="navIndex === 0" (click)="scrollToSection('explore')">Explore</button>
+      <a      class="nav-link" [class.active]="navIndex === 1" routerLink="/features">Features</a>
+      <a      class="nav-link" [class.active]="navIndex === 2" routerLink="/community">Community</a>
+      <a      class="nav-link" [class.active]="navIndex === 3" routerLink="/pricing">Pricing</a>
+    </div>
+  </div>
 
   <!-- ===== DESTINATION: single destination search ===== -->
   <div class="navbar-search navbar-search--single" *ngIf="isDestination && !isTripPlanner">

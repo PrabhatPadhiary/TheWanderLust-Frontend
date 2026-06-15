@@ -1,10 +1,10 @@
-import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, EventEmitter, HostListener, Input, OnInit, OnDestroy, Output, ElementRef, ViewChild, AfterViewInit, QueryList, ViewChildren } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../services/auth.service';
 import { AuthGateModalComponent } from '../auth-gate-modal/auth-gate-modal.component';
 import { TripResponse } from '../../services/trip.service';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
 
@@ -16,7 +16,7 @@ declare var google: any;
   styleUrls: ['./navbar.component.scss'],
   standalone: false
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() destinationName: string = '';
   @Input() tripName: string = '';
   @Input() existingTrip: TripResponse | null = null;
@@ -34,11 +34,19 @@ export class NavbarComponent implements OnInit {
   searchActive = false;
   showTripTooltip = false;
   scrolled = false;
-  landingSection = 'explore';
+  navIndex = 0;
+  pillReady = false; // controls transition — off until after first paint
   private searchSubject = new Subject<string>();
   private autocompleteService: any;
   private blurTimeout: any;
   private initialized = false;
+  private routerSub!: Subscription;
+
+  private readonly navRoutes = ['explore', 'features', 'community', 'pricing'];
+
+  get pillTransform(): string {
+    return `translateX(${this.navIndex * 110}px)`;
+  }
 
   constructor(
     public authService: AuthService,
@@ -47,7 +55,33 @@ export class NavbarComponent implements OnInit {
     private toastr: ToastrService
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.routerSub = this.router.events.pipe(
+      filter(e => e instanceof NavigationEnd)
+    ).subscribe((e: any) => {
+      this.updateIndex(e.urlAfterRedirects || e.url);
+    });
+    this.updateIndex(this.router.url);
+  }
+
+  ngAfterViewInit(): void {
+    // Enable transition only after first paint so the pill
+    // doesn't animate from Explore on every page load
+    requestAnimationFrame(() => {
+      this.pillReady = true;
+    });
+  }
+
+  private updateIndex(url: string): void {
+    if (url.startsWith('/features'))       this.navIndex = 1;
+    else if (url.startsWith('/community')) this.navIndex = 2;
+    else if (url.startsWith('/pricing'))   this.navIndex = 3;
+    else                                   this.navIndex = 0;
+  }
+
+  ngOnDestroy(): void {
+    this.routerSub?.unsubscribe();
+  }
 
   @HostListener('window:scroll')
   onWindowScroll(): void {
@@ -194,9 +228,13 @@ export class NavbarComponent implements OnInit {
   }
 
   scrollToSection(section: string): void {
-    this.landingSection = section;
+    this.navIndex = 0; // Explore
     const el = document.getElementById(section);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      this.router.navigate(['/']);
+    }
   }
 
   backToDestination(): void {
