@@ -7,6 +7,7 @@ import { FavouritesComponent } from './components/favourites/favourites.componen
 import { JoinTripComponent } from './components/join-trip/join-trip.component';
 import { MyTripsComponent } from './components/my-trips/my-trips.component';
 import { CommunityComponent } from './components/community/community.component';
+import { WriteJournalComponent } from './components/community/write-journal/write-journal.component';
 import { FeaturesComponent } from './components/features/features.component';
 import { PricingComponent } from './components/pricing/pricing.component';
 
@@ -21,6 +22,7 @@ const routes: Routes = [
   { path: 'favourites', component: FavouritesComponent },
   { path: 'my-trips', component: MyTripsComponent },
   { path: 'community', component: CommunityComponent },
+  { path: 'community/write', component: WriteJournalComponent },
   { path: 'features', component: FeaturesComponent },
   { path: 'pricing', component: PricingComponent },
 ];

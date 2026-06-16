@@ -1,0 +1,223 @@
+<div class="write-journal-page">
+
+  <!-- Header -->
+  <div class="wj-header">
+    <button class="wj-back-btn" (click)="router.navigate(['/community'])">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 12H5M12 19l-7-7 7-7"/>
+      </svg>
+    </button>
+    <h1>Write a Journal</h1>
+    <div class="wj-header-actions">
+      <button class="wj-draft-btn" (click)="onSaveDraft()" [disabled]="isSubmitting">Save Draft</button>
+      <button class="wj-publish-btn" (click)="onPublish()" [disabled]="isSubmitting">
+        <span class="wj-spinner" *ngIf="isSubmitting"></span>
+        <span *ngIf="!isSubmitting">Publish</span>
+        <span *ngIf="isSubmitting">Publishing...</span>
+      </button>
+    </div>
+  </div>
+  
+  <div class="wj-content">
+
+    <!-- ===== TRIP SELECTOR (Step 0) ===== -->
+    <div class="wj-trip-selector">
+      <div class="wj-trip-selector-inner">
+        <div class="wj-trip-selector-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+          </svg>
+        </div>
+        <div class="wj-trip-selector-text">
+          <strong>Link to a trip?</strong>
+          <span>Auto-fill details from your past trips</span>
+        </div>
+        <div class="wj-custom-select" (click)="tripDropdownOpen = !tripDropdownOpen" (blur)="tripDropdownOpen = false" tabindex="0">
+          <div class="wj-custom-select-display">
+            <span>{{ selectedTrip ? (selectedTrip.name || selectedTrip.primaryDestination || 'Untitled Trip') : 'Start fresh (no trip)' }}</span>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </div>
+          <div class="wj-custom-select-options" *ngIf="tripDropdownOpen">
+            <div class="wj-option" [class.selected]="!selectedTrip" (mousedown)="onTripSelect(''); tripDropdownOpen = false">
+              <span class="wj-option-text">Start fresh (no trip)</span>
+            </div>
+            <div class="wj-option" *ngFor="let trip of userTrips"
+                 [class.selected]="selectedTrip?.id === trip.id"
+                 (mousedown)="onTripSelect(trip.id); tripDropdownOpen = false">
+              <span class="wj-option-text">{{ trip.name || trip.primaryDestination || 'Untitled Trip' }}</span>
+              <span class="wj-option-meta" *ngIf="trip.startDate">{{ trip.startDate | date:'MMM yyyy' }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== VISIBILITY ===== -->
+    <div class="wj-visibility-bar">
+      <label>Post as</label>
+      <div class="wj-visibility-toggle">
+        <button [class.active]="visibility === 'public'" (click)="visibility = 'public'">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+          Public
+        </button>
+        <button [class.active]="visibility === 'private'" (click)="visibility = 'private'">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          Private
+        </button>
+      </div>
+    </div>
+
+    <!-- ===== SECTION 1: Trip Details ===== -->
+    <section class="wj-section">
+      <div class="wj-section-header">
+        <span class="wj-section-num">1</span>
+        <h2>Trip Details</h2>
+      </div>
+
+      <div class="wj-form-grid">
+        <div class="wj-field full-width">
+          <label>Destination</label>
+          <input type="text" [(ngModel)]="destination" placeholder="Where did you go?" [disabled]="tripLinked">
+        </div>
+        <div class="wj-field">
+          <label>From</label>
+          <input type="date" [(ngModel)]="startDate" [disabled]="tripLinked">
+        </div>
+        <div class="wj-field">
+          <label>To</label>
+          <input type="date" [(ngModel)]="endDate" [disabled]="tripLinked">
+        </div>
+        <div class="wj-field">
+          <label>Travelers</label>
+          <input type="number" [(ngModel)]="travelersCount" min="1" [disabled]="tripLinked">
+        </div>
+        <div class="wj-field">
+          <label>Budget ({{ currency }})</label>
+          <input type="number" [(ngModel)]="budget" placeholder="Optional" [disabled]="tripLinked">
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 2: Your Story ===== -->
+    <section class="wj-section">
+      <div class="wj-section-header">
+        <span class="wj-section-num">2</span>
+        <h2>Your Story</h2>
+      </div>
+
+      <div class="wj-story-editor">
+        <input type="text" class="wj-title-input" [(ngModel)]="journalTitle"
+               placeholder="Give your journal a title...">
+        <textarea class="wj-body-input" [(ngModel)]="journalBody"
+                  placeholder="Write about your experience — the highlights, surprises, what you loved, what you'd skip..."
+                  rows="10"></textarea>
+      </div>
+
+      <!-- Story Photos -->
+      <div class="wj-story-photos">
+        <label>Photos</label>
+        <div class="wj-photos-grid">
+          <div class="wj-photo-thumb" *ngFor="let photo of storyPhotos; let i = index">
+            <img [src]="photo.preview" alt="Story photo">
+            <button class="wj-photo-remove" (click)="removeStoryPhoto(i)">✕</button>
+          </div>
+          <div class="wj-photo-add" (click)="storyPhotoInput.click()">
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            <span>Add photos</span>
+            <input #storyPhotoInput type="file" accept="image/*" multiple hidden (change)="onStoryPhotoSelect($event)">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 3: Tag Places ===== -->
+    <section class="wj-section">
+      <div class="wj-section-header">
+        <span class="wj-section-num">3</span>
+        <h2>Tag Places You Visited</h2>
+      </div>
+
+      <div class="wj-places-list" *ngIf="places.length > 0">
+        <div class="wj-place-chip" *ngFor="let place of places; let i = index"
+             [class.selected]="place.selected" (click)="togglePlace(i)">
+          <span class="wj-place-cat">
+            <svg *ngIf="getCategoryIcon(place.category) === 'food'" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
+            </svg>
+            <svg *ngIf="getCategoryIcon(place.category) === 'stay'" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <svg *ngIf="getCategoryIcon(place.category) === 'attraction'" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+            <svg *ngIf="getCategoryIcon(place.category) === 'other'" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+            </svg>
+          </span>
+          <span>{{ place.name }}</span>
+          <button class="wj-place-remove" (click)="removePlace(i); $event.stopPropagation()">✕</button>
+        </div>
+      </div>
+
+      <div class="wj-places-empty" *ngIf="places.length === 0 && !tripLinked">
+        <p>No places yet. Add places you visited below.</p>
+      </div>
+
+      <div class="wj-add-place-row">
+        <input type="text" [(ngModel)]="manualPlaceInput" placeholder="Add a place..."
+               (keyup.enter)="addManualPlace()">
+        <button class="wj-add-place-btn" (click)="addManualPlace()">+ Add</button>
+      </div>
+    </section>
+
+    <!-- ===== SECTION 4: Extras ===== -->
+    <section class="wj-section">
+      <div class="wj-section-header">
+        <span class="wj-section-num">4</span>
+        <h2>Extras</h2>
+      </div>
+
+      <!-- Trip Vibe -->
+      <div class="wj-field-group">
+        <label>Trip Vibe</label>
+        <div class="wj-vibes">
+          <button class="wj-vibe-pill" *ngFor="let vibe of vibeOptions"
+                  [class.selected]="selectedVibes.includes(vibe)"
+                  (click)="toggleVibe(vibe)">
+            {{ vibe }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Pro Tips -->
+      <div class="wj-field-group">
+        <label>Pro Tips</label>
+        <textarea class="wj-protips-input" [(ngModel)]="proTips"
+                  placeholder="Any tips for future travelers? (e.g., 'Book 2 weeks in advance', 'Skip the tourist bus')"
+                  rows="4"></textarea>
+      </div>
+    </section>
+
+    <!-- ===== BOTTOM ACTIONS ===== -->
+    <div class="wj-bottom-actions">
+      <button class="wj-draft-btn" (click)="onSaveDraft()" [disabled]="isSubmitting">Save as Draft</button>
+      <button class="wj-publish-btn" (click)="onPublish()" [disabled]="isSubmitting">
+        <span class="wj-spinner" *ngIf="isSubmitting"></span>
+        <svg *ngIf="!isSubmitting" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+        </svg>
+        <span *ngIf="!isSubmitting">Publish Journal</span>
+        <span *ngIf="isSubmitting">Publishing...</span>
+      </button>
+    </div>
+
+  </div>
+</div>

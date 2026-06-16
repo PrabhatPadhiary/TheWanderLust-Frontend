@@ -44,6 +44,7 @@ import { AddChecklistItemModalComponent } from './components/trip-planner/checkl
 import { AddExpenseModalComponent } from './components/trip-planner/budget-tab/add-expense-modal/add-expense-modal.component';
 import { LandingPageV2Component } from './components/landing-page-v2/landing-page-v2.component';
 import { CommunityComponent } from './components/community/community.component';
+import { WriteJournalComponent } from './components/community/write-journal/write-journal.component';
 import { FeaturesComponent } from './components/features/features.component';
 import { PricingComponent } from './components/pricing/pricing.component';
 
@@ -79,6 +80,7 @@ import { PricingComponent } from './components/pricing/pricing.component';
     AddChecklistItemModalComponent,
     LandingPageV2Component,
     CommunityComponent,
+    WriteJournalComponent,
     FeaturesComponent,
     PricingComponent,
   ],

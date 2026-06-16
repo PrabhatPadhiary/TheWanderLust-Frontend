@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../services/auth.service';
+import { AuthGateModalComponent } from '../auth-gate-modal/auth-gate-modal.component';
+import { JournalService, JournalFeedItem } from '../../services/journal.service';
 
 export interface TripJournal {
   id: string;
@@ -65,68 +68,8 @@ export class CommunityComponent implements OnInit {
     { value: '3.2K',   label: 'Questions Answered' },
   ];
 
-  journals: TripJournal[] = [
-    {
-      id: '1',
-      authorName: 'Rahul Menon',
-      authorInitial: 'R',
-      authorColor: '#e85d04',
-      authorLocation: 'Mumbai',
-      tripCount: 12,
-      destinationName: 'Wayanad, Kerala',
-      destinationCountry: 'India',
-      month: 'June 2024',
-      title: 'Monsoon magic in Wayanad — the waterfalls were unreal',
-      excerpt: 'Went in with zero expectations during off-season and came back completely blown away. Soochipara falls was at full force, the tea estates were misty and green, and we barely met another tourist. Best decision we made.',
-      tags: ['Adventure', 'Nature'],
-      placesMentioned: ['Sythil Village Resort', 'Soochipara Falls', 'Pepper Vine Restaurant'],
-      likes: 142,
-      comments: 28,
-      saves: 0,
-      tripBadge: '5 day trip',
-      imageUrl: 'assets/images/background/card-bg1.jpg'
-    },
-    {
-      id: '2',
-      authorName: 'Priya Sharma',
-      authorInitial: 'P',
-      authorColor: '#2563eb',
-      authorLocation: 'Bangalore',
-      tripCount: 7,
-      destinationName: 'Dubai, UAE',
-      destinationCountry: 'UAE',
-      month: 'May 2024',
-      title: 'First timer in Dubai — what I wish I knew beforehand',
-      excerpt: 'Booked on a whim and almost got overwhelmed by the options. The desert safari at sunset was the highlight. Skip the mall and walk the old spice souk instead — completely different vibe.',
-      tags: ['City', 'Food'],
-      placesMentioned: ['Spice Souk', 'Al Fahidi Fort', 'Ravi Restaurant'],
-      likes: 89,
-      comments: 15,
-      saves: 0,
-      tripBadge: '4p',
-      imageUrl: 'assets/images/background/card-bg2.jpg'
-    },
-    {
-      id: '3',
-      authorName: 'Ananya Roy',
-      authorInitial: 'A',
-      authorColor: '#16a34a',
-      authorLocation: 'Delhi',
-      tripCount: 19,
-      destinationName: 'Coorg, Karnataka',
-      destinationCountry: 'India',
-      month: 'April 2024',
-      title: 'A weekend in Coorg with the family — coffee trails and cozy stays',
-      excerpt: 'Perfect for a 2-night getaway. We did a coffee plantation walk in the morning, sat by the Cauvery in the evening. Kids loved it. Booked everything through Wayraa and saved a ton of planning time.',
-      tags: ['Family', 'Nature'],
-      placesMentioned: ['Dubare Elephant Camp', 'Madikeri Fort', 'Abbey Falls'],
-      likes: 211,
-      comments: 41,
-      saves: 0,
-      tripBadge: null,
-      imageUrl: 'assets/images/background/card-bg3.jpg'
-    }
-  ];
+  journals: TripJournal[] = [];
+  feedLoading = true;
 
   questions: CommunityQuestion[] = [
     { id: '1', text: 'Is Wayanad worth visiting in June during monsoon?', destination: 'Wayanad', answers: 14, tag: 'Wayanad' },
@@ -151,13 +94,97 @@ export class CommunityComponent implements OnInit {
   ];
 
   newQuestion = '';
+  showAuthBlur = false;
 
   constructor(
     public authService: AuthService,
-    private router: Router
+    private router: Router,
+    private dialog: MatDialog,
+    private journalService: JournalService
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.checkAuth();
+    this.loadFeed();
+  }
+
+  private loadFeed(): void {
+    this.feedLoading = true;
+    this.journalService.getFeed().subscribe({
+      next: (items) => {
+        this.journals = items.map(item => this.mapFeedItemToJournal(item));
+        this.feedLoading = false;
+      },
+      error: () => { this.feedLoading = false; }
+    });
+  }
+
+  private mapFeedItemToJournal(item: JournalFeedItem): TripJournal {
+    const authorName = item.author?.name || 'Anonymous';
+    const colors = ['#e85d04', '#2563eb', '#16a34a', '#7c3aed', '#db2777', '#0891b2'];
+    const colorIndex = authorName.charCodeAt(0) % colors.length;
+
+    // Calculate trip duration badge
+    let tripBadge: string | null = null;
+    if (item.startDate && item.endDate) {
+      const days = Math.round((new Date(item.endDate).getTime() - new Date(item.startDate).getTime()) / (1000 * 60 * 60 * 24));
+      if (days > 0) tripBadge = `${days} day trip`;
+    }
+
+    // Format month
+    const publishedDate = item.publishedAt ? new Date(item.publishedAt) : new Date(item.createdAt);
+    const month = publishedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+    return {
+      id: item.id,
+      authorName: authorName,
+      authorInitial: authorName.charAt(0).toUpperCase(),
+      authorColor: colors[colorIndex],
+      authorLocation: '',
+      tripCount: 0,
+      destinationName: item.destination,
+      destinationCountry: '',
+      month: month,
+      title: item.title,
+      excerpt: item.body.length > 200 ? item.body.substring(0, 200) + '...' : item.body,
+      tags: [],
+      placesMentioned: item.places?.map(p => p.placeName) || [],
+      likes: item.likesCount || 0,
+      comments: item.commentsCount || 0,
+      saves: 0,
+      tripBadge: tripBadge,
+      imageUrl: item.photos && item.photos.length > 0 ? item.photos[0].url : null
+    };
+  }
+
+  private checkAuth(): void {
+    if (!this.authService.isLoggedIn) {
+      this.showAuthBlur = true;
+      const dialogRef = this.dialog.open(AuthGateModalComponent, {
+        panelClass: 'auth-gate-dialog',
+        maxWidth: '500px',
+        width: '500px',
+        disableClose: true
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result?.type === 'authenticated') {
+          this.showAuthBlur = false;
+        } else {
+          // User dismissed without logging in — redirect home
+          this.router.navigate(['/']);
+        }
+      });
+    }
+  }
+
+  onWriteJournal(): void {
+    if (!this.authService.isLoggedIn) {
+      this.checkAuth();
+      return;
+    }
+    this.router.navigate(['/community/write']);
+  }
 
   setTab(tab: typeof this.activeTab): void {
     this.activeTab = tab;

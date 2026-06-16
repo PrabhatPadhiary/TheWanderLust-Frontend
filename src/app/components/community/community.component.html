@@ -1,3 +1,5 @@
+<div class="community-page-wrapper" [class.blurred]="showAuthBlur">
+
 <app-navbar [isLanding]="true"></app-navbar>
 
 <!-- ===== HERO HEADER ===== -->
@@ -5,6 +7,12 @@
   <div class="community-hero-inner">
     <h1>Travel Stories from Real People</h1>
     <p>Journals, tips, and itineraries shared by the Wayraa community — not algorithms, not ads.</p>
+    <button class="write-journal-btn" (click)="onWriteJournal()">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+      </svg>
+      Write a Journal
+    </button>
     <div class="community-stats">
       <div class="cstat" *ngFor="let s of stats">
         <span class="cstat-num">{{ s.value }}</span>
@@ -58,6 +66,20 @@
           <button [class.active]="journalSort === 'recent'"  (click)="setSort('recent')">Most Recent</button>
           <button [class.active]="journalSort === 'popular'" (click)="setSort('popular')">Most Popular</button>
         </div>
+      </div>
+
+      <!-- Loading state -->
+      <div class="feed-loader" *ngIf="feedLoading">
+        <div class="feed-loader-spinner"></div>
+        <span>Loading journals...</span>
+      </div>
+
+      <!-- Empty state -->
+      <div class="feed-empty" *ngIf="!feedLoading && journals.length === 0">
+        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+        </svg>
+        <p>No journals yet. Be the first to share your travel story!</p>
       </div>
 
       <div class="journal-card" *ngFor="let j of journals">
@@ -258,3 +280,5 @@
   </aside>
 
 </div>
+
+</div><!-- end .community-page-wrapper -->
