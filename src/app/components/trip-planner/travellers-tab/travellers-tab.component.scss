@@ -228,24 +228,9 @@
   &:hover { background: #fee2e2; }
 }
 
-// ===== PENDING INVITES =====
-.trav-invite-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  align-items: flex-start;
+// ===== INVITE VIA LINK =====
+.trav-invite-section {
   margin-bottom: 24px;
-}
-
-.trav-invite-col {
-  min-width: 0;
-}
-
-.trav-pending-empty {
-  font-size: 0.78rem;
-  color: #bbb;
-  margin: 0;
-  padding: 14px 0;
 }
 
 .trav-pending-list {
@@ -587,9 +572,6 @@
 // ===== RESPONSIVE =====
 @media (max-width: 700px) {
   .trav-split-row {
-    grid-template-columns: 1fr;
-  }
-  .trav-invite-row {
     grid-template-columns: 1fr;
   }
 }
