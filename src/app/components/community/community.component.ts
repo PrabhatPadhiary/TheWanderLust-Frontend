@@ -161,6 +161,7 @@ export class CommunityComponent implements OnInit {
     if (!this.authService.isLoggedIn) {
       this.showAuthBlur = true;
       const dialogRef = this.dialog.open(AuthGateModalComponent, {
+        data: { destination: '' },
         panelClass: 'auth-gate-dialog',
         maxWidth: '500px',
         width: '500px',
