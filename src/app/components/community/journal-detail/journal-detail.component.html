@@ -1,0 +1,228 @@
+<!-- Loading -->
+<div class="jd-loader" *ngIf="loading">
+  <app-navbar [isLanding]="true"></app-navbar>
+  <div class="jd-loader-inner">
+    <div class="jd-spinner"></div>
+    <p>Loading journal...</p>
+  </div>
+</div>
+
+<!-- Not found -->
+<div class="jd-notfound" *ngIf="!loading && notFound">
+  <app-navbar [isLanding]="true"></app-navbar>
+  <div class="jd-notfound-inner">
+    <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+      <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+    </svg>
+    <h2>Journal not found</h2>
+    <p>This journal may have been removed or made private.</p>
+    <button class="jd-back-btn" (click)="goBack()">← Back to Community</button>
+  </div>
+</div>
+
+<!-- Main content -->
+<div class="jd-page" *ngIf="!loading && !notFound && journal">
+
+  <app-navbar [isLanding]="true"></app-navbar>
+
+  <div class="jd-container">
+
+    <!-- Back link -->
+    <button class="jd-back-link" (click)="goBack()">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Back to Community
+    </button>
+
+    <!-- Author row -->
+    <div class="jd-author-row">
+      <span class="jd-avatar" [style.background]="authorColor">{{ authorInitial }}</span>
+      <div class="jd-author-info">
+        <span class="jd-author-name">{{ journal.author.name }}</span>
+        <span class="jd-author-meta">
+          <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+          </svg>
+          {{ journal.destination }}
+        </span>
+      </div>
+      <button class="jd-follow-btn">+ Follow</button>
+    </div>
+
+    <!-- Trip metadata chips -->
+    <div class="jd-meta-chips" *ngIf="formattedDateRange || travelersLabel || budgetLabel">
+      <span class="jd-chip jd-chip--dest">
+        <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+        </svg>
+        {{ journal.destination }}
+      </span>
+      <span class="jd-chip" *ngIf="formattedDateRange">{{ formattedDateRange }}</span>
+      <span class="jd-chip" *ngIf="travelersLabel">{{ travelersEmoji }} {{ travelersLabel }}</span>
+      <span class="jd-chip" *ngIf="budgetLabel">{{ budgetEmoji }} {{ budgetLabel }}</span>
+    </div>
+
+    <!-- Duration badge -->
+    <div class="jd-duration-badge" *ngIf="tripDurationLabel">{{ tripDurationLabel }}</div>
+
+    <!-- Title -->
+    <h1 class="jd-title">{{ journal.title }}</h1>
+
+    <!-- Vibe tags -->
+    <div class="jd-vibes" *ngIf="journal.vibes && journal.vibes.length > 0">
+      <span class="jd-vibe" *ngFor="let v of journal.vibes">{{ v }}</span>
+    </div>
+
+    <!-- Photo grid -->
+    <div class="jd-photo-grid" *ngIf="journal.photos && journal.photos.length > 0">
+      <div class="jd-photo-main" (click)="openLightbox(0)">
+        <img [src]="journal.photos[0].url" [alt]="journal.title" loading="lazy">
+      </div>
+      <div class="jd-photo-side" *ngIf="journal.photos.length > 1">
+        <div class="jd-photo-side-item" *ngFor="let photo of journal.photos.slice(1, 3); let i = index"
+             (click)="openLightbox(i + 1)">
+          <img [src]="photo.url" [alt]="journal.title" loading="lazy">
+          <!-- +N overlay on last visible -->
+          <div class="jd-photo-more" *ngIf="i === 1 && journal.photos.length > 3">
+            +{{ journal.photos.length - 3 }} photos
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions bar -->
+    <div class="jd-actions">
+      <button class="jd-action" [class.jd-action--liked]="isLiked" (click)="toggleLike()">
+        <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="2"
+             [attr.fill]="isLiked ? 'currentColor' : 'none'">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+        {{ likesCount }}
+      </button>
+      <button class="jd-action" (click)="shareJournal()">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+        Share
+      </button>
+      <button class="jd-action jd-action--cta">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+        </svg>
+        + Save Itinerary to My Trip
+      </button>
+    </div>
+
+    <!-- Body text -->
+    <div class="jd-body">
+      <!-- First paragraph gets drop cap -->
+      <p class="jd-body-para jd-body-para--dropcap" *ngIf="bodyFirstParagraph">{{ bodyFirstParagraph }}</p>
+      <p class="jd-body-para" *ngFor="let para of bodyRemainingParagraphs">{{ para }}</p>
+    </div>
+
+    <!-- Pro Tips -->
+    <div class="jd-protips" *ngIf="proTipsArray.length > 0">
+      <div class="jd-protips-header">
+        <span class="jd-protips-icon">💡</span>
+        <strong>{{ journal.author.name.split(' ')[0] }}'s Pro Tips</strong>
+      </div>
+      <ul class="jd-protips-list">
+        <li *ngFor="let tip of proTipsArray">
+          <span class="jd-protips-arrow">→</span>{{ tip }}
+        </li>
+      </ul>
+    </div>
+
+    <!-- Places in this journal -->
+    <div class="jd-places" *ngIf="journal.places && journal.places.length > 0">
+      <h2 class="jd-section-title">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+        </svg>
+        Places in this journal
+      </h2>
+      <div class="jd-places-grid">
+        <div class="jd-place-card" *ngFor="let place of journal.places">
+          <div class="jd-place-icon">{{ getCategoryIcon(place.category) }}</div>
+          <div class="jd-place-info">
+            <strong>{{ place.placeName }}</strong>
+            <span>{{ place.category | titlecase }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comments section -->
+    <div class="jd-comments" id="comments">
+      <h2 class="jd-section-title">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+        </svg>
+        {{ journal.commentsCount }} Comments
+      </h2>
+
+      <!-- Comment input -->
+      <div class="jd-comment-input-row">
+        <span class="jd-comment-avatar" [style.background]="authorColor">
+          {{ authService.currentUser?.name?.charAt(0)?.toUpperCase() ?? '?' }}
+        </span>
+        <div class="jd-comment-input-wrap">
+          <textarea
+            class="jd-comment-textarea"
+            placeholder="Add a comment..."
+            [(ngModel)]="newComment"
+            rows="1"
+            (keydown.enter)="$event.preventDefault(); postComment()"
+          ></textarea>
+          <button class="jd-comment-post-btn"
+                  [disabled]="!newComment.trim() || postingComment"
+                  (click)="postComment()">
+            {{ postingComment ? '...' : 'Post' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Comment list -->
+      <div class="jd-comment-list">
+        <div class="jd-comment" *ngFor="let c of journal.comments">
+          <span class="jd-comment-avatar" [style.background]="getCommentColor(c)">
+            {{ getCommentInitial(c) }}
+          </span>
+          <div class="jd-comment-body">
+            <div class="jd-comment-meta">
+              <strong>{{ c.author.name }}</strong>
+              <span class="jd-comment-time">{{ relativeTime(c.createdAt) }}</span>
+            </div>
+            <p>{{ c.body }}</p>
+          </div>
+        </div>
+
+        <div class="jd-no-comments" *ngIf="journal.comments.length === 0">
+          Be the first to leave a comment.
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end .jd-container -->
+
+</div><!-- end .jd-page -->
+
+<!-- Lightbox -->
+<div class="jd-lightbox" *ngIf="lightboxOpen" (click)="closeLightbox()">
+  <button class="jd-lightbox-close" (click)="closeLightbox()">✕</button>
+  <button class="jd-lightbox-nav jd-lightbox-nav--prev" (click)="$event.stopPropagation(); prevPhoto()">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <polyline points="15 18 9 12 15 6"/>
+    </svg>
+  </button>
+  <img [src]="activePhotoUrl" class="jd-lightbox-img" (click)="$event.stopPropagation()" alt="photo">
+  <button class="jd-lightbox-nav jd-lightbox-nav--next" (click)="$event.stopPropagation(); nextPhoto()">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <polyline points="9 18 15 12 9 6"/>
+    </svg>
+  </button>
+  <span class="jd-lightbox-counter">{{ activePhotoIndex + 1 }} / {{ totalPhotos }}</span>
+</div>

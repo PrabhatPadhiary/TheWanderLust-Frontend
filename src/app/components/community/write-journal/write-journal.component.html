@@ -10,7 +10,7 @@
     <h1>Write a Journal</h1>
     <div class="wj-header-actions">
       <button class="wj-draft-btn" (click)="onSaveDraft()" [disabled]="isSubmitting">Save Draft</button>
-      <button class="wj-publish-btn" (click)="onPublish()" [disabled]="isSubmitting">
+      <button class="wj-publish-btn" (click)="onPublish()" [disabled]="isSubmitting || hasImageError">
         <span class="wj-spinner" *ngIf="isSubmitting"></span>
         <span *ngIf="!isSubmitting">Publish</span>
         <span *ngIf="isSubmitting">Publishing...</span>
@@ -121,7 +121,22 @@
 
       <!-- Story Photos -->
       <div class="wj-story-photos">
-        <label>Photos</label>
+        <label>Photos <span class="wj-photo-hint">JPG, PNG or WebP · max 5 MB each</span></label>
+
+        <!-- Image error banner -->
+        <div class="wj-image-errors" *ngIf="imageErrors.length > 0">
+          <div class="wj-image-error-header">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            The following photos were not added:
+          </div>
+          <ul>
+            <li *ngFor="let err of imageErrors">{{ err }}</li>
+          </ul>
+          <button class="wj-error-dismiss" (click)="clearImageErrors()">Dismiss</button>
+        </div>
+
         <div class="wj-photos-grid">
           <div class="wj-photo-thumb" *ngFor="let photo of storyPhotos; let i = index">
             <img [src]="photo.preview" alt="Story photo">
@@ -132,7 +147,7 @@
               <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
             <span>Add photos</span>
-            <input #storyPhotoInput type="file" accept="image/*" multiple hidden (change)="onStoryPhotoSelect($event)">
+            <input #storyPhotoInput type="file" accept="image/jpeg,image/png,image/webp" multiple hidden (change)="onStoryPhotoSelect($event)">
           </div>
         </div>
       </div>
@@ -209,7 +224,7 @@
     <!-- ===== BOTTOM ACTIONS ===== -->
     <div class="wj-bottom-actions">
       <button class="wj-draft-btn" (click)="onSaveDraft()" [disabled]="isSubmitting">Save as Draft</button>
-      <button class="wj-publish-btn" (click)="onPublish()" [disabled]="isSubmitting">
+      <button class="wj-publish-btn" (click)="onPublish()" [disabled]="isSubmitting || hasImageError">
         <span class="wj-spinner" *ngIf="isSubmitting"></span>
         <svg *ngIf="!isSubmitting" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>

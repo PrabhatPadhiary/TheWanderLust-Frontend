@@ -1,9 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
+import { Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { AuthGateModalComponent } from '../auth-gate-modal/auth-gate-modal.component';
 import { JournalService, JournalFeedItem } from '../../services/journal.service';
+import { JournalUploadStateService, JournalUploadState } from '../../services/journal-upload-state.service';
+import { ToastrService } from 'ngx-toastr';
 
 export interface TripJournal {
   id: string;
@@ -20,6 +23,7 @@ export interface TripJournal {
   tags: string[];
   placesMentioned: string[];
   likes: number;
+  isLiked: boolean;
   comments: number;
   saves: number;
   tripBadge: string | null;
@@ -56,7 +60,7 @@ export interface TopTraveler {
   styleUrls: ['./community.component.scss'],
   standalone: false
 })
-export class CommunityComponent implements OnInit {
+export class CommunityComponent implements OnInit, OnDestroy {
 
   activeTab: 'journals' | 'ask' | 'squads' | 'trending' = 'journals';
   journalSort: 'recent' | 'popular' = 'recent';
@@ -70,6 +74,8 @@ export class CommunityComponent implements OnInit {
 
   journals: TripJournal[] = [];
   feedLoading = true;
+  uploadState: JournalUploadState = { status: 'idle', journalId: null, title: null };
+  private uploadSub?: Subscription;
 
   questions: CommunityQuestion[] = [
     { id: '1', text: 'Is Wayanad worth visiting in June during monsoon?', destination: 'Wayanad', answers: 14, tag: 'Wayanad' },
@@ -100,12 +106,23 @@ export class CommunityComponent implements OnInit {
     public authService: AuthService,
     private router: Router,
     private dialog: MatDialog,
-    private journalService: JournalService
+    private journalService: JournalService,
+    public uploadStateService: JournalUploadStateService,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
     this.checkAuth();
-    this.loadFeed();
+    // Wait for Firebase auth to restore before loading feed
+    // so the backend can resolve the current user and return correct isLiked values
+    this.authService.authReady.then(() => this.loadFeed());
+    this.uploadSub = this.uploadStateService.upload$.subscribe(state => {
+      this.uploadState = state;
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.uploadSub?.unsubscribe();
   }
 
   private loadFeed(): void {
@@ -150,6 +167,7 @@ export class CommunityComponent implements OnInit {
       tags: [],
       placesMentioned: item.places?.map(p => p.placeName) || [],
       likes: item.likesCount || 0,
+      isLiked: item.isLiked || false,
       comments: item.commentsCount || 0,
       saves: 0,
       tripBadge: tripBadge,
@@ -212,8 +230,34 @@ export class CommunityComponent implements OnInit {
     this.newQuestion = '';
   }
 
+  openJournal(journalId: string, fragment?: string): void {
+    this.router.navigate(['/community/journal', journalId], fragment ? { fragment } : {});
+  }
+
   likeJournal(journal: TripJournal): void {
-    journal.likes++;
+    if (!this.authService.isLoggedIn) {
+      this.checkAuth();
+      return;
+    }
+
+    // Optimistic update
+    const wasLiked = journal.isLiked;
+    journal.isLiked = !wasLiked;
+    journal.likes += wasLiked ? -1 : 1;
+
+    this.journalService.toggleLike(journal.id).subscribe({
+      next: (res) => {
+        // Sync with server truth
+        journal.isLiked = res.liked;
+        journal.likes = res.likesCount;
+      },
+      error: () => {
+        // Revert on failure
+        journal.isLiked = wasLiked;
+        journal.likes += wasLiked ? 1 : -1;
+        this.toastr.error('Could not update like. Try again.');
+      }
+    });
   }
 
   saveJournal(journal: TripJournal): void {

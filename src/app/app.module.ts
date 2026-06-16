@@ -45,6 +45,7 @@ import { AddExpenseModalComponent } from './components/trip-planner/budget-tab/a
 import { LandingPageV2Component } from './components/landing-page-v2/landing-page-v2.component';
 import { CommunityComponent } from './components/community/community.component';
 import { WriteJournalComponent } from './components/community/write-journal/write-journal.component';
+import { JournalDetailComponent } from './components/community/journal-detail/journal-detail.component';
 import { FeaturesComponent } from './components/features/features.component';
 import { PricingComponent } from './components/pricing/pricing.component';
 
@@ -81,6 +82,7 @@ import { PricingComponent } from './components/pricing/pricing.component';
     LandingPageV2Component,
     CommunityComponent,
     WriteJournalComponent,
+    JournalDetailComponent,
     FeaturesComponent,
     PricingComponent,
   ],

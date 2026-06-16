@@ -417,6 +417,11 @@
 
   &:hover { background: #f5f5f5; color: #333; }
 
+  &--liked {
+    color: #e85d04;
+    &:hover { background: #fff5f0; color: #e85d04; }
+  }
+
   &--cta {
     margin-left: auto;
     background: #f0f9f5;
@@ -721,4 +726,122 @@
   .community-sidebar { position: relative; top: 0; }
   .community-tabs { padding: 0 20px; overflow-x: auto; scrollbar-width: none; &::-webkit-scrollbar { display: none; } }
   .community-hero-inner { padding: 0 20px; }
+}
+
+
+// ===== UPLOAD PROGRESS BANNER =====
+.upload-banner {
+  position: relative;
+  background: #fff;
+  border: 1.5px solid #e0e7ff;
+  border-radius: 14px;
+  margin-bottom: 16px;
+  overflow: hidden;
+  animation: banner-slide-in 0.3s ease;
+
+  &--done {
+    border-color: #bbf7d0;
+    background: #f0fdf4;
+  }
+
+  &--error {
+    border-color: #fca5a5;
+    background: #fff5f5;
+  }
+}
+
+// The indeterminate animated progress bar at the very top
+.upload-banner-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  background: #e0e7ff;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -40%;
+    width: 40%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, #6366f1, transparent);
+    animation: progress-slide 1.4s ease-in-out infinite;
+  }
+}
+
+.upload-banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+}
+
+.upload-banner-icon {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+
+  .upload-banner--done & svg { stroke: #16a34a; }
+  .upload-banner--error & svg { stroke: #dc2626; }
+}
+
+.upload-banner-text {
+  flex: 1;
+  font-size: 0.85rem;
+  color: #374151;
+  line-height: 1.4;
+
+  strong { font-weight: 600; }
+
+  .upload-banner--done & { color: #166534; }
+  .upload-banner--error & { color: #991b1b; }
+}
+
+.upload-banner-dismiss {
+  background: none;
+  border: none;
+  color: #9ca3af;
+  cursor: pointer;
+  font-size: 0.8rem;
+  padding: 4px 6px;
+  border-radius: 4px;
+  flex-shrink: 0;
+  line-height: 1;
+  &:hover { color: #374151; background: #f3f4f6; }
+}
+
+// Three animated dots for uploading state
+.upload-dots {
+  display: inline-flex;
+  gap: 3px;
+  align-items: center;
+
+  span {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #6366f1;
+    animation: dot-bounce 1.2s ease-in-out infinite;
+
+    &:nth-child(2) { animation-delay: 0.2s; }
+    &:nth-child(3) { animation-delay: 0.4s; }
+  }
+}
+
+@keyframes progress-slide {
+  0%   { left: -40%; }
+  100% { left: 100%; }
+}
+
+@keyframes dot-bounce {
+  0%, 80%, 100% { transform: scale(0.7); opacity: 0.5; }
+  40%            { transform: scale(1);   opacity: 1; }
+}
+
+@keyframes banner-slide-in {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }

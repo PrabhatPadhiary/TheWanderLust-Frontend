@@ -8,6 +8,7 @@ import { JoinTripComponent } from './components/join-trip/join-trip.component';
 import { MyTripsComponent } from './components/my-trips/my-trips.component';
 import { CommunityComponent } from './components/community/community.component';
 import { WriteJournalComponent } from './components/community/write-journal/write-journal.component';
+import { JournalDetailComponent } from './components/community/journal-detail/journal-detail.component';
 import { FeaturesComponent } from './components/features/features.component';
 import { PricingComponent } from './components/pricing/pricing.component';
 
@@ -23,6 +24,7 @@ const routes: Routes = [
   { path: 'my-trips', component: MyTripsComponent },
   { path: 'community', component: CommunityComponent },
   { path: 'community/write', component: WriteJournalComponent },
+  { path: 'community/journal/:id', component: JournalDetailComponent },
   { path: 'features', component: FeaturesComponent },
   { path: 'pricing', component: PricingComponent },
 ];

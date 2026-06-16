@@ -7,7 +7,7 @@
     </button>
 
     <div class="options-view">
-        <h2 *ngIf="data?.destination">Plan your trip to <strong>{{ data.destination }}</strong></h2>
+        <h2 *ngIf="data?.destination">Plan your trip to <strong>{{ data!.destination }}</strong></h2>
         <h2 *ngIf="!data?.destination">Sign in to continue</h2>
         <p class="subtitle">Sign in to save your itinerary and access it anywhere.</p>
         <div class="auth-buttons">

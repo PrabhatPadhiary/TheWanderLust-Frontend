@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { TripService, TripResponse, TripDestinationResponse } from '../../../services/trip.service';
 import { JournalService, CreateJournalDto } from '../../../services/journal.service';
+import { JournalUploadStateService } from '../../../services/journal-upload-state.service';
 import { ToastrService } from 'ngx-toastr';
 
 interface PlaceTag {
@@ -40,6 +41,15 @@ export class WriteJournalComponent implements OnInit {
   journalBody = '';
   storyPhotos: { file: File; preview: string }[] = [];
 
+  // Image validation
+  readonly ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+  readonly MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
+  imageErrors: string[] = [];
+
+  get hasImageError(): boolean {
+    return this.imageErrors.length > 0;
+  }
+
   // Section 3: Tag Places
   places: PlaceTag[] = [];
   manualPlaceInput = '';
@@ -56,6 +66,7 @@ export class WriteJournalComponent implements OnInit {
     public authService: AuthService,
     private tripService: TripService,
     private journalService: JournalService,
+    private uploadState: JournalUploadStateService,
     public router: Router,
     private toastr: ToastrService
   ) {}
@@ -124,14 +135,22 @@ export class WriteJournalComponent implements OnInit {
   // Cover photo
   onCoverPhotoSelect(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      this.coverPhotoFile = input.files[0];
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        this.coverPhotoPreview = e.target?.result as string;
-      };
-      reader.readAsDataURL(input.files[0]);
+    if (!input.files || !input.files[0]) return;
+
+    const file = input.files[0];
+    const error = this.validateImageFile(file);
+    if (error) {
+      this.toastr.error(error, 'Cover photo rejected');
+      input.value = '';
+      return;
     }
+
+    this.coverPhotoFile = file;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.coverPhotoPreview = e.target?.result as string;
+    };
+    reader.readAsDataURL(file);
   }
 
   removeCoverPhoto(): void {
@@ -142,15 +161,49 @@ export class WriteJournalComponent implements OnInit {
   // Story photos
   onStoryPhotoSelect(event: Event): void {
     const input = event.target as HTMLInputElement;
-    if (input.files) {
-      Array.from(input.files).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.storyPhotos.push({ file, preview: e.target?.result as string });
-        };
-        reader.readAsDataURL(file);
-      });
+    if (!input.files) return;
+
+    Array.from(input.files).forEach(file => {
+      const error = this.validateImageFile(file);
+      if (error) {
+        this.addImageError(`${file.name}: ${error}`);
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.storyPhotos.push({ file, preview: e.target?.result as string });
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Reset so the same file can trigger change again if user removes and re-adds
+    input.value = '';
+  }
+
+  private validateImageFile(file: File): string | null {
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+    const blockedExtensions = ['heic', 'heif', 'bmp', 'tiff', 'tif', 'gif', 'svg'];
+
+    if (blockedExtensions.includes(ext)) {
+      return `${ext.toUpperCase()} format is not supported. Convert to JPG, PNG, or WebP first.`;
     }
+    if (!this.ALLOWED_TYPES.includes(file.type)) {
+      return `Invalid format. Use JPG, PNG, or WebP.`;
+    }
+    if (file.size > this.MAX_SIZE_BYTES) {
+      const sizeMb = (file.size / (1024 * 1024)).toFixed(1);
+      return `File is ${sizeMb} MB — maximum allowed is 5 MB.`;
+    }
+    return null;
+  }
+
+  private addImageError(msg: string): void {
+    this.imageErrors.push(msg);
+    this.toastr.error(msg, 'Photo rejected');
+  }
+
+  clearImageErrors(): void {
+    this.imageErrors = [];
   }
 
   removeStoryPhoto(index: number): void {
@@ -196,6 +249,10 @@ export class WriteJournalComponent implements OnInit {
       this.toastr.error('Please add a destination');
       return;
     }
+    if (this.hasImageError) {
+      this.toastr.error('Fix photo errors before publishing');
+      return;
+    }
     this.submitJournal('published');
   }
 
@@ -234,21 +291,24 @@ export class WriteJournalComponent implements OnInit {
 
     this.journalService.createJournal(dto).subscribe({
       next: (res) => {
-        // If photos were selected, upload them
         if (this.storyPhotos.length > 0) {
+          // Signal uploading state → navigate → upload in background
+          this.uploadState.setUploading(res.id, this.journalTitle.trim());
+          this.router.navigate(['/community']);
+
           const files = this.storyPhotos.map(p => p.file);
           this.journalService.uploadPhotos(res.id, files).subscribe({
-            next: () => {
-              this.showSuccessAndNavigate(status);
-            },
+            next: () => this.uploadState.setDone(),
             error: () => {
-              // Journal was created but photos failed — still navigate, show warning
+              this.uploadState.setError();
               this.toastr.warning('Journal saved but some photos failed to upload');
-              this.router.navigate(['/community']);
             }
           });
         } else {
-          this.showSuccessAndNavigate(status);
+          // No photos — navigate immediately, show quick success
+          this.uploadState.setUploading(res.id, this.journalTitle.trim());
+          this.uploadState.setDone();
+          this.router.navigate(['/community']);
         }
       },
       error: (err) => {
@@ -257,15 +317,6 @@ export class WriteJournalComponent implements OnInit {
         this.toastr.error(typeof message === 'string' ? message : 'Failed to save journal');
       }
     });
-  }
-
-  private showSuccessAndNavigate(status: string): void {
-    if (status === 'published') {
-      this.toastr.success('Journal published!');
-    } else {
-      this.toastr.info('Draft saved');
-    }
-    this.router.navigate(['/community']);
   }
 
   getCategoryIcon(category: string): string {

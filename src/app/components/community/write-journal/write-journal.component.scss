@@ -413,6 +413,59 @@ $accent-hover: #1e3d1a;
     letter-spacing: 0.5px;
     margin-bottom: 10px;
   }
+
+  .wj-photo-hint {
+    font-size: 0.7rem;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: #bbb;
+    margin-left: 6px;
+  }
+}
+
+// ===== IMAGE ERROR BANNER =====
+.wj-image-errors {
+  background: #fff5f5;
+  border: 1px solid #fca5a5;
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+
+  .wj-image-error-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #b91c1c;
+    margin-bottom: 6px;
+    svg { flex-shrink: 0; stroke: #b91c1c; }
+  }
+
+  ul {
+    margin: 0 0 10px 18px;
+    padding: 0;
+    li {
+      font-size: 0.75rem;
+      color: #b91c1c;
+      line-height: 1.6;
+    }
+  }
+
+  .wj-error-dismiss {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #b91c1c;
+    background: none;
+    border: 1px solid #fca5a5;
+    border-radius: 6px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s;
+    &:hover { background: #fee2e2; }
+  }
 }
 
 .wj-photos-grid {

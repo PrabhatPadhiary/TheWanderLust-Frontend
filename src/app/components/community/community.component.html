@@ -68,6 +68,36 @@
         </div>
       </div>
 
+      <!-- ===== UPLOAD PROGRESS BANNER ===== -->
+      <div class="upload-banner"
+           *ngIf="uploadState.status === 'uploading' || uploadState.status === 'done' || uploadState.status === 'error'"
+           [class.upload-banner--done]="uploadState.status === 'done'"
+           [class.upload-banner--error]="uploadState.status === 'error'">
+        <div class="upload-banner-progress" *ngIf="uploadState.status === 'uploading'"></div>
+        <div class="upload-banner-inner">
+          <span class="upload-banner-icon">
+            <!-- Uploading: animated dots -->
+            <span *ngIf="uploadState.status === 'uploading'" class="upload-dots">
+              <span></span><span></span><span></span>
+            </span>
+            <!-- Done: checkmark -->
+            <svg *ngIf="uploadState.status === 'done'" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            <!-- Error: warning -->
+            <svg *ngIf="uploadState.status === 'error'" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </span>
+          <span class="upload-banner-text">
+            <ng-container *ngIf="uploadState.status === 'uploading'">Uploading photos for <strong>{{ uploadState.title }}</strong>...</ng-container>
+            <ng-container *ngIf="uploadState.status === 'done'">Journal published! <strong>{{ uploadState.title }}</strong></ng-container>
+            <ng-container *ngIf="uploadState.status === 'error'">Photos failed to upload — journal was saved without them.</ng-container>
+          </span>
+          <button class="upload-banner-dismiss" (click)="uploadStateService.clear()">✕</button>
+        </div>
+      </div>
+
       <!-- Loading state -->
       <div class="feed-loader" *ngIf="feedLoading">
         <div class="feed-loader-spinner"></div>
@@ -108,8 +138,8 @@
         <!-- Content -->
         <div class="jcard-content">
           <div class="jcard-text">
-            <h3>{{ j.title }}</h3>
-            <p>{{ j.excerpt }}</p>
+            <h3 (click)="openJournal(j.id)" style="cursor:pointer">{{ j.title }}</h3>
+            <p (click)="openJournal(j.id)" style="cursor:pointer">{{ j.excerpt }}</p>
             <!-- Places mentioned -->
             <div class="jcard-places" *ngIf="j.placesMentioned.length > 0">
               <span class="place-chip" *ngFor="let place of j.placesMentioned.slice(0, 3)">
@@ -126,13 +156,14 @@
 
         <!-- Actions -->
         <div class="jcard-actions">
-          <button class="jaction" (click)="likeJournal(j)">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <button class="jaction" [class.jaction--liked]="j.isLiked" (click)="likeJournal(j)">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2"
+                 [attr.fill]="j.isLiked ? 'currentColor' : 'none'">
               <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
             </svg>
             {{ j.likes }}
           </button>
-          <button class="jaction">
+          <button class="jaction" (click)="openJournal(j.id, 'comments')">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
             </svg>
