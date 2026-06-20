@@ -16,13 +16,13 @@
   }
 }
 
-// ===== WRITE JOURNAL BUTTON =====
+// ===== WRITE JOURNAL FAB =====
 .write-journal-btn {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   padding: 12px 28px;
-  background: #e85d04;
+  background: #1a1a1a;
   color: #fff;
   border: none;
   border-radius: 50px;
@@ -36,9 +36,38 @@
   svg { flex-shrink: 0; }
 
   &:hover {
-    background: #c0392b;
+    background: #333;
     transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(232, 93, 4, 0.25);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.write-journal-fab {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 24px;
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  z-index: 500;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+
+  svg { flex-shrink: 0; }
+
+  &:hover {
+    background: #333;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
   }
 }
 
@@ -423,7 +452,6 @@
   }
 
   &--cta {
-    margin-left: auto;
     background: #f0f9f5;
     color: #2d5a27;
     font-weight: 600;
@@ -431,6 +459,152 @@
 
     &:hover { background: #2d5a27; color: #fff; }
   }
+
+  &--more {
+    color: #888;
+    padding: 6px 8px;
+    margin-left: 4px;
+
+    &:hover { background: #f0f0f0; color: #333; }
+  }
+
+  &--read {
+    margin-left: auto;
+    color: #02334a;
+    font-weight: 600;
+
+    &:hover { background: rgba(2, 51, 74, 0.06); }
+  }
+}
+
+// ===== JOURNAL 3-DOT DROPDOWN =====
+.journal-menu-dropdown {
+  position: fixed;
+  background: #fff;
+  border: 1px solid #ebebeb;
+  border-radius: 10px;
+  box-shadow: 0 6px 24px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.05);
+  z-index: 9999;
+  min-width: 148px;
+  overflow: hidden;
+  animation: jmenu-in 0.12s ease;
+}
+
+@keyframes jmenu-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.journal-menu-header {
+  padding: 8px 12px 4px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.journal-menu-divider {
+  height: 1px;
+  background: #f0f0f0;
+  margin: 3px 0;
+}
+
+.journal-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  color: #444;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s;
+
+  &:hover { background: #f7f7f7; }
+
+  &--danger {
+    color: #e53e3e;
+    &:hover { background: #fff5f5; }
+  }
+}
+
+.journal-menu-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  background: #f5f5f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  .journal-menu-item--danger & {
+    background: #fff0f0;
+  }
+}
+
+// ===== DELETE JOURNAL DIALOG =====
+.delete-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-dialog {
+  background: #fff;
+  border-radius: 14px;
+  padding: 28px;
+  width: 340px;
+  max-width: 95vw;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  font-family: 'Poppins', sans-serif;
+
+  h4 { margin: 0 0 8px; font-size: 1rem; font-weight: 700; color: #1a1a1a; }
+  p  { font-size: 0.85rem; color: #666; margin: 0 0 20px; strong { color: #1a1a1a; } }
+}
+
+.delete-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.btn-cancel {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 9px 20px;
+  border-radius: 20px;
+  border: 1.5px solid #e0e0e0;
+  background: #fff;
+  color: #555;
+  cursor: pointer;
+  &:hover { background: #f5f5f5; }
+}
+
+.btn-danger {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 9px 20px;
+  border-radius: 20px;
+  border: none;
+  background: #e53e3e;
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s;
+  &:hover { background: #c53030; }
+  &:disabled { opacity: 0.4; cursor: default; }
 }
 
 // ===== ASK TAB =====

@@ -11,6 +11,7 @@ import { WriteJournalComponent } from './components/community/write-journal/writ
 import { JournalDetailComponent } from './components/community/journal-detail/journal-detail.component';
 import { FeaturesComponent } from './components/features/features.component';
 import { PricingComponent } from './components/pricing/pricing.component';
+import { MyJournalsComponent } from './components/my-journals/my-journals.component';
 
 const routes: Routes = [
   { path: '', component: LandingPageV2Component },
@@ -25,6 +26,7 @@ const routes: Routes = [
   { path: 'community', component: CommunityComponent },
   { path: 'community/write', component: WriteJournalComponent },
   { path: 'community/journal/:id', component: JournalDetailComponent },
+  { path: 'my-journals', component: MyJournalsComponent },
   { path: 'features', component: FeaturesComponent },
   { path: 'pricing', component: PricingComponent },
 ];

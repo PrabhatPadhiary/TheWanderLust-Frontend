@@ -81,7 +81,7 @@ export class JournalDetailComponent implements OnInit {
   }
 
   get authorColor(): string {
-    const colors = ['#e85d04', '#2563eb', '#16a34a', '#7c3aed', '#db2777', '#0891b2'];
+    const colors = ['#02334a', '#4a1942', '#1a365d', '#744210', '#1e3a5f', '#3d0c45'];
     const name = this.journal?.author.name ?? '';
     return colors[name.charCodeAt(0) % colors.length];
   }
@@ -181,7 +181,7 @@ export class JournalDetailComponent implements OnInit {
   }
 
   getCommentColor(comment: JournalComment): string {
-    const colors = ['#e85d04', '#2563eb', '#16a34a', '#7c3aed', '#db2777', '#0891b2'];
+    const colors = ['#02334a', '#4a1942', '#1a365d', '#744210', '#1e3a5f', '#3d0c45'];
     return colors[comment.author.name?.charCodeAt(0) % colors.length];
   }
 
@@ -241,6 +241,13 @@ export class JournalDetailComponent implements OnInit {
     } else {
       navigator.clipboard.writeText(window.location.href);
       this.toastr.success('Link copied to clipboard');
+    }
+  }
+
+  scrollToComments(): void {
+    const el = document.getElementById('comments');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }
 

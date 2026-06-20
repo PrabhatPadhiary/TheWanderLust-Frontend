@@ -1,15 +1,22 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 import { AuthService } from '../../../services/auth.service';
 import { TripService, TripResponse, TripDestinationResponse } from '../../../services/trip.service';
 import { JournalService, CreateJournalDto } from '../../../services/journal.service';
 import { JournalUploadStateService } from '../../../services/journal-upload-state.service';
 import { ToastrService } from 'ngx-toastr';
 
+declare var google: any;
+
 interface PlaceTag {
   name: string;
   category: string;
   selected: boolean;
+  googlePlaceId?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 @Component({
@@ -53,6 +60,10 @@ export class WriteJournalComponent implements OnInit {
   // Section 3: Tag Places
   places: PlaceTag[] = [];
   manualPlaceInput = '';
+  placePredictions: any[] = [];
+  showPlaceDropdown = false;
+  private placeSearchSubject = new Subject<string>();
+  private placeSearchInitialized = false;
 
   // Section 4: Extras
   visibility: 'public' | 'private' = 'public';
@@ -61,6 +72,9 @@ export class WriteJournalComponent implements OnInit {
   proTips = '';
 
   isSubmitting = false;
+  isEditMode = false;
+  editJournalId: string | null = null;
+  loadingJournal = false;
 
   constructor(
     public authService: AuthService,
@@ -68,6 +82,7 @@ export class WriteJournalComponent implements OnInit {
     private journalService: JournalService,
     private uploadState: JournalUploadStateService,
     public router: Router,
+    private route: ActivatedRoute,
     private toastr: ToastrService
   ) {}
 
@@ -77,12 +92,65 @@ export class WriteJournalComponent implements OnInit {
       return;
     }
     this.loadTrips();
+
+    // Check if editing an existing journal
+    this.route.queryParams.subscribe(params => {
+      if (params['edit']) {
+        this.editJournalId = params['edit'];
+        this.isEditMode = true;
+        this.loadJournalForEdit(this.editJournalId!);
+      }
+    });
   }
 
   private loadTrips(): void {
     this.tripService.getAllTrips().subscribe({
       next: (trips) => { this.userTrips = trips; },
       error: () => {}
+    });
+  }
+
+  private loadJournalForEdit(journalId: string): void {
+    this.loadingJournal = true;
+    this.journalService.getById(journalId).subscribe({
+      next: (journal) => {
+        // Check if current user is the author
+        const currentUserId = this.authService.currentUser?.id;
+        if (journal.author.id !== currentUserId) {
+          this.toastr.error('You can only edit your own journals');
+          this.router.navigate(['/community']);
+          return;
+        }
+
+        // Prefill all fields
+        this.journalTitle = journal.title;
+        this.journalBody = journal.body;
+        this.destination = journal.destination;
+        this.startDate = this.formatDateForInput(journal.startDate);
+        this.endDate = this.formatDateForInput(journal.endDate);
+        this.travelersCount = journal.travelersCount || 1;
+        this.budget = journal.budget || null;
+        this.currency = journal.currency || 'INR';
+        this.visibility = (journal.visibility as 'public' | 'private') || 'public';
+        this.proTips = journal.proTips || '';
+        this.selectedVibes = journal.vibes || [];
+
+        // Places
+        this.places = (journal.places || []).map(p => ({
+          name: p.placeName,
+          category: p.category,
+          selected: true,
+          googlePlaceId: p.googlePlaceId || null,
+          latitude: p.latitude || null,
+          longitude: p.longitude || null
+        }));
+
+        this.loadingJournal = false;
+      },
+      error: () => {
+        this.toastr.error('Failed to load journal');
+        this.router.navigate(['/community']);
+      }
     });
   }
 
@@ -124,7 +192,10 @@ export class WriteJournalComponent implements OnInit {
             this.places.push({
               name: place.placeName,
               category: place.category,
-              selected: true
+              selected: true,
+              googlePlaceId: place.placeId || null,
+              latitude: place.latitude || null,
+              longitude: place.longitude || null
             });
           });
         }
@@ -217,8 +288,88 @@ export class WriteJournalComponent implements OnInit {
 
   addManualPlace(): void {
     if (!this.manualPlaceInput.trim()) return;
-    this.places.push({ name: this.manualPlaceInput.trim(), category: 'other', selected: true });
+    this.places.push({
+      name: this.manualPlaceInput.trim(),
+      category: 'other',
+      selected: true,
+      googlePlaceId: null,
+      latitude: null,
+      longitude: null
+    });
     this.manualPlaceInput = '';
+    this.placePredictions = [];
+    this.showPlaceDropdown = false;
+  }
+
+  onPlaceSearchInput(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.manualPlaceInput = value;
+    if (value.length < 2) {
+      this.placePredictions = [];
+      this.showPlaceDropdown = false;
+      return;
+    }
+    this.initPlaceSearch();
+    this.placeSearchSubject.next(value);
+  }
+
+  onPlaceSearchBlur(): void {
+    setTimeout(() => { this.showPlaceDropdown = false; }, 200);
+  }
+
+  selectPlacePrediction(prediction: any): void {
+    this.places.push({
+      name: prediction.name,
+      category: this.inferCategory(prediction.types),
+      selected: true,
+      googlePlaceId: prediction.place_id,
+      latitude: prediction.latitude,
+      longitude: prediction.longitude
+    });
+    this.manualPlaceInput = '';
+    this.placePredictions = [];
+    this.showPlaceDropdown = false;
+  }
+
+  private initPlaceSearch(): void {
+    if (this.placeSearchInitialized) return;
+    this.placeSearchInitialized = true;
+
+    this.placeSearchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      filter(v => v.length >= 2)
+    ).subscribe(value => this.runPlaceSearch(value));
+  }
+
+  private runPlaceSearch(query: string): void {
+    if (typeof google === 'undefined' || !google.maps?.places) return;
+    const mapDiv = document.createElement('div');
+    const service = new google.maps.places.PlacesService(mapDiv);
+    service.textSearch({ query }, (results: any[], status: string) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+        this.placePredictions = results.slice(0, 5).map(r => ({
+          place_id: r.place_id,
+          name: r.name,
+          vicinity: r.vicinity || r.formatted_address || '',
+          latitude: r.geometry?.location?.lat() ?? null,
+          longitude: r.geometry?.location?.lng() ?? null,
+          types: r.types || []
+        }));
+        this.showPlaceDropdown = this.placePredictions.length > 0;
+      } else {
+        this.placePredictions = [];
+        this.showPlaceDropdown = false;
+      }
+    });
+  }
+
+  private inferCategory(types: string[]): string {
+    if (!types) return 'other';
+    if (types.includes('restaurant') || types.includes('cafe') || types.includes('food') || types.includes('bakery')) return 'food';
+    if (types.includes('lodging') || types.includes('hotel')) return 'stay';
+    if (types.includes('tourist_attraction') || types.includes('museum') || types.includes('park')) return 'attraction';
+    return 'other';
   }
 
   removePlace(index: number): void {
@@ -285,19 +436,27 @@ export class WriteJournalComponent implements OnInit {
         .map(p => ({
           placeName: p.name,
           category: p.category,
-          googlePlaceId: null
+          googlePlaceId: p.googlePlaceId || null,
+          latitude: p.latitude || null,
+          longitude: p.longitude || null
         }))
     };
 
-    this.journalService.createJournal(dto).subscribe({
+    const apiCall = this.isEditMode
+      ? this.journalService.updateJournal(this.editJournalId!, dto)
+      : this.journalService.createJournal(dto);
+
+    apiCall.subscribe({
       next: (res) => {
-        if (this.storyPhotos.length > 0) {
+        const journalId = res.id || this.editJournalId;
+
+        if (this.storyPhotos.length > 0 && journalId) {
           // Signal uploading state → navigate → upload in background
-          this.uploadState.setUploading(res.id, this.journalTitle.trim());
+          this.uploadState.setUploading(journalId, this.journalTitle.trim());
           this.router.navigate(['/community']);
 
           const files = this.storyPhotos.map(p => p.file);
-          this.journalService.uploadPhotos(res.id, files).subscribe({
+          this.journalService.uploadPhotos(journalId, files).subscribe({
             next: () => this.uploadState.setDone(),
             error: () => {
               this.uploadState.setError();
@@ -305,9 +464,13 @@ export class WriteJournalComponent implements OnInit {
             }
           });
         } else {
-          // No photos — navigate immediately, show quick success
-          this.uploadState.setUploading(res.id, this.journalTitle.trim());
-          this.uploadState.setDone();
+          // No photos — navigate immediately
+          if (this.isEditMode) {
+            this.toastr.success('Journal updated!');
+          } else {
+            this.uploadState.setUploading(journalId || '', this.journalTitle.trim());
+            this.uploadState.setDone();
+          }
           this.router.navigate(['/community']);
         }
       },

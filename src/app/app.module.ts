@@ -48,6 +48,7 @@ import { WriteJournalComponent } from './components/community/write-journal/writ
 import { JournalDetailComponent } from './components/community/journal-detail/journal-detail.component';
 import { FeaturesComponent } from './components/features/features.component';
 import { PricingComponent } from './components/pricing/pricing.component';
+import { MyJournalsComponent } from './components/my-journals/my-journals.component';
 
 @NgModule({
   declarations: [
@@ -85,6 +86,7 @@ import { PricingComponent } from './components/pricing/pricing.component';
     JournalDetailComponent,
     FeaturesComponent,
     PricingComponent,
+    MyJournalsComponent,
   ],
   imports: [
     FormsModule,

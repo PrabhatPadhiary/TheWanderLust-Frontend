@@ -8,6 +8,8 @@ export interface CreateJournalPlaceDto {
   placeName: string;
   category: string;
   googlePlaceId?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 export interface CreateJournalDto {
@@ -47,13 +49,14 @@ export interface JournalFeedItem {
   currency?: string | null;
   proTips?: string | null;
   vibes?: string[];
+  status?: string;
   likesCount: number;
   commentsCount: number;
   isLiked: boolean;
   publishedAt: string;
   createdAt: string;
   author: { id: string; name: string };
-  places: { id: string; placeName: string; category: string; googlePlaceId?: string | null }[];
+  places: { id: string; placeName: string; category: string; googlePlaceId?: string | null; latitude?: number | null; longitude?: number | null }[];
   photos?: { id: string; url: string; order: number }[];
 }
 
@@ -86,7 +89,7 @@ export interface JournalDetail {
   publishedAt: string;
   createdAt: string;
   author: { id: string; name: string };
-  places: { id: string; placeName: string; category: string; googlePlaceId?: string | null }[];
+  places: { id: string; placeName: string; category: string; googlePlaceId?: string | null; latitude?: number | null; longitude?: number | null }[];
   photos: { id: string; url: string; caption?: string | null; order: number }[];
   comments: JournalComment[];
 }
@@ -199,6 +202,48 @@ export class JournalService {
           formData.append('files', file, file.name);
         });
         this.http.post<any>(`${environment.apiUrl}/Journals/${journalId}/photos`, formData, { headers })
+          .subscribe({
+            next: (res) => { observer.next(res); observer.complete(); },
+            error: (err) => observer.error(err)
+          });
+      });
+    });
+  }
+
+  getMyJournals(): Observable<JournalFeedItem[]> {
+    return new Observable(observer => {
+      this.authService.getFirebaseToken().then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.get<JournalFeedItem[]>(`${environment.apiUrl}/Journals/mine`, { headers })
+          .subscribe({
+            next: (res) => { observer.next(res); observer.complete(); },
+            error: (err) => observer.error(err)
+          });
+      });
+    });
+  }
+
+  deleteJournal(journalId: string): Observable<void> {
+    return new Observable(observer => {
+      this.authService.getFirebaseToken().then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.delete<void>(`${environment.apiUrl}/Journals/${journalId}`, { headers })
+          .subscribe({
+            next: () => { observer.next(); observer.complete(); },
+            error: (err) => observer.error(err)
+          });
+      });
+    });
+  }
+
+  updateJournal(journalId: string, dto: CreateJournalDto): Observable<any> {
+    return new Observable(observer => {
+      this.authService.getFirebaseToken().then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.put<any>(`${environment.apiUrl}/Journals/${journalId}`, dto, { headers })
           .subscribe({
             next: (res) => { observer.next(res); observer.complete(); },
             error: (err) => observer.error(err)

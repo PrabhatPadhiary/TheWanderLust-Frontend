@@ -1,24 +1,32 @@
 <div class="write-journal-page">
 
+  <!-- Loading state for edit mode -->
+  <div class="wj-edit-loader" *ngIf="loadingJournal">
+    <div class="wj-edit-loader-inner">
+      <div class="wj-edit-spinner"></div>
+      <p>Loading journal...</p>
+    </div>
+  </div>
+
   <!-- Header -->
-  <div class="wj-header">
+  <div class="wj-header" *ngIf="!loadingJournal">
     <button class="wj-back-btn" (click)="router.navigate(['/community'])">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M19 12H5M12 19l-7-7 7-7"/>
       </svg>
     </button>
-    <h1>Write a Journal</h1>
+    <h1>{{ isEditMode ? 'Edit Journal' : 'Write a Journal' }}</h1>
     <div class="wj-header-actions">
       <button class="wj-draft-btn" (click)="onSaveDraft()" [disabled]="isSubmitting">Save Draft</button>
       <button class="wj-publish-btn" (click)="onPublish()" [disabled]="isSubmitting || hasImageError">
         <span class="wj-spinner" *ngIf="isSubmitting"></span>
-        <span *ngIf="!isSubmitting">Publish</span>
-        <span *ngIf="isSubmitting">Publishing...</span>
+        <span *ngIf="!isSubmitting">{{ isEditMode ? 'Update' : 'Publish' }}</span>
+        <span *ngIf="isSubmitting">{{ isEditMode ? 'Updating...' : 'Publishing...' }}</span>
       </button>
     </div>
   </div>
   
-  <div class="wj-content">
+  <div class="wj-content" *ngIf="!loadingJournal">
 
     <!-- ===== TRIP SELECTOR (Step 0) ===== -->
     <div class="wj-trip-selector">
@@ -187,8 +195,19 @@
       </div>
 
       <div class="wj-add-place-row">
-        <input type="text" [(ngModel)]="manualPlaceInput" placeholder="Add a place..."
-               (keyup.enter)="addManualPlace()">
+        <div class="wj-place-search-wrap">
+          <input type="text" [value]="manualPlaceInput" placeholder="Search for a place..."
+                 (input)="onPlaceSearchInput($event)"
+                 (blur)="onPlaceSearchBlur()"
+                 (keyup.enter)="addManualPlace()">
+          <div class="wj-place-dropdown" *ngIf="showPlaceDropdown && placePredictions.length > 0">
+            <div class="wj-place-dropdown-item" *ngFor="let pred of placePredictions"
+                 (mousedown)="selectPlacePrediction(pred)">
+              <span class="wj-place-dropdown-name">{{ pred.name }}</span>
+              <span class="wj-place-dropdown-vicinity">{{ pred.vicinity }}</span>
+            </div>
+          </div>
+        </div>
         <button class="wj-add-place-btn" (click)="addManualPlace()">+ Add</button>
       </div>
     </section>
@@ -229,8 +248,8 @@
         <svg *ngIf="!isSubmitting" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
         </svg>
-        <span *ngIf="!isSubmitting">Publish Journal</span>
-        <span *ngIf="isSubmitting">Publishing...</span>
+        <span *ngIf="!isSubmitting">{{ isEditMode ? 'Update Journal' : 'Publish Journal' }}</span>
+        <span *ngIf="isSubmitting">{{ isEditMode ? 'Updating...' : 'Publishing...' }}</span>
       </button>
     </div>
 

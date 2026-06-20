@@ -169,6 +169,14 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
     this.router.navigate(['/my-trips']);
   }
 
+  onJournalsClick(): void {
+    if (!this.authService.isLoggedIn) {
+      this.openAuthModal();
+      return;
+    }
+    this.router.navigate(['/my-journals']);
+  }
+
   onSignIn(): void {
     if (this.authService.isLoggedIn) {
       this.router.navigate(['/my-trips']);

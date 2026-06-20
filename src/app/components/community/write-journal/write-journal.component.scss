@@ -16,6 +16,41 @@ $accent-hover: #1e3d1a;
   padding: 0 24px 80px;
 }
 
+// ===== EDIT LOADER =====
+.wj-edit-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+}
+
+.wj-edit-loader-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+
+  p {
+    font-size: 0.88rem;
+    color: #aaa;
+    font-weight: 500;
+    margin: 0;
+  }
+}
+
+.wj-edit-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid #f0f0f0;
+  border-top-color: $accent;
+  border-radius: 50%;
+  animation: wj-spin 0.7s linear infinite;
+}
+
+@keyframes wj-spin {
+  to { transform: rotate(360deg); }
+}
+
 // ===== HEADER =====
 .wj-header {
   display: flex;
@@ -590,8 +625,13 @@ $accent-hover: #1e3d1a;
   display: flex;
   gap: 10px;
 
-  input {
+  .wj-place-search-wrap {
     flex: 1;
+    position: relative;
+  }
+
+  input {
+    width: 100%;
     padding: 10px 16px;
     border: 1.5px solid #e8e8e8;
     border-radius: 10px;
@@ -619,6 +659,43 @@ $accent-hover: #1e3d1a;
     transition: all 0.15s;
 
     &:hover { background: #1a1a1a; color: #fff; }
+  }
+}
+
+.wj-place-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  z-index: 200;
+  overflow: hidden;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.wj-place-dropdown-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: background 0.1s;
+
+  &:hover { background: #f8faf7; }
+
+  .wj-place-dropdown-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #1a1a1a;
+  }
+
+  .wj-place-dropdown-vicinity {
+    font-size: 0.72rem;
+    color: #888;
   }
 }
 

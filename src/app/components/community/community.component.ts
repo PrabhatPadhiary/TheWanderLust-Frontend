@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
@@ -10,6 +10,7 @@ import { ToastrService } from 'ngx-toastr';
 
 export interface TripJournal {
   id: string;
+  authorId: string;
   authorName: string;
   authorInitial: string;
   authorColor: string;
@@ -102,6 +103,12 @@ export class CommunityComponent implements OnInit, OnDestroy {
   newQuestion = '';
   showAuthBlur = false;
 
+  // Journal menu state
+  openMenuJournalId: string | null = null;
+  journalMenuPosition = { top: 0, right: 0 };
+  journalToDelete: TripJournal | null = null;
+  deletingJournal = false;
+
   constructor(
     public authService: AuthService,
     private router: Router,
@@ -110,6 +117,11 @@ export class CommunityComponent implements OnInit, OnDestroy {
     public uploadStateService: JournalUploadStateService,
     private toastr: ToastrService
   ) {}
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    if (this.openMenuJournalId) this.openMenuJournalId = null;
+  }
 
   ngOnInit(): void {
     this.checkAuth();
@@ -138,7 +150,7 @@ export class CommunityComponent implements OnInit, OnDestroy {
 
   private mapFeedItemToJournal(item: JournalFeedItem): TripJournal {
     const authorName = item.author?.name || 'Anonymous';
-    const colors = ['#e85d04', '#2563eb', '#16a34a', '#7c3aed', '#db2777', '#0891b2'];
+    const colors = ['#02334a', '#4a1942', '#1a365d', '#744210', '#1e3a5f', '#3d0c45'];
     const colorIndex = authorName.charCodeAt(0) % colors.length;
 
     // Calculate trip duration badge
@@ -154,6 +166,7 @@ export class CommunityComponent implements OnInit, OnDestroy {
 
     return {
       id: item.id,
+      authorId: item.author?.id || '',
       authorName: authorName,
       authorInitial: authorName.charAt(0).toUpperCase(),
       authorColor: colors[colorIndex],
@@ -203,6 +216,15 @@ export class CommunityComponent implements OnInit, OnDestroy {
       return;
     }
     this.router.navigate(['/community/write']);
+  }
+
+  editJournal(journal: TripJournal): void {
+    this.openMenuJournalId = null;
+    this.router.navigate(['/community/write'], { queryParams: { edit: journal.id } });
+  }
+
+  isOwnJournal(journal: TripJournal): boolean {
+    return this.authService.currentUser?.id === journal.authorId;
   }
 
   setTab(tab: typeof this.activeTab): void {
@@ -256,6 +278,54 @@ export class CommunityComponent implements OnInit, OnDestroy {
         journal.isLiked = wasLiked;
         journal.likes += wasLiked ? 1 : -1;
         this.toastr.error('Could not update like. Try again.');
+      }
+    });
+  }
+
+  // ── Journal menu actions ──────────────────────────────────────────────────
+
+  toggleJournalMenu(journal: TripJournal, event: Event): void {
+    event.stopPropagation();
+    if (this.openMenuJournalId === journal.id) {
+      this.openMenuJournalId = null;
+      return;
+    }
+    const btn = event.currentTarget as HTMLElement;
+    const rect = btn.getBoundingClientRect();
+    this.journalMenuPosition = {
+      top: rect.bottom + 6,
+      right: window.innerWidth - rect.right
+    };
+    this.openMenuJournalId = journal.id;
+  }
+
+  getOpenMenuJournal(): TripJournal | undefined {
+    return this.journals.find(j => j.id === this.openMenuJournalId);
+  }
+
+  openDeleteConfirm(journal: TripJournal): void {
+    this.openMenuJournalId = null;
+    this.journalToDelete = journal;
+  }
+
+  cancelDeleteJournal(): void {
+    this.journalToDelete = null;
+  }
+
+  confirmDeleteJournal(): void {
+    if (!this.journalToDelete || this.deletingJournal) return;
+    this.deletingJournal = true;
+
+    this.journalService.deleteJournal(this.journalToDelete.id).subscribe({
+      next: () => {
+        this.journals = this.journals.filter(j => j.id !== this.journalToDelete!.id);
+        this.toastr.success('Journal deleted successfully');
+        this.deletingJournal = false;
+        this.journalToDelete = null;
+      },
+      error: () => {
+        this.toastr.error('Failed to delete journal. Try again.');
+        this.deletingJournal = false;
       }
     });
   }
