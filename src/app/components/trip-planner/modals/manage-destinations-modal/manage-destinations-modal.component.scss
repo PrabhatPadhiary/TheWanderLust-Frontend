@@ -1,0 +1,186 @@
+.manage-dest-modal {
+  background: #1e293b;
+  border-radius: 20px;
+  padding: 32px;
+  width: 520px;
+  max-width: 95vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  color: #fff;
+  font-family: 'Poppins', sans-serif;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+
+  &::-webkit-scrollbar { width: 5px; }
+  &::-webkit-scrollbar-track { background: transparent; }
+  &::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+}
+
+// ===== HEADER =====
+.mdm-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+
+  h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0 0 4px;
+    color: #fff;
+  }
+}
+
+.mdm-subtitle {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+}
+
+.mdm-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 4px;
+  border-radius: 8px;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+  }
+}
+
+// ===== TIMELINE BAR =====
+.mdm-timeline-bar {
+  display: flex;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 24px;
+  gap: 2px;
+}
+
+.mdm-bar-segment {
+  border-radius: 4px;
+  min-width: 8px;
+}
+
+// ===== DESTINATION LIST =====
+.mdm-dest-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.mdm-dest-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.07);
+  }
+}
+
+.mdm-dest-drag {
+  cursor: grab;
+  opacity: 0.4;
+  flex-shrink: 0;
+
+  &:hover { opacity: 0.7; }
+}
+
+.mdm-dest-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.mdm-dest-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+
+  strong {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.mdm-dest-dates {
+  font-size: 0.74rem;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.mdm-dest-action {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(255, 255, 255, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.mdm-dest-edit {
+  color: rgba(255, 255, 255, 0.5);
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+  }
+
+  svg { stroke: currentColor; }
+}
+
+.mdm-dest-delete {
+  color: rgba(239, 68, 68, 0.7);
+
+  &:hover {
+    background: rgba(239, 68, 68, 0.12);
+    color: #ef4444;
+  }
+
+  svg { stroke: currentColor; }
+}
+
+// ===== ADD BUTTON =====
+.mdm-add-btn {
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  border: 1.5px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #fff;
+    background: rgba(255, 255, 255, 0.04);
+  }
+}

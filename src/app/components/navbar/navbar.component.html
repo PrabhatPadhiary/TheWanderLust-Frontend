@@ -1,18 +1,23 @@
 <nav class="app-navbar"
      [class.app-navbar--landing]="isLanding"
      [class.app-navbar--scrolled]="isLanding && scrolled"
-     [class.app-navbar--compact]="isTripPlanner"
-     [class.app-navbar--destination]="isDestination">
+     [class.app-navbar--destination]="isDestination"
+     [class.app-navbar--tripplanner]="isTripPlanner">
 
   <!-- ===== LOGO ===== -->
-  <div class="navbar-brand" *ngIf="!isTripPlanner" (click)="goHome()">
+  <div class="navbar-brand" (click)="goHome()">
     <img src="assets/images/logo/wayraa_logo_notext.svg" alt="Wayraa" class="brand-logo-img">
     <span class="brand-name" *ngIf="!isDestination">wayraa</span>
   </div>
 
-  <!-- ===== TRIP PLANNER: center trip name ===== -->
-  <div class="navbar-trip-name" *ngIf="isTripPlanner">
-    <span>{{ tripName || destinationName || 'Trip Planner' }}</span>
+  <!-- ===== TRIP PLANNER: trip name in place of search ===== -->
+  <div class="navbar-search navbar-search--single" *ngIf="isTripPlanner">
+    <div class="single-search-bar trip-name-display">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" class="search-icon">
+        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+      </svg>
+      <span class="trip-name-text">{{ tripName || destinationName || 'Trip Planner' }}</span>
+    </div>
   </div>
 
   <!-- ===== LANDING: section links with sliding pill ===== -->
@@ -108,17 +113,17 @@
     </div>
 
     <!-- Favourites (app mode only) -->
-    <button class="nav-action-btn" [class.with-label]="!isTripPlanner && !isLanding"
+    <button class="nav-action-btn" [class.with-label]="!isLanding"
             *ngIf="!isLanding"
             (click)="onFavouritesClick()" title="Favourites">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
       </svg>
-      <span *ngIf="!isTripPlanner">Favourites</span>
+      <span>Favourites</span>
     </button>
 
     <!-- My Trips (app mode, logged in only) -->
-    <button class="nav-action-btn" [class.with-label]="!isTripPlanner && !isLanding"
+    <button class="nav-action-btn" [class.with-label]="!isLanding"
             *ngIf="!isLanding && authService.isLoggedIn"
             (click)="onTripsClick()" title="My Trips">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
@@ -127,11 +132,11 @@
         <line x1="8" y1="2" x2="8" y2="6"></line>
         <line x1="3" y1="10" x2="21" y2="10"></line>
       </svg>
-      <span *ngIf="!isTripPlanner">My Trips</span>
+      <span>My Trips</span>
     </button>
 
     <!-- My Journals (app mode, logged in only) -->
-    <button class="nav-action-btn" [class.with-label]="!isTripPlanner && !isLanding"
+    <button class="nav-action-btn" [class.with-label]="!isLanding"
             *ngIf="authService.isLoggedIn"
             (click)="onJournalsClick()" title="My Journals">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">

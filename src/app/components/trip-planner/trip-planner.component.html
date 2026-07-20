@@ -3,10 +3,6 @@
 <div class="trip-planner-layout">
   <!-- Sidebar -->
   <aside class="sidebar">
-    <div class="sidebar-brand" (click)="goToMyTrips()">
-      <img src="assets/images/logo/wayraa_logo_notext.svg" alt="Wayraa" class="sidebar-logo-img">
-      <span class="sidebar-logo-text">wayraa</span>
-    </div>
     <nav class="sidebar-nav">
       <a class="nav-item" [class.active]="activeTab === 'overview'" (click)="setActiveTab('overview')">Overview</a>
       <a class="nav-item" [class.active]="activeTab === 'itinerary'" (click)="setActiveTab('itinerary')">
@@ -23,6 +19,23 @@
   <!-- Main Content -->
   <main class="main-content">
 
+    <!-- Trip actions: top right -->
+    <div class="trip-actions-fixed" *ngIf="isOwner">
+      <button class="trip-action-btn" (click)="openEditTripModal()" title="Edit trip">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
+      </button>
+      <button class="trip-action-btn trip-action-btn--danger" (click)="openDeleteTripConfirm()" title="Delete trip">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+          <path d="M10 11v6M14 11v6"/>
+          <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+        </svg>
+      </button>
+    </div>
     <!-- Header -->
     <header class="content-header">
       <div class="back-capsule-wrap">
@@ -126,31 +139,6 @@
               Invite
             </button>
             <span class="section-badge" [ngClass]="'status-' + getStatusClass(tripStatus)">{{ tripStatus }}</span>
-            <div class="trip-menu-wrap" *ngIf="isOwner">
-              <button class="trip-menu-btn" (click)="showTripMenu = !showTripMenu; $event.stopPropagation()">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                  <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
-                </svg>
-              </button>
-              <div class="trip-menu-dropdown" *ngIf="showTripMenu">
-                <button class="trip-menu-item" (click)="showTripMenu = false; openEditTripModal()">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-                  </svg>
-                  Edit trip
-                </button>
-                <button class="trip-menu-item trip-menu-item--danger" (click)="showTripMenu = false; openDeleteTripConfirm()">
-                  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="3 6 5 6 21 6"/>
-                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                    <path d="M10 11v6M14 11v6"/>
-                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-                  </svg>
-                  Delete trip
-                </button>
-              </div>
-            </div>
           </div>
         </div>
         <div class="trip-summary">
@@ -191,7 +179,7 @@
           </div>
 
           <!-- Destination capsules -->
-          <p class="dest-capsules-label">Destinations — click to manage places</p>
+          <p class="dest-capsules-label">Destinations</p>
           <div class="dest-capsules-row">
             <button
               class="dest-capsule"
@@ -199,15 +187,25 @@
               [class.dest-capsule--active]="activeDestIndex === i"
               [class.dest-capsule--deleting]="deletingDestId && dest.id === deletingDestId"
               (click)="selectDest(i)">
-              {{ dest.name }}
+              <span class="dest-capsule-content">
+                <span class="dest-capsule-name">{{ dest.name }}</span>
+                <span class="dest-capsule-dates" *ngIf="dest.startDate || dest.endDate">
+                  {{ dest.startDate ? (dest.startDate | date:'MMM d') : '?' }}
+                  <span *ngIf="dest.endDate"> – {{ dest.endDate | date:'MMM d' }}</span>
+                </span>
+              </span>
+              <span class="dest-capsule-edit" *ngIf="managingDestinations && i > 0" (click)="openEditDestDialog(i); $event.stopPropagation()">
+                <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              </span>
               <span class="dest-capsule-delete" *ngIf="managingDestinations && i > 0" (click)="openDeleteDestConfirm(i); $event.stopPropagation()">×</span>
             </button>
-            <button class="dest-capsule dest-capsule--add" (click)="openAddDestDialog()" *ngIf="canEdit">
-              + Add destination
-            </button>
           </div>
-          <button class="manage-dest-btn" (click)="managingDestinations = !managingDestinations" *ngIf="destinations.length > 1 && canEdit">
-            {{ managingDestinations ? 'Done' : 'Manage destinations' }}
+          <button class="manage-dest-btn"
+            (click)="openManageDestModal(); $event.stopPropagation()" *ngIf="canEdit">
+            Manage / Add destinations
           </button>
         </div>
       </div>
@@ -217,7 +215,7 @@
 
         <!-- Left: destination detail panel -->
         <div class="dest-split-left">
-          <div class="dest-detail-panel">
+          <div class="dest-detail-panel" [style.border-top]="'3px solid ' + getDestColor()">
         <div class="dest-detail-header">
           <div class="dest-detail-title">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#2d5a27" stroke-width="2">
@@ -231,31 +229,17 @@
               {{ activeDest?.startDate | date:'MMM d' }}
               <span *ngIf="activeDest?.endDate"> → {{ activeDest?.endDate | date:'MMM d' }}</span>
             </span>
-            <button class="dest-hdr-btn" title="Edit" (click)="openEditDestDialog(activeDestIndex)" *ngIf="activeDestIndex > 0 && canEdit">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-              </svg>
-            </button>
-            <button class="dest-hdr-btn dest-hdr-btn--delete" title="Remove" (click)="openDeleteDestConfirm(activeDestIndex)" *ngIf="activeDestIndex > 0 && canEdit">
-              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
-                <polyline points="3 6 5 6 21 6"/>
-                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                <path d="M10 11v6M14 11v6"/>
-                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-              </svg>
-            </button>
           </div>
         </div>
         <div class="dest-detail-tabs">
-          <button class="dest-tab" [class.dest-tab--active]="activeDestTab === 'stays'" (click)="activeDestTab = 'stays'">
+          <button class="dest-tab" [class.dest-tab--active]="activeDestTab === 'stays'" (click)="switchDestTab('stays')">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
               <polyline points="9 22 9 12 15 12 15 22"/>
             </svg>
             Stays
           </button>
-          <button class="dest-tab" [class.dest-tab--active]="activeDestTab === 'food'" (click)="activeDestTab = 'food'">
+          <button class="dest-tab" [class.dest-tab--active]="activeDestTab === 'food'" (click)="switchDestTab('food')">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
               <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
@@ -265,7 +249,7 @@
             </svg>
             Food
           </button>
-          <button class="dest-tab" [class.dest-tab--active]="activeDestTab === 'activities'" (click)="activeDestTab = 'activities'">
+          <button class="dest-tab" [class.dest-tab--active]="activeDestTab === 'activities'" (click)="switchDestTab('activities')">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
               <polygon points="3 11 22 2 13 21 11 13 3 11"/>
             </svg>
@@ -273,7 +257,7 @@
           </button>
           <div class="dest-tab-ink" [style.transform]="'translateX(' + (getDestTabIndex() * 100) + '%)'"></div>
         </div>
-        <div class="dest-detail-body">
+        <div class="dest-detail-body" [class.dest-detail-body--fade]="destFading">
           <!-- Places list -->
           <div class="dest-places-list" *ngIf="getPlacesForActiveTab().length > 0">
             <div class="dest-place-card" *ngFor="let place of getPlacesForActiveTab()">
@@ -301,6 +285,7 @@
           <button class="dest-detail-add-btn" (click)="openAddPlaceModal()" *ngIf="canEdit">+ Add</button>
         </div>
       </div>
+
         </div><!-- end dest-split-left -->
 
         <!-- Right: sticky map -->
@@ -315,14 +300,37 @@
 
       </div><!-- end dest-split-layout -->
 
+      <!-- Visual cue: section below -->
+      <div class="explore-section-hint" *ngIf="activeDest?.id && canEdit">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#2d5a27" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+
+      <!-- Mini Explore: full-width browse & add places -->
+      <app-mini-explore
+        *ngIf="activeDest?.id && canEdit"
+        [tripId]="tripId"
+        [destinationId]="activeDest?.id || ''"
+        [destinationName]="activeDest?.name || ''"
+        [googlePlaceId]="activeDest?.googlePlaceId || ''"
+        [activeTab]="activeDestTab"
+        [latitude]="activeDest?.latitude || null"
+        [longitude]="activeDest?.longitude || null"
+        [existingPlaceIds]="getPlacesForActiveDest().length > 0 ? getExistingPlaceIds() : []"
+        (placeAdded)="onMiniExplorePlaceAdded($event)">
+      </app-mini-explore>
+
     </div><!-- end overview tab-content -->
 
     <!-- Itinerary Tab -->
     <div class="tab-content" *ngIf="!loading && activeTab === 'itinerary'">
       <app-itinerary-tab
+        [tripId]="tripId"
         [fromDate]="fromDate"
         [toDate]="toDate"
-        [places]="getAllPlaces()">
+        [places]="getAllPlaces()"
+        [destinations]="destinations">
       </app-itinerary-tab>
     </div>
 

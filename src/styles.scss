@@ -256,3 +256,46 @@ body.no-scroll {
   object-fit: initial !important;
   display: inline !important;
 }
+
+// ===== CDK Drag & Drop global styles =====
+.cdk-drag-preview {
+  box-sizing: border-box;
+  z-index: 9999 !important;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+  background: #1e293b !important;
+  color: #fff !important;
+  padding: 12px 16px;
+  border-left: 4px solid #4ade80;
+  font-family: 'Poppins', sans-serif;
+  min-width: 180px;
+
+  strong {
+    color: #fff !important;
+    font-size: 0.82rem;
+    font-weight: 600;
+    display: block;
+  }
+
+  .unscheduled-card-meta,
+  .scheduled-item-meta {
+    color: rgba(255, 255, 255, 0.6) !important;
+    font-size: 0.7rem;
+
+    svg {
+      stroke: rgba(255, 255, 255, 0.5) !important;
+    }
+  }
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.3;
+  border: 1.5px dashed #4ade80;
+  border-radius: 8px;
+  background: rgba(74, 222, 128, 0.08);
+  min-height: 42px;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}

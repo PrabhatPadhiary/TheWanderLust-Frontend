@@ -15,6 +15,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { DestinationComponent } from './components/destination/destination.component';
 import { PlaceDetailPanelComponent } from './components/place-detail-panel/place-detail-panel.component';
 import { AuthGateModalComponent } from './components/auth-gate-modal/auth-gate-modal.component';
@@ -23,6 +24,7 @@ import { AddPlaceModalComponent } from './components/trip-planner/modals/add-pla
 import { AddDestinationDialogComponent } from './components/trip-planner/modals/add-destination-dialog/add-destination-dialog.component';
 import { DeleteTripConfirmComponent } from './components/trip-planner/modals/delete-trip-confirm/delete-trip-confirm.component';
 import { DeleteDestinationConfirmComponent } from './components/trip-planner/modals/delete-destination-confirm/delete-destination-confirm.component';
+import { ManageDestinationsModalComponent } from './components/trip-planner/modals/manage-destinations-modal/manage-destinations-modal.component';
 import { InviteModalComponent } from './components/trip-planner/modals/invite-modal/invite-modal.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FavouritesComponent } from './components/favourites/favourites.component';
@@ -36,6 +38,7 @@ import { AddToTripModalComponent } from './components/add-to-trip-modal/add-to-t
 import { ItineraryTabComponent } from './components/trip-planner/itinerary-tab/itinerary-tab.component';
 import { EditTripModalComponent } from './components/trip-planner/modals/edit-trip-modal/edit-trip-modal.component';
 import { TripMapComponent } from './components/trip-planner/trip-map/trip-map.component';
+import { MiniExploreComponent } from './components/trip-planner/mini-explore/mini-explore.component';
 import { BudgetTabComponent } from './components/trip-planner/budget-tab/budget-tab.component';
 import { TravellersTabComponent } from './components/trip-planner/travellers-tab/travellers-tab.component';
 import { RemoveMemberConfirmComponent } from './components/trip-planner/modals/remove-member-confirm/remove-member-confirm.component';
@@ -61,6 +64,7 @@ import { MyJournalsComponent } from './components/my-journals/my-journals.compon
     AddDestinationDialogComponent,
     DeleteTripConfirmComponent,
     DeleteDestinationConfirmComponent,
+    ManageDestinationsModalComponent,
     InviteModalComponent,
     NavbarComponent,
     FavouritesComponent,
@@ -74,6 +78,7 @@ import { MyJournalsComponent } from './components/my-journals/my-journals.compon
     ItineraryTabComponent,
     EditTripModalComponent,
     TripMapComponent,
+    MiniExploreComponent,
     BudgetTabComponent,
     AddExpenseModalComponent,
     TravellersTabComponent,
@@ -119,7 +124,8 @@ import { MyJournalsComponent } from './components/my-journals/my-journals.compon
     MatDatepickerModule,
     MatNativeDateModule,
     MatInputModule,
-    MatFormFieldModule
+    MatFormFieldModule,
+    DragDropModule
   ],
   providers: [
     provideAnimationsAsync(),

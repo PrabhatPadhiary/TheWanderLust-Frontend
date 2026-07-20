@@ -1,0 +1,335 @@
+.mini-explore {
+  margin-top: 28px;
+  padding: 28px;
+  background: #fef9f3;
+  border-radius: 16px;
+  border: 1px solid #fde8d0;
+}
+
+// ===== HEADER =====
+.mini-explore-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.mini-explore-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mini-explore-heading {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  letter-spacing: -0.3px;
+}
+
+.mini-explore-subtitle {
+  font-size: 1.1rem;
+  color: #494848;
+  margin: 0;
+  line-height: 1.5;
+  font-family: 'Poppins', sans-serif;
+}
+
+.mini-explore-badge {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: #2d5a27;
+  background: #e8f5e3;
+  padding: 4px 12px;
+  border-radius: 12px;
+  white-space: nowrap;
+  margin-top: 4px;
+}
+
+// ===== GRID — matches explore page =====
+.places-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+// ===== CARD — replicates explore page .place-card =====
+.place-card {
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  cursor: default;
+
+  &:hover {
+    border-color: rgba(232, 93, 4, 0.15);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  &--adding {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  &--added {
+    opacity: 0.85;
+
+    .place-card-img img {
+      filter: brightness(0.7);
+    }
+  }
+}
+
+.place-card-added-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #2d5a27;
+  color: #fff;
+  border-radius: 8px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.place-card-img {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  background: linear-gradient(135deg, #f0f4ff, #e8f0fe);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.place-card-placeholder {
+  font-size: 3rem;
+  opacity: 0.35;
+}
+
+.place-card-body {
+  padding: 14px 16px 16px;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 4px;
+
+  h3 {
+    font-size: 0.93rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .place-vicinity {
+    font-size: 0.76rem;
+    color: #999;
+    margin: 0;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .place-rating {
+    font-size: 0.78rem;
+    color: #444;
+    font-weight: 500;
+
+    .rating-count {
+      color: #bbb;
+      font-weight: 400;
+    }
+  }
+
+  .card-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 12px;
+    border-top: 1px solid #f5f5f5;
+  }
+}
+
+.add-trip-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: transparent;
+  border: 1.5px solid #2d5a27;
+  color: #2d5a27;
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: #2d5a27;
+    color: #fff;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.added-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #edf7ea;
+  border: 1.5px solid #c5e8bc;
+  color: #2d5a27;
+  padding: 6px 14px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: 'Poppins', sans-serif;
+}
+
+.maps-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: #ccc;
+  padding: 6px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+
+  svg { width: 18px; height: 18px; }
+
+  &:hover {
+    color: #043247;
+    background: #f0f4ff;
+  }
+}
+
+// ===== SKELETON =====
+.place-card.skeleton {
+  pointer-events: none;
+  cursor: default;
+  box-shadow: none;
+  border-color: #f0f0f0;
+
+  &:hover {
+    transform: none;
+    box-shadow: none;
+    border-color: #f0f0f0;
+  }
+
+  .skeleton-img {
+    aspect-ratio: 16 / 9;
+    width: 100%;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+  }
+
+  .skeleton-body {
+    padding: 14px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .skeleton-line {
+    height: 12px;
+    border-radius: 6px;
+    background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.4s infinite;
+
+    &.wide   { width: 75%; }
+    &.medium { width: 55%; }
+    &.narrow { width: 35%; }
+  }
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+// ===== SHOW MORE =====
+.mini-explore-show-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 20px;
+  padding: 12px;
+  border: 1px dashed #d4edda;
+  background: transparent;
+  border-radius: 10px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #2d5a27;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: #f4faf3;
+  }
+}
+
+// ===== EMPTY STATE =====
+.mini-explore-empty {
+  text-align: center;
+  padding: 32px 16px;
+
+  p {
+    font-size: 0.82rem;
+    color: #999;
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+// ===== RESPONSIVE =====
+@media (max-width: 900px) {
+  .places-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 500px) {
+  .places-grid {
+    grid-template-columns: 1fr;
+  }
+}

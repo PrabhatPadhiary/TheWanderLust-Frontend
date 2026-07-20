@@ -163,6 +163,15 @@
   }
 }
 
+// Trip planner mode: tighter padding to match edge-to-edge layout
+.app-navbar--tripplanner {
+  padding: 0 20px;
+
+  .navbar-brand {
+    flex-shrink: 0;
+  }
+}
+
 // Single search bar (destination mode)
 .navbar-search--single {
   flex: 1;
@@ -201,6 +210,23 @@
       outline: none;
       &::placeholder { color: #aaa; }
     }
+  }
+
+  .trip-name-display {
+    cursor: default;
+
+    &:focus-within {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.07);
+      box-shadow: none;
+    }
+  }
+
+  .trip-name-text {
+    font-size: 0.88rem;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: #1a1a1a;
   }
 }
 .navbar-search {

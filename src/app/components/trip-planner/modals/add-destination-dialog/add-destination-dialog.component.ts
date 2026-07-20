@@ -7,11 +7,14 @@ declare var google: any;
 
 export interface AddDestinationDialogData {
   editMode: boolean;
+  lockDestination?: boolean; // If true, don't allow changing the destination itself
   name?: string;
   startDate?: Date | null;
   endDate?: Date | null;
   fromDate?: string | null;
   toDate?: string | null;
+  lastDestEndDate?: string | null;
+  existingDestinations?: { name: string; startDate: string | null; endDate: string | null }[];
 }
 
 export interface AddDestinationDialogResult {
@@ -53,9 +56,28 @@ export class AddDestinationDialogComponent {
       this.destSearchQuery = data.name;
       this.selectedDestPrediction = { structured_formatting: { main_text: data.name, secondary_text: '' } };
     }
-    this.addDestStart = data.startDate || null;
+    // Pre-fill start date: if lastDestEndDate provided, use next day
+    if (!data.editMode && data.lastDestEndDate) {
+      const nextDay = new Date(data.lastDestEndDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+      this.addDestStart = nextDay;
+    } else {
+      this.addDestStart = data.startDate || null;
+    }
     this.addDestEnd = data.endDate || null;
     this.initAutocomplete();
+  }
+
+  get minStartDate(): Date | null {
+    // For adding new destinations: min = last destination's end date + 1 day
+    // For editing: no min constraint (allow any date)
+    if (this.data.editMode) return null;
+    if (this.data.lastDestEndDate) {
+      const nextDay = new Date(this.data.lastDestEndDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+      return nextDay;
+    }
+    return null;
   }
 
   private initAutocomplete(): void {

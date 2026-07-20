@@ -194,6 +194,42 @@ export interface TripResponse {
   placeIds?: string[];
 }
 
+export interface ItineraryItemResponse {
+  id: string;
+  tripId: string;
+  destinationId: string;
+  tripPlaceId: string | null;
+  title: string;
+  category: string;
+  scheduledDate: string;
+  startTime: string | null;
+  endTime: string | null;
+  notes: string | null;
+  createdAt: string;
+}
+
+export interface CreateItineraryItemDto {
+  destinationId: string;
+  tripPlaceId?: string | null;
+  title: string;
+  category?: string;
+  scheduledDate: string;
+  startTime?: string | null;
+  endTime?: string | null;
+  notes?: string | null;
+}
+
+export interface UpdateItineraryItemDto {
+  destinationId?: string;
+  tripPlaceId?: string | null;
+  title?: string;
+  category?: string;
+  scheduledDate?: string;
+  startTime?: string | null;
+  endTime?: string | null;
+  notes?: string | null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -623,6 +659,73 @@ export class TripService {
         if (!token) { observer.error('Not authenticated'); return; }
         const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
         this.http.delete<void>(`${environment.apiUrl}/Trips/${tripId}/members/${userId}`, { headers })
+          .subscribe({ next: () => { observer.next(); observer.complete(); }, error: err => observer.error(err) });
+      });
+    });
+  }
+
+  // ===== ITINERARY =====
+
+  updateDestinationDates(tripId: string, destinations: { destinationId: string; startDate: string | null; endDate: string | null }[]): Observable<any> {
+    return new Observable(observer => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.put<any>(`${environment.apiUrl}/Trips/${tripId}/destinations/dates`, destinations, { headers })
+          .subscribe({ next: res => { observer.next(res); observer.complete(); }, error: err => observer.error(err) });
+      });
+    });
+  }
+
+  getItinerary(tripId: string): Observable<ItineraryItemResponse[]> {
+    return new Observable(observer => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.get<ItineraryItemResponse[]>(`${environment.apiUrl}/trips/${tripId}/itinerary`, { headers })
+          .subscribe({ next: res => { observer.next(res); observer.complete(); }, error: err => observer.error(err) });
+      });
+    });
+  }
+
+  createItineraryItem(tripId: string, dto: CreateItineraryItemDto): Observable<ItineraryItemResponse> {
+    return new Observable(observer => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.post<ItineraryItemResponse>(`${environment.apiUrl}/trips/${tripId}/itinerary`, dto, { headers })
+          .subscribe({ next: res => { observer.next(res); observer.complete(); }, error: err => observer.error(err) });
+      });
+    });
+  }
+
+  updateItineraryItem(tripId: string, itemId: string, dto: UpdateItineraryItemDto): Observable<ItineraryItemResponse> {
+    return new Observable(observer => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.put<ItineraryItemResponse>(`${environment.apiUrl}/trips/${tripId}/itinerary/${itemId}`, dto, { headers })
+          .subscribe({ next: res => { observer.next(res); observer.complete(); }, error: err => observer.error(err) });
+      });
+    });
+  }
+
+  deleteItineraryItem(tripId: string, itemId: string): Observable<void> {
+    return new Observable(observer => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.delete<void>(`${environment.apiUrl}/trips/${tripId}/itinerary/${itemId}`, { headers })
           .subscribe({ next: () => { observer.next(); observer.complete(); }, error: err => observer.error(err) });
       });
     });

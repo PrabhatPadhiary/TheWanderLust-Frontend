@@ -1,71 +1,135 @@
 <div class="itinerary-container">
-  <!-- Header -->
-  <div class="itinerary-header">
-    <h2>Itinerary</h2>
-    <span class="itinerary-meta" *ngIf="fromDate && toDate">
-      {{ days.length }} day{{ days.length !== 1 ? 's' : '' }} · {{ fromDate | date:'MMM d' }} – {{ toDate | date:'MMM d, y' }}
-    </span>
-    <span class="itinerary-meta" *ngIf="!fromDate || !toDate">No dates set</span>
+
+  <!-- Loading state -->
+  <div class="itinerary-loading" *ngIf="loading">
+    <div class="itinerary-loading-spinner"></div>
+    <p>Loading itinerary...</p>
   </div>
 
-  <!-- Empty state -->
-  <div class="itinerary-empty" *ngIf="places.length === 0">
-    <div class="itinerary-empty-icon">
-      <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="#ccc" stroke-width="1.5">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-        <line x1="16" y1="2" x2="16" y2="6"/>
-        <line x1="8" y1="2" x2="8" y2="6"/>
-        <line x1="3" y1="10" x2="21" y2="10"/>
+  <ng-container *ngIf="!loading">
+
+  <!-- Day tabs -->
+  <div class="day-tabs">
+    <button class="day-tab" *ngFor="let day of days; let i = index"
+            [class.day-tab--active]="activeDayIndex === i"
+            (click)="selectDay(i)">
+      <span class="day-tab-name">{{ day.dayName }}</span>
+      <span class="day-tab-date">{{ day.date ? getDateLabel(day.date) : 'TBD' }}</span>
+      <span class="day-tab-color" [style.background]="getDayDestColor(day)"></span>
+    </button>
+  </div>
+
+  <!-- Legend -->
+  <div class="itinerary-legend">
+    <span class="legend-dest" *ngIf="activeDest">
+      <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
       </svg>
-    </div>
-    <h3>No activities planned yet</h3>
-    <p>Add places from the Overview tab, then organise them here by day.</p>
+      {{ activeDest }}
+    </span>
+    <span class="legend-item">
+      <span class="legend-dot" style="background: #60a5fa;"></span> Activity
+    </span>
+    <span class="legend-item">
+      <span class="legend-dot" style="background: #fbbf24;"></span> Food
+    </span>
+    <span class="legend-item">
+      <span class="legend-dot" style="background: #4ade80;"></span> Stay
+    </span>
   </div>
 
-  <!-- Days timeline -->
-  <div class="itinerary-timeline" *ngIf="places.length > 0">
-    <div class="itinerary-day" *ngFor="let day of days">
-      <!-- Day header -->
-      <div class="day-header">
-        <div class="day-badge">{{ day.dayNumber }}</div>
-        <div class="day-info">
-          <span class="day-title">Day {{ day.dayNumber }}</span>
-          <span class="day-date" *ngIf="day.date">{{ getDayLabel(day) }}, {{ day.date | date:'MMM d' }}</span>
-          <span class="day-date" *ngIf="!day.date">Unscheduled</span>
-        </div>
-        <span class="day-count" *ngIf="day.items.length">{{ day.items.length }} place{{ day.items.length !== 1 ? 's' : '' }}</span>
-      </div>
+  <!-- Main layout: timeline + unscheduled sidebar -->
+  <div class="itinerary-split">
 
-      <!-- Day items -->
-      <div class="day-items" *ngIf="day.items.length > 0">
-        <div class="day-item" *ngFor="let place of day.items; let i = index">
-          <div class="day-item-connector">
-            <div class="connector-dot"></div>
-            <div class="connector-line" *ngIf="i < day.items.length - 1"></div>
-          </div>
-          <div class="day-item-card">
-            <div class="day-item-img" *ngIf="place.photoUrl">
-              <img [src]="place.photoUrl" [alt]="place.placeName">
+    <!-- Left: Time-based schedule -->
+    <div class="schedule-col">
+      <div class="time-grid">
+        <div class="time-row" *ngFor="let slot of timeSlots">
+          <span class="time-label">{{ slot }}</span>
+          <div class="time-slot"
+               cdkDropList
+               cdkDropListOrientation="horizontal"
+               [id]="getSlotDropListId(slot)"
+               [cdkDropListData]="scheduledSlots[slot]"
+               [cdkDropListConnectedTo]="['unscheduled-list'].concat(allSlotIds)"
+               (cdkDropListDropped)="dropOnSlot($event, slot)">
+
+            <!-- Scheduled items in this slot -->
+            <div class="scheduled-item" *ngFor="let item of scheduledSlots[slot]; let idx = index"
+                 cdkDrag
+                 [style.border-left-color]="getCategoryColor(item.category)">
+              <strong>{{ item.title }}</strong>
+              <span class="scheduled-item-meta">{{ getCategoryLabel(item.category) }}</span>
+              <button class="scheduled-item-remove" (click)="removeFromSlot(slot, idx)" title="Remove from schedule">
+                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5">
+                  <line x1="5" y1="12" x2="19" y2="12"/>
+                </svg>
+              </button>
             </div>
-            <div class="day-item-img day-item-img--placeholder" *ngIf="!place.photoUrl">
-              {{ getCategoryIcon(place.category) }}
-            </div>
-            <div class="day-item-info">
-              <strong>{{ place.placeName }}</strong>
-              <span class="day-item-meta">
-                <span class="day-item-category">{{ getCategoryLabel(place.category) }}</span>
-                <span *ngIf="place.vicinity"> · {{ place.vicinity }}</span>
-              </span>
-              <span class="day-item-rating" *ngIf="place.rating">{{ place.rating }} · {{ place.userRatingsTotal }} reviews</span>
+
+            <!-- Drop placeholder when empty -->
+            <div class="time-slot-drop" *ngIf="scheduledSlots[slot].length === 0">
+              <span class="drop-hint">Drop here</span>
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Empty day -->
-      <div class="day-empty" *ngIf="day.items.length === 0">
-        <p>Nothing planned for this day</p>
       </div>
     </div>
+
+    <!-- Right: Unscheduled sidebar -->
+    <div class="unscheduled-col">
+
+      <div class="unscheduled-dest-sections"
+           cdkDropList
+           id="unscheduled-list"
+           [cdkDropListData]="unscheduledPlaces"
+           [cdkDropListConnectedTo]="allSlotIds"
+           (cdkDropListDropped)="dropOnUnscheduled($event)">
+
+        <div class="unscheduled-dest-section" *ngFor="let dest of destinations; let i = index">
+
+          <!-- Destination header -->
+          <div class="unscheduled-dest-header" [class.unscheduled-dest-header--active]="expandedDestIndex === i" (click)="toggleDest(i)">
+            <span class="unscheduled-dest-chevron">{{ expandedDestIndex === i ? '▾' : '›' }}</span>
+            <span class="unscheduled-dest-dot" [style.background]="getDestColor(i)"></span>
+            <span class="unscheduled-dest-label">Unscheduled · {{ dest.name }}</span>
+            <span class="unscheduled-dest-count">{{ getPlacesForDest(dest).length }}</span>
+          </div>
+
+          <!-- Expanded: draggable cards -->
+          <div class="unscheduled-dest-body" *ngIf="expandedDestIndex === i">
+            <div class="unscheduled-list" *ngIf="getPlacesForDest(dest).length > 0">
+              <div class="unscheduled-card" *ngFor="let place of getPlacesForDest(dest)"
+                   cdkDrag
+                   [cdkDragData]="place"
+                   [style.border-left-color]="getCategoryColor(place.category)">
+                <strong>{{ place.placeName }}</strong>
+                <span class="unscheduled-card-meta">
+                  <svg *ngIf="place.category === 'stay'" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+                  </svg>
+                  <svg *ngIf="place.category === 'food'" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+                  </svg>
+                  <svg *ngIf="place.category === 'activity'" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="3 11 22 2 13 21 11 13 3 11"/>
+                  </svg>
+                  {{ getCategoryLabel(place.category) }}
+                </span>
+              </div>
+            </div>
+            <div class="unscheduled-empty" *ngIf="getPlacesForDest(dest).length === 0">
+              <p>All places scheduled!</p>
+            </div>
+            <button class="explore-link">+ Explore more in {{ dest.name }}</button>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
   </div>
+
+  </ng-container>
 </div>

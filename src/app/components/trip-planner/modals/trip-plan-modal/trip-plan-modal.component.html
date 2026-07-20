@@ -36,11 +36,12 @@
   <!-- Dates -->
   <div class="field-group">
     <div class="label-row">
-      <label>Travel Dates <span class="optional">(optional)</span></label>
+      <label>When are you going? <span class="optional">(optional)</span></label>
       <button class="undecided-btn" [class.active]="datesUndecided" (click)="toggleDatesUndecided()">
         Not decided yet
       </button>
     </div>
+    <p class="field-hint" *ngIf="!datesUndecided">You can adjust dates per destination later.</p>
     <div class="date-row" [class.disabled]="datesUndecided">
       <div class="date-input-wrap">
         <label class="date-label">From</label>

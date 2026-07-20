@@ -14,6 +14,7 @@ import { DeleteTripConfirmComponent, DeleteTripConfirmData } from './modals/dele
 import { DeleteDestinationConfirmComponent, DeleteDestinationConfirmData } from './modals/delete-destination-confirm/delete-destination-confirm.component';
 import { InviteModalComponent, InviteModalData } from './modals/invite-modal/invite-modal.component';
 import { EditTripModalComponent, EditTripModalData, EditTripModalResult } from './modals/edit-trip-modal/edit-trip-modal.component';
+import { ManageDestinationsModalComponent, ManageDestinationsModalData } from './modals/manage-destinations-modal/manage-destinations-modal.component';
 import { TripPlanModalComponent, TripPlanModalData } from './modals/trip-plan-modal/trip-plan-modal.component';
 
 @Component({
@@ -38,7 +39,7 @@ export class TripPlannerComponent implements OnInit {
   travellers: number = 0;
 
   // Destinations list (primary + added)
-  destinations: { id?: string; name: string; startDate: string | null; endDate: string | null; latitude?: number; longitude?: number; places?: TripPlaceDetailResponse[] }[] = [];
+  destinations: { id?: string; googlePlaceId?: string; name: string; startDate: string | null; endDate: string | null; latitude?: number; longitude?: number; places?: TripPlaceDetailResponse[] }[] = [];
   primaryPlaceId: string = ''; // for back-to-destination nav
 
   // Trip members
@@ -63,6 +64,7 @@ export class TripPlannerComponent implements OnInit {
   activeDestIndex: number = 0;
   activeDestTab: 'stays' | 'food' | 'activities' = 'stays';
   managingDestinations = false;
+  destFading = false;
   // Sidebar tab
   activeTab: 'overview' | 'itinerary' | 'budget' | 'checklist' | 'travellers' = 'overview';
 
@@ -147,6 +149,7 @@ export class TripPlannerComponent implements OnInit {
                 .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
                 .map((d, i) => ({
                   id: d.id,
+                  googlePlaceId: d.googlePlaceId,
                   name: d.name,
                   latitude: d.latitude,
                   longitude: d.longitude,
@@ -285,12 +288,31 @@ export class TripPlannerComponent implements OnInit {
   }
 
   selectDest(index: number): void {
-    this.activeDestIndex = index;
-    this.activeDestTab = 'stays';
+    if (index === this.activeDestIndex) return;
+    this.destFading = true;
+    setTimeout(() => {
+      this.activeDestIndex = index;
+      this.activeDestTab = 'stays';
+      this.destFading = false;
+    }, 150);
+  }
+
+  switchDestTab(tab: 'stays' | 'food' | 'activities'): void {
+    if (tab === this.activeDestTab) return;
+    this.destFading = true;
+    setTimeout(() => {
+      this.activeDestTab = tab;
+      this.destFading = false;
+    }, 150);
   }
 
   getDestTabIndex(): number {
     return ['stays', 'food', 'activities'].indexOf(this.activeDestTab);
+  }
+
+  getDestColor(): string {
+    const colors = ['#4ade80', '#8b5cf6', '#3b82f6', '#f59e0b', '#ec4899'];
+    return colors[this.activeDestIndex % colors.length];
   }
 
   getPlacesForActiveTab(): TripPlaceDetailResponse[] {
@@ -304,6 +326,18 @@ export class TripPlannerComponent implements OnInit {
   getPlacesForActiveDest(): TripPlaceDetailResponse[] {
     const dest = this.destinations[this.activeDestIndex];
     return dest?.places || [];
+  }
+
+  getExistingPlaceIds(): string[] {
+    const dest = this.destinations[this.activeDestIndex];
+    if (!dest?.places) return [];
+    return dest.places.map(p => p.placeId);
+  }
+
+  onMiniExplorePlaceAdded(place: TripPlaceDetailResponse): void {
+    const dest = this.destinations[this.activeDestIndex];
+    if (!dest.places) dest.places = [];
+    dest.places.push(place);
   }
 
   getAllPlaces(): TripPlaceDetailResponse[] {
@@ -373,18 +407,75 @@ export class TripPlannerComponent implements OnInit {
   }
 
   openAddDestDialog(): void {
+    // Calculate last destination's end date for pre-fill
+    const lastDest = this.destinations[this.destinations.length - 1];
+    const lastDestEndDate = lastDest?.endDate || null;
+
     const dialogRef = this.dialog.open(AddDestinationDialogComponent, {
       panelClass: 'custom-dialog-container',
       data: {
         editMode: false,
         fromDate: this.fromDate,
-        toDate: this.toDate
+        toDate: this.toDate,
+        lastDestEndDate,
+        existingDestinations: this.destinations.map(d => ({
+          name: d.name,
+          startDate: d.startDate,
+          endDate: d.endDate
+        }))
       } as AddDestinationDialogData
     });
 
     dialogRef.afterClosed().subscribe((result: AddDestinationDialogResult | null) => {
       if (result) {
         this.handleAddDest(result);
+      }
+    });
+  }
+
+  openManageDestModal(): void {
+    const dialogRef = this.dialog.open(ManageDestinationsModalComponent, {
+      panelClass: 'custom-dialog-container',
+      data: {
+        tripId: this.tripId,
+        fromDate: this.fromDate,
+        toDate: this.toDate,
+        destinations: this.destinations.map(d => ({
+          id: d.id,
+          googlePlaceId: d.googlePlaceId,
+          name: d.name,
+          startDate: d.startDate,
+          endDate: d.endDate
+        }))
+      } as ManageDestinationsModalData
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result) {
+        // Sync local state from the modal's current state
+        this.destinations = result.destinations.map((d: any) => {
+          // Preserve local data (places, etc.) for existing destinations
+          const existing = this.destinations.find(ed => ed.id === d.id);
+          if (existing) {
+            return { ...existing, name: d.name, startDate: d.startDate, endDate: d.endDate };
+          }
+          return { ...d, places: [] };
+        });
+
+        // Update trip dates
+        if (result.tripFromDate) this.fromDate = result.tripFromDate;
+        if (result.tripToDate) this.toDate = result.tripToDate;
+
+        // Sync trip dates to backend
+        this.tripService.updateTrip(this.tripId, {
+          startDate: this.fromDate,
+          endDate: this.toDate
+        }).subscribe();
+
+        // Reset active dest index if needed
+        if (this.activeDestIndex >= this.destinations.length) {
+          this.activeDestIndex = 0;
+        }
       }
     });
   }
@@ -399,7 +490,10 @@ export class TripPlannerComponent implements OnInit {
         startDate: dest.startDate ? new Date(dest.startDate) : null,
         endDate: dest.endDate ? new Date(dest.endDate) : null,
         fromDate: this.fromDate,
-        toDate: this.toDate
+        toDate: this.toDate,
+        existingDestinations: this.destinations
+          .filter((_, i) => i !== index)
+          .map(d => ({ name: d.name, startDate: d.startDate, endDate: d.endDate }))
       } as AddDestinationDialogData
     });
 
@@ -431,15 +525,40 @@ export class TripPlannerComponent implements OnInit {
     };
     this.tripService.addDestination(this.tripId, dto).subscribe({
       next: (res) => {
-        this.destinations.push({ id: res.id, ...entry, latitude: res.latitude, longitude: res.longitude });
+        this.destinations.push({ id: res.id, googlePlaceId: res.googlePlaceId, ...entry, latitude: res.latitude, longitude: res.longitude });
         this.loaderService.hide();
         this.toastr.success(`${entry.name} added to trip`);
+        // Auto-update trip dates to span all destinations
+        this.autoUpdateTripDates();
       },
       error: () => {
         this.destinations.push(entry);
         this.loaderService.hide();
       }
     });
+  }
+
+  private autoUpdateTripDates(): void {
+    let minDate: string | null = null;
+    let maxDate: string | null = null;
+    for (const dest of this.destinations) {
+      if (dest.startDate && (!minDate || dest.startDate < minDate)) {
+        minDate = dest.startDate;
+      }
+      if (dest.endDate && (!maxDate || dest.endDate > maxDate)) {
+        maxDate = dest.endDate;
+      }
+    }
+    // Only update if dates actually changed
+    if ((minDate && minDate !== this.fromDate) || (maxDate && maxDate !== this.toDate)) {
+      this.fromDate = minDate || this.fromDate;
+      this.toDate = maxDate || this.toDate;
+      // Sync with backend
+      this.tripService.updateTrip(this.tripId, {
+        startDate: this.fromDate,
+        endDate: this.toDate
+      }).subscribe();
+    }
   }
 
   private handleEditDest(index: number, result: AddDestinationDialogResult): void {
@@ -450,6 +569,7 @@ export class TripPlannerComponent implements OnInit {
       startDate: result.startDate ? fmt(result.startDate) : null,
       endDate: result.endDate ? fmt(result.endDate) : null
     };
+    this.autoUpdateTripDates();
   }
 
   openDeleteDestConfirm(index: number): void {
@@ -522,6 +642,7 @@ export class TripPlannerComponent implements OnInit {
   onDocumentClick(): void {
     if (this.showTripMenu) this.showTripMenu = false;
     if (this.showMembersDropdown) this.showMembersDropdown = false;
+    if (this.managingDestinations) this.managingDestinations = false;
   }
 
   openDeleteTripConfirm(): void {

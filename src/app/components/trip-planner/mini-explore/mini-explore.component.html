@@ -1,0 +1,94 @@
+<div class="mini-explore">
+  <div class="mini-explore-header">
+    <div class="mini-explore-title-block">
+      <h3 class="mini-explore-heading">Explore {{ destinationName }}</h3>
+      <p class="mini-explore-subtitle">
+        <span *ngIf="activeTab === 'stays'">Discover top-rated places to stay — hotels, hostels, and homestays nearby.</span>
+        <span *ngIf="activeTab === 'food'">Find the best restaurants, cafes, and street food spots in the area.</span>
+        <span *ngIf="activeTab === 'activities'">Browse popular tourist attractions and things to do around here.</span>
+      </p>
+    </div>
+    <span class="mini-explore-badge" *ngIf="suggestions.length > 0">{{ suggestions.length }} found</span>
+  </div>
+
+  <!-- Loading skeleton -->
+  <div class="places-grid" *ngIf="loading">
+    <div class="place-card skeleton" *ngFor="let i of [1,2,3,4,5,6]">
+      <div class="skeleton-img"></div>
+      <div class="skeleton-body">
+        <div class="skeleton-line wide"></div>
+        <div class="skeleton-line medium"></div>
+        <div class="skeleton-line narrow"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Results grid -->
+  <div class="places-grid" *ngIf="!loading && visibleSuggestions.length > 0">
+    <div class="place-card" *ngFor="let place of visibleSuggestions"
+         [class.place-card--adding]="addingPlaceId === place.placeId"
+         [class.place-card--added]="isAdded(place.placeId)">
+      <div class="place-card-img">
+        <img *ngIf="place.photos.length > 0" [src]="place.photos[0].url" [alt]="place.name">
+        <div *ngIf="place.photos.length === 0" class="place-card-placeholder">{{ tabIcon }}</div>
+        <div class="place-card-added-badge" *ngIf="isAdded(place.placeId)">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="#fff" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          Added
+        </div>
+      </div>
+      <div class="place-card-body">
+        <h3>{{ place.name }}</h3>
+        <p class="place-vicinity">{{ place.vicinity }}</p>
+        <span class="place-rating" *ngIf="place.rating">
+          ⭐ {{ place.rating }}
+          <span class="rating-count" *ngIf="place.userRatingsTotal"> · {{ place.userRatingsTotal }} reviews</span>
+        </span>
+        <div class="card-actions">
+          <button class="add-trip-btn" *ngIf="!isAdded(place.placeId)"
+                  (click)="addPlace(place)"
+                  [disabled]="addingPlaceId === place.placeId">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            <span *ngIf="addingPlaceId !== place.placeId">Add to Trip</span>
+            <span *ngIf="addingPlaceId === place.placeId">Adding...</span>
+          </button>
+          <span class="added-label" *ngIf="isAdded(place.placeId)">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+            Added to Trip
+          </span>
+          <a class="maps-btn"
+             [href]="'https://www.google.com/maps/search/?api=1&query=' + place.geometry.latitude + ',' + place.geometry.longitude"
+             target="_blank" title="View on Google Maps">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Show more -->
+  <button class="mini-explore-show-more" *ngIf="hasMore" (click)="showAll = true">
+    Show more suggestions
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+      <polyline points="6 9 12 15 18 9"/>
+    </svg>
+  </button>
+
+  <!-- Empty state -->
+  <div class="mini-explore-empty" *ngIf="!loading && suggestions.length === 0 && googlePlaceId">
+    <p>No suggestions found for this area. Try adding places using the search button above.</p>
+  </div>
+
+  <!-- No placeId -->
+  <div class="mini-explore-empty" *ngIf="!googlePlaceId">
+    <p>Location data unavailable for this destination. Use the <strong>+ Add</strong> button above to search manually.</p>
+  </div>
+</div>
