@@ -1,5 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatCalendarCellClassFunction } from '@angular/material/datepicker';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 
@@ -164,4 +165,42 @@ export class AddDestinationDialogComponent {
   cancel(): void {
     this.dialogRef.close(null);
   }
+
+  // Highlight existing destination date ranges in the calendar
+  dateClassFn: MatCalendarCellClassFunction<Date> = (cellDate, view) => {
+    if (view !== 'month') return '';
+    if (!this.data.existingDestinations?.length) return '';
+
+    const time = cellDate.getTime();
+    const classes: string[] = [];
+
+    for (let i = 0; i < this.data.existingDestinations.length; i++) {
+      const dest = this.data.existingDestinations[i];
+      if (!dest.startDate || !dest.endDate) continue;
+
+      const start = new Date(dest.startDate);
+      start.setHours(0, 0, 0, 0);
+      const end = new Date(dest.endDate);
+      end.setHours(0, 0, 0, 0);
+
+      const cellDay = new Date(cellDate);
+      cellDay.setHours(0, 0, 0, 0);
+      const cellTime = cellDay.getTime();
+
+      if (cellTime >= start.getTime() && cellTime <= end.getTime()) {
+        const colorIdx = i % 5;
+        classes.push(`dest-range-${colorIdx}`);
+
+        if (cellTime === start.getTime()) {
+          classes.push('dest-range-start');
+        } else if (cellTime === end.getTime()) {
+          classes.push('dest-range-end');
+        } else {
+          classes.push('dest-range-mid');
+        }
+      }
+    }
+
+    return classes.join(' ');
+  };
 }

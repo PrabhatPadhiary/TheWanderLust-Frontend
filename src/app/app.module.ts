@@ -26,6 +26,7 @@ import { DeleteTripConfirmComponent } from './components/trip-planner/modals/del
 import { DeleteDestinationConfirmComponent } from './components/trip-planner/modals/delete-destination-confirm/delete-destination-confirm.component';
 import { ManageDestinationsModalComponent } from './components/trip-planner/modals/manage-destinations-modal/manage-destinations-modal.component';
 import { InviteModalComponent } from './components/trip-planner/modals/invite-modal/invite-modal.component';
+import { ExploreModalComponent } from './components/trip-planner/modals/explore-modal/explore-modal.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { FavouritesComponent } from './components/favourites/favourites.component';
 import { SafePipe } from './pipes/safe.pipe';
@@ -38,7 +39,6 @@ import { AddToTripModalComponent } from './components/add-to-trip-modal/add-to-t
 import { ItineraryTabComponent } from './components/trip-planner/itinerary-tab/itinerary-tab.component';
 import { EditTripModalComponent } from './components/trip-planner/modals/edit-trip-modal/edit-trip-modal.component';
 import { TripMapComponent } from './components/trip-planner/trip-map/trip-map.component';
-import { MiniExploreComponent } from './components/trip-planner/mini-explore/mini-explore.component';
 import { BudgetTabComponent } from './components/trip-planner/budget-tab/budget-tab.component';
 import { TravellersTabComponent } from './components/trip-planner/travellers-tab/travellers-tab.component';
 import { RemoveMemberConfirmComponent } from './components/trip-planner/modals/remove-member-confirm/remove-member-confirm.component';
@@ -66,6 +66,7 @@ import { MyJournalsComponent } from './components/my-journals/my-journals.compon
     DeleteDestinationConfirmComponent,
     ManageDestinationsModalComponent,
     InviteModalComponent,
+    ExploreModalComponent,
     NavbarComponent,
     FavouritesComponent,
     SafePipe,
@@ -78,7 +79,6 @@ import { MyJournalsComponent } from './components/my-journals/my-journals.compon
     ItineraryTabComponent,
     EditTripModalComponent,
     TripMapComponent,
-    MiniExploreComponent,
     BudgetTabComponent,
     AddExpenseModalComponent,
     TravellersTabComponent,

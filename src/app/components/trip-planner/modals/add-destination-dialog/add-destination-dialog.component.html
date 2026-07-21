@@ -27,7 +27,8 @@
     </p>
     <!-- Show existing destinations info (only when adding new) -->
     <div class="existing-dests-info" *ngIf="!data.editMode && data.existingDestinations && data.existingDestinations.length > 0">
-      <div class="existing-dest-chip" *ngFor="let d of data.existingDestinations">
+      <div class="existing-dest-chip" *ngFor="let d of data.existingDestinations; let i = index">
+        <span class="existing-dest-dot" [class]="'dest-dot-' + (i % 5)"></span>
         <span class="existing-dest-name">{{ d.name }}</span>
         <span class="existing-dest-dates" *ngIf="d.startDate && d.endDate">{{ d.startDate | date:'MMM d' }} → {{ d.endDate | date:'MMM d' }}</span>
       </div>
@@ -38,7 +39,7 @@
         <input matInput [matDatepicker]="destStartPicker" [(ngModel)]="addDestStart"
                [min]="minStartDate" placeholder="Start date">
         <mat-datepicker-toggle matIconSuffix [for]="destStartPicker"></mat-datepicker-toggle>
-        <mat-datepicker #destStartPicker></mat-datepicker>
+        <mat-datepicker #destStartPicker [dateClass]="dateClassFn"></mat-datepicker>
       </mat-form-field>
     </div>
     <div class="dialog-field">
@@ -47,7 +48,7 @@
         <input matInput [matDatepicker]="destEndPicker" [(ngModel)]="addDestEnd"
                [min]="addDestStart || minStartDate" placeholder="End date">
         <mat-datepicker-toggle matIconSuffix [for]="destEndPicker"></mat-datepicker-toggle>
-        <mat-datepicker #destEndPicker></mat-datepicker>
+        <mat-datepicker #destEndPicker [dateClass]="dateClassFn"></mat-datepicker>
       </mat-form-field>
     </div>
   </div>

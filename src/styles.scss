@@ -246,6 +246,26 @@ body.no-scroll {
   padding: 0 !important;
 }
 
+// Explore modal — large dialog
+.explore-dialog-container .mat-mdc-dialog-surface {
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 20px !important;
+  overflow: visible !important;
+}
+
+.explore-dialog-container .mat-mdc-dialog-container {
+  padding: 0 !important;
+  max-width: none !important;
+}
+
+.explore-dialog-container + .cdk-overlay-backdrop,
+.cdk-overlay-backdrop.cdk-overlay-backdrop-showing {
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  background: rgba(0, 0, 0, 0.4);
+}
+
 /* ===== Google Maps tile fix ===== */
 .gm-style img,
 .gm-style canvas {
@@ -255,6 +275,27 @@ body.no-scroll {
   box-shadow: none !important;
   object-fit: initial !important;
   display: inline !important;
+}
+
+/* ===== Google Maps InfoWindow compact ===== */
+.gm-style .gm-style-iw-c {
+  padding: 8px 12px !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12) !important;
+}
+
+.gm-style .gm-style-iw-d {
+  overflow: hidden !important;
+  padding: 0 !important;
+}
+
+.gm-style .gm-style-iw-tc::after {
+  background: #fff !important;
+}
+
+/* Hide the default close button to remove reserved space */
+.gm-style .gm-style-iw-chr {
+  display: none !important;
 }
 
 // ===== CDK Drag & Drop global styles =====
@@ -298,4 +339,42 @@ body.no-scroll {
 
 .cdk-drag-animating {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+// ===== Calendar destination date range highlights =====
+// Range position classes
+.mat-calendar-body-cell.dest-range-start .mat-calendar-body-cell-content {
+  border-radius: 50% 0 0 50% !important;
+}
+.mat-calendar-body-cell.dest-range-mid .mat-calendar-body-cell-content {
+  border-radius: 0 !important;
+}
+.mat-calendar-body-cell.dest-range-end .mat-calendar-body-cell-content {
+  border-radius: 0 50% 50% 0 !important;
+}
+// Single day (start == end) gets full circle
+.mat-calendar-body-cell.dest-range-start.dest-range-end .mat-calendar-body-cell-content {
+  border-radius: 50% !important;
+}
+
+// Color variants — applied as background on the cell content
+.mat-calendar-body-cell.dest-range-0 .mat-calendar-body-cell-content {
+  background: rgba(74, 222, 128, 0.3) !important;
+  color: #1a1a1a !important;
+}
+.mat-calendar-body-cell.dest-range-1 .mat-calendar-body-cell-content {
+  background: rgba(139, 92, 246, 0.3) !important;
+  color: #1a1a1a !important;
+}
+.mat-calendar-body-cell.dest-range-2 .mat-calendar-body-cell-content {
+  background: rgba(59, 130, 246, 0.3) !important;
+  color: #1a1a1a !important;
+}
+.mat-calendar-body-cell.dest-range-3 .mat-calendar-body-cell-content {
+  background: rgba(245, 158, 11, 0.3) !important;
+  color: #1a1a1a !important;
+}
+.mat-calendar-body-cell.dest-range-4 .mat-calendar-body-cell-content {
+  background: rgba(236, 72, 153, 0.3) !important;
+  color: #1a1a1a !important;
 }

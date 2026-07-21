@@ -1,14 +1,15 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { ToastrService } from 'ngx-toastr';
 import { AuthService, UserResponse } from '../../services/auth.service';
 import { DestinationService } from '../../services/destination.service';
-import { PlaceCategoriesResponse, PlaceDto } from '../../models/destination.model';
+import { PlaceCategoriesResponse, PlaceDto, PlaceDetailsResponse } from '../../models/destination.model';
 import { FavouritesService, FavouriteItem } from '../../services/favourites.service';
 import { TripService, CreateTripDestinationDto, TripMemberResponse, TripPlaceDetailResponse } from '../../services/trip.service';
 import { LoaderService } from '../../services/loader.service';
 import { AddPlaceModalComponent, AddPlaceModalData } from './modals/add-place-modal/add-place-modal.component';
+import { ExploreModalComponent, ExploreModalData } from './modals/explore-modal/explore-modal.component';
 import { AddDestinationDialogComponent, AddDestinationDialogData, AddDestinationDialogResult } from './modals/add-destination-dialog/add-destination-dialog.component';
 import { DeleteTripConfirmComponent, DeleteTripConfirmData } from './modals/delete-trip-confirm/delete-trip-confirm.component';
 import { DeleteDestinationConfirmComponent, DeleteDestinationConfirmData } from './modals/delete-destination-confirm/delete-destination-confirm.component';
@@ -65,6 +66,11 @@ export class TripPlannerComponent implements OnInit {
   activeDestTab: 'stays' | 'food' | 'activities' = 'stays';
   managingDestinations = false;
   destFading = false;
+
+  // Place detail section
+  selectedTripPlace: TripPlaceDetailResponse | null = null;
+  selectedPlaceDetails: PlaceDetailsResponse | null = null;
+  placeDetailLoading = false;
   // Sidebar tab
   activeTab: 'overview' | 'itinerary' | 'budget' | 'checklist' | 'travellers' = 'overview';
 
@@ -315,6 +321,42 @@ export class TripPlannerComponent implements OnInit {
     return colors[this.activeDestIndex % colors.length];
   }
 
+  @ViewChild('placeDetailSection') placeDetailSection!: ElementRef;
+
+  openPlaceDetail(place: TripPlaceDetailResponse): void {
+    // If same place clicked, close it
+    if (this.selectedTripPlace?.placeId === place.placeId) {
+      this.closePlaceDetail();
+      return;
+    }
+
+    this.selectedTripPlace = place;
+    this.selectedPlaceDetails = null;
+    this.placeDetailLoading = true;
+
+    // Scroll to the skeleton section immediately (it has fixed height, so no layout shift)
+    setTimeout(() => {
+      this.placeDetailSection?.nativeElement?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 50);
+
+    // Fetch full details — content fades in when ready
+    this.destinationService.getDetails(place.placeId).subscribe({
+      next: (details) => {
+        this.selectedPlaceDetails = details;
+        this.placeDetailLoading = false;
+      },
+      error: () => {
+        this.placeDetailLoading = false;
+      }
+    });
+  }
+
+  closePlaceDetail(): void {
+    this.selectedTripPlace = null;
+    this.selectedPlaceDetails = null;
+    this.placeDetailLoading = false;
+  }
+
   getPlacesForActiveTab(): TripPlaceDetailResponse[] {
     const dest = this.destinations[this.activeDestIndex];
     if (!dest?.places) return [];
@@ -332,12 +374,6 @@ export class TripPlannerComponent implements OnInit {
     const dest = this.destinations[this.activeDestIndex];
     if (!dest?.places) return [];
     return dest.places.map(p => p.placeId);
-  }
-
-  onMiniExplorePlaceAdded(place: TripPlaceDetailResponse): void {
-    const dest = this.destinations[this.activeDestIndex];
-    if (!dest.places) dest.places = [];
-    dest.places.push(place);
   }
 
   getAllPlaces(): TripPlaceDetailResponse[] {
@@ -365,24 +401,27 @@ export class TripPlannerComponent implements OnInit {
     const dest = this.destinations[this.activeDestIndex];
     if (!dest?.id || !this.tripId) return;
 
-    const dialogRef = this.dialog.open(AddPlaceModalComponent, {
-      panelClass: 'custom-dialog-container',
+    const dialogRef = this.dialog.open(ExploreModalComponent, {
+      panelClass: 'explore-dialog-container',
+      width: '95vw',
+      maxWidth: '1200px',
+      height: '88vh',
       data: {
         tripId: this.tripId,
         destinationId: dest.id,
         destinationName: dest.name || '',
+        googlePlaceId: dest.googlePlaceId || '',
         activeTab: this.activeDestTab,
+        existingPlaceIds: (dest.places || []).map(p => p.placeId),
         latitude: dest.latitude,
         longitude: dest.longitude
-      } as AddPlaceModalData
+      } as ExploreModalData
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result?.place) {
-        // Add the new place to the local destinations list so it appears immediately
+      if (result?.addedPlaces?.length) {
         if (!dest.places) dest.places = [];
-        dest.places.push(result.place);
-        this.toastr.success(`${result.place.placeName} added`);
+        dest.places.push(...result.addedPlaces);
       }
     });
   }
