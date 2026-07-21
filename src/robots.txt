@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /trip-planner
+Disallow: /favourites
+Disallow: /my-trips
+Disallow: /my-journals
+Disallow: /join/
+Disallow: /community/write
+
+Sitemap: https://wayraa.com/sitemap.xml
