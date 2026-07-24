@@ -115,7 +115,6 @@ export class BudgetTabComponent implements OnInit, OnChanges {
     if (this.tripId) {
       // API-stored currency takes priority, fall back to localStorage
       this.currency = this.initialCurrency || localStorage.getItem(`trip_currency_${this.tripId}`) || '₹';
-      this.loadExpenses();
     }
   }
 

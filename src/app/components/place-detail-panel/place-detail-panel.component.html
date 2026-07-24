@@ -31,49 +31,74 @@
 
         <div class="panel-content">
             <h2>{{ details.name }}</h2>
-            <p class="panel-address">{{ details.formattedAddress }}</p>
 
-            <!-- Stats row -->
-            <div class="panel-stats">
-                <span class="panel-rating" *ngIf="details.rating">
-                    ⭐ {{ details.rating }}
-                    <span *ngIf="details.userRatingsTotal"> · {{ details.userRatingsTotal }} reviews</span>
-                </span>
-                <span class="panel-price" *ngIf="details.priceLevel">{{ getPriceLevel() }}</span>
-                <span class="panel-status" *ngIf="details.openingHours?.openNow !== null"
-                      [class.open]="details.openingHours?.openNow"
-                      [class.closed]="!details.openingHours?.openNow">
-                    {{ details.openingHours?.openNow ? 'Open Now' : 'Closed' }}
-                </span>
-            </div>
+            <!-- Info Card -->
+            <div class="info-card">
+                <div class="info-card-row" *ngIf="details.formattedAddress">
+                    <div class="info-card-icon">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                        </svg>
+                    </div>
+                    <div class="info-card-text">{{ details.formattedAddress }}</div>
+                </div>
 
-            <!-- Contact info -->
-            <div class="panel-contact" *ngIf="details.formattedPhoneNumber || details.website">
-                <a *ngIf="details.formattedPhoneNumber" [href]="'tel:' + details.formattedPhoneNumber" class="contact-item">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path>
-                    </svg>
-                    {{ details.formattedPhoneNumber }}
-                </a>
-                <a *ngIf="details.website" [href]="details.website" target="_blank" class="contact-item">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <line x1="2" y1="12" x2="22" y2="12"></line>
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-                    </svg>
-                    Visit Website
-                </a>
-            </div>
+                <div class="info-card-row" *ngIf="details.rating">
+                    <div class="info-card-icon">⭐</div>
+                    <div class="info-card-text">
+                        {{ details.rating }}
+                        <span class="info-muted" *ngIf="details.userRatingsTotal"> · {{ details.userRatingsTotal }} reviews</span>
+                        <span class="info-price" *ngIf="details.priceLevel"> · {{ getPriceLevel() }}</span>
+                    </div>
+                </div>
 
-            <!-- Opening Hours -->
-            <div class="panel-hours" *ngIf="details.openingHours?.weekdayText?.length">
-                <button class="hours-toggle" (click)="showHours = !showHours">
-                    {{ showHours ? 'Hide' : 'Show' }} Opening Hours
-                    <span [class.rotated]="showHours">▾</span>
-                </button>
-                <ul *ngIf="showHours">
-                    <li *ngFor="let day of details.openingHours!.weekdayText">{{ day }}</li>
-                </ul>
+                <div class="info-card-row" *ngIf="details.formattedPhoneNumber">
+                    <div class="info-card-icon">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"></path>
+                        </svg>
+                    </div>
+                    <a [href]="'tel:' + details.formattedPhoneNumber" class="info-card-link">{{ details.formattedPhoneNumber }}</a>
+                </div>
+
+                <div class="info-card-row" *ngIf="details.website">
+                    <div class="info-card-icon">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="2" y1="12" x2="22" y2="12"></line>
+                            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                        </svg>
+                    </div>
+                    <a [href]="details.website" target="_blank" class="info-card-link">Visit Website</a>
+                </div>
+
+                <div class="info-card-row" *ngIf="details.openingHours?.openNow !== null">
+                    <div class="info-card-icon">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </div>
+                    <div class="info-card-text">
+                        <span class="panel-status"
+                              [class.open]="details.openingHours?.openNow"
+                              [class.closed]="!details.openingHours?.openNow">
+                            {{ details.openingHours?.openNow ? 'Open Now' : 'Closed' }}
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Opening Hours (expandable inside the card) -->
+                <div class="info-card-hours" *ngIf="details.openingHours?.weekdayText?.length">
+                    <button class="hours-toggle" (click)="showHours = !showHours">
+                        {{ showHours ? 'Hide' : 'Show' }} Opening Hours
+                        <span [class.rotated]="showHours">▾</span>
+                    </button>
+                    <ul *ngIf="showHours">
+                        <li *ngFor="let day of details.openingHours!.weekdayText">{{ day }}</li>
+                    </ul>
+                </div>
             </div>
 
             <!-- Actions -->

@@ -4,6 +4,7 @@ import { TripService, CreateTripDestinationDto } from '../../../../services/trip
 import { ToastrService } from 'ngx-toastr';
 import { AddDestinationDialogComponent, AddDestinationDialogData, AddDestinationDialogResult } from '../add-destination-dialog/add-destination-dialog.component';
 import { DeleteDestinationConfirmComponent, DeleteDestinationConfirmData } from '../delete-destination-confirm/delete-destination-confirm.component';
+import { RescheduleWarningModalComponent, RescheduleWarningData } from '../reschedule-warning-modal/reschedule-warning-modal.component';
 
 export interface ManageDestinationsModalData {
   tripId: string;
@@ -30,6 +31,11 @@ export class ManageDestinationsModalComponent {
     private toastr: ToastrService
   ) {
     this.destinations = [...data.destinations.map(d => ({ ...d }))];
+
+    // Ensure backdrop click also returns the current state
+    this.dialogRef.backdropClick().subscribe(() => {
+      this.close();
+    });
   }
 
   get tripDateRange(): string {
@@ -122,23 +128,61 @@ export class ManageDestinationsModalComponent {
         const newStart = result.startDate ? this.fmt(result.startDate) : null;
         const newEnd = result.endDate ? this.fmt(result.endDate) : null;
 
-        // Update locally
-        this.destinations[index] = { ...this.destinations[index], startDate: newStart, endDate: newEnd };
-        this.destinations = [...this.destinations];
+        // Check if destination's range is shrinking (could orphan itinerary items)
+        const oldStart = dest.startDate;
+        const oldEnd = dest.endDate;
+        const destRangeShrank = (newStart && oldStart && newStart > oldStart) ||
+                                (newEnd && oldEnd && newEnd < oldEnd);
 
-        // Call API immediately to update dates
-        if (dest.id) {
-          this.tripService.updateDestinationDates(this.data.tripId, [{
-            destinationId: dest.id,
-            startDate: newStart,
-            endDate: newEnd
-          }]).subscribe({
-            next: () => this.toastr.success(`${dest.name} dates updated`),
-            error: () => this.toastr.error('Failed to update dates')
+        if (destRangeShrank) {
+          // Show warning before applying
+          const warnRef = this.dialog.open(RescheduleWarningModalComponent, {
+            panelClass: 'custom-dialog-container',
+            data: { destinationName: dest.name } as RescheduleWarningData
           });
+
+          warnRef.afterClosed().subscribe((confirmed: boolean) => {
+            if (!confirmed) return;
+            this.applyDestDateUpdate(index, dest, newStart, newEnd);
+          });
+        } else {
+          this.applyDestDateUpdate(index, dest, newStart, newEnd);
         }
       }
     });
+  }
+
+  private applyDestDateUpdate(index: number, dest: any, newStart: string | null, newEnd: string | null): void {
+    // Update locally
+    this.destinations[index] = { ...this.destinations[index], startDate: newStart, endDate: newEnd };
+    this.destinations = [...this.destinations];
+
+    // Call API to update dates
+    if (dest.id) {
+      this.tripService.updateDestinationDates(this.data.tripId, [{
+        destinationId: dest.id,
+        startDate: newStart,
+        endDate: newEnd
+      }]).subscribe({
+        next: () => {
+          this.toastr.success(`${dest.name} dates updated`);
+          // Clean up orphaned itinerary items
+          const tripStart = this.tripFromDate;
+          const tripEnd = this.tripToDate;
+          if (tripStart && tripEnd) {
+            this.tripService.deleteItineraryOutsideRange(this.data.tripId, tripStart, tripEnd).subscribe({
+              next: (res) => {
+                if (res.deleted > 0) {
+                  this.toastr.info(`${res.deleted} itinerary item(s) removed (outside new dates)`);
+                }
+              },
+              error: () => {}
+            });
+          }
+        },
+        error: () => this.toastr.error('Failed to update dates')
+      });
+    }
   }
 
   deleteDest(index: number): void {

@@ -857,3 +857,32 @@
   &:hover { background: #333; }
   &:disabled { opacity: 0.4; cursor: default; }
 }
+
+// Dotted add expense button
+.add-expense-dotted {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px;
+  margin-top: 12px;
+  border: 1.5px dashed #d1d5db;
+  border-radius: 12px;
+  background: transparent;
+  color: #888;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  svg { stroke: #888; }
+
+  &:hover {
+    border-color: #2d5a27;
+    color: #2d5a27;
+    background: rgba(45, 90, 39, 0.03);
+    svg { stroke: #2d5a27; }
+  }
+}

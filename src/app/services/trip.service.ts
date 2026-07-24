@@ -730,4 +730,19 @@ export class TripService {
       });
     });
   }
+
+  deleteItineraryOutsideRange(tripId: string, startDate: string, endDate: string): Observable<{ deleted: number }> {
+    return new Observable(observer => {
+      this.authService.authReady.then(() =>
+        this.authService.getFirebaseToken()
+      ).then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' });
+        this.http.request<{ deleted: number }>('delete', `${environment.apiUrl}/trips/${tripId}/itinerary/outside-range`, {
+          headers,
+          body: { startDate, endDate }
+        }).subscribe({ next: (res) => { observer.next(res); observer.complete(); }, error: err => observer.error(err) });
+      });
+    });
+  }
 }

@@ -1,0 +1,91 @@
+<div class="iid-container">
+  <!-- Header -->
+  <div class="iid-header">
+    <div class="iid-color-bar" [style.background]="getCategoryColor(category)"></div>
+    <div class="iid-header-content">
+      <input *ngIf="isManualItem" class="iid-title-input" [(ngModel)]="title" placeholder="Item name">
+      <h3 *ngIf="!isManualItem">{{ title }}</h3>
+      <span class="iid-destination">{{ data.destinationName }}</span>
+    </div>
+    <button class="iid-close" (click)="cancel()">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Category pills (editable only for manual items) -->
+  <div class="iid-section">
+    <span class="iid-label">Category</span>
+    <div class="iid-categories" *ngIf="isManualItem">
+      <button class="iid-cat" *ngFor="let cat of categories"
+              [class.iid-cat--active]="category === cat"
+              [style.--cat-color]="getCategoryColor(cat)"
+              (click)="category = cat">
+        {{ categoryLabels[cat] }}
+      </button>
+    </div>
+    <span class="iid-cat-badge" *ngIf="!isManualItem" [style.background]="getCategoryColor(category) + '20'" [style.color]="getCategoryColor(category)">
+      {{ categoryLabels[category] || category }}
+    </span>
+  </div>
+
+  <!-- Time section -->
+  <div class="iid-section">
+    <span class="iid-label">Time</span>
+    <div class="iid-time-row">
+      <div class="iid-time-field">
+        <span class="iid-time-sub">Start</span>
+        <div class="iid-time-picker" (click)="startDropdownOpen = !startDropdownOpen; endDropdownOpen = false; $event.stopPropagation()">
+          <span>{{ formatTimeLabel(startTime) }}</span>
+          <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          <div class="iid-time-dropdown" *ngIf="startDropdownOpen" (click)="$event.stopPropagation()">
+            <div class="iid-time-option" *ngFor="let t of timeOptions"
+                 [class.iid-time-option--active]="t === startTime"
+                 (click)="startTime = t; startDropdownOpen = false">
+              {{ formatTimeLabel(t) }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="iid-time-arrow">→</span>
+      <div class="iid-time-field">
+        <span class="iid-time-sub">End</span>
+        <div class="iid-time-picker" (click)="endDropdownOpen = !endDropdownOpen; startDropdownOpen = false; $event.stopPropagation()">
+          <span>{{ formatTimeLabel(endTime) }}</span>
+          <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+          <div class="iid-time-dropdown" *ngIf="endDropdownOpen" (click)="$event.stopPropagation()">
+            <div class="iid-time-option" *ngFor="let t of timeOptions"
+                 [class.iid-time-option--active]="t === endTime"
+                 (click)="endTime = t; endDropdownOpen = false">
+              {{ formatTimeLabel(t) }}
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="iid-duration">{{ getDuration() }}</span>
+    </div>
+  </div>
+
+  <!-- Notes -->
+  <div class="iid-section">
+    <span class="iid-label">Notes</span>
+    <textarea class="iid-notes" [(ngModel)]="notes" placeholder="Add notes..." rows="3"></textarea>
+  </div>
+
+  <!-- Footer -->
+  <div class="iid-footer">
+    <button class="iid-delete" (click)="delete()" [disabled]="deleting">
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+      </svg>
+      {{ deleting ? 'Removing...' : 'Remove' }}
+    </button>
+    <div class="iid-footer-right">
+      <button class="iid-cancel" (click)="cancel()">Cancel</button>
+      <button class="iid-save" (click)="save()" [disabled]="saving || (!isManualItem && !startTime)">
+        {{ saving ? 'Saving...' : 'Save' }}
+      </button>
+    </div>
+  </div>
+</div>

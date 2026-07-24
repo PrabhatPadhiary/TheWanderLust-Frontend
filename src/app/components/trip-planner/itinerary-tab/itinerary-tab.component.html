@@ -41,36 +41,56 @@
   <!-- Main layout: timeline + unscheduled sidebar -->
   <div class="itinerary-split">
 
-    <!-- Left: Time-based schedule -->
-    <div class="schedule-col">
-      <div class="time-grid">
-        <div class="time-row" *ngFor="let slot of timeSlots">
-          <span class="time-label">{{ slot }}</span>
-          <div class="time-slot"
-               cdkDropList
-               cdkDropListOrientation="horizontal"
-               [id]="getSlotDropListId(slot)"
-               [cdkDropListData]="scheduledSlots[slot]"
-               [cdkDropListConnectedTo]="['unscheduled-list'].concat(allSlotIds)"
-               (cdkDropListDropped)="dropOnSlot($event, slot)">
+    <!-- Left: Absolute-positioned schedule -->
+    <div class="schedule-col" #scheduleCol
+         cdkDropList
+         id="schedule-drop-zone"
+         [cdkDropListData]="activeDayItems"
+         [cdkDropListConnectedTo]="['unscheduled-list']"
+         (cdkDropListDropped)="dropOnSchedule($event)"
+         (click)="onScheduleClick($event)">
+      <div class="schedule-col-inner">
+        <!-- Background grid lines -->
+        <div class="hour-line" *ngFor="let slot of timeSlots; let i = index"
+             [style.top.px]="i * 80">
+          <span class="hour-label">{{ slot }}</span>
+          <span class="half-hour-label">{{ getHalfHourLabel(i) }}</span>
+        </div>
 
-            <!-- Scheduled items in this slot -->
-            <div class="scheduled-item" *ngFor="let item of scheduledSlots[slot]; let idx = index"
-                 cdkDrag
-                 [style.border-left-color]="getCategoryColor(item.category)">
-              <strong>{{ item.title }}</strong>
-              <span class="scheduled-item-meta">{{ getCategoryLabel(item.category) }}</span>
-              <button class="scheduled-item-remove" (click)="removeFromSlot(slot, idx)" title="Remove from schedule">
-                <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                </svg>
-              </button>
-            </div>
+        <!-- Absolutely positioned items -->
+        <div class="cal-item" *ngFor="let item of activeDayItems"
+             [style.top.px]="getItemTop(item)"
+             [style.height.px]="getItemHeight(item)"
+             [style.left]="getItemLeftPercent(item)"
+             [style.width]="getItemWidthPercent(item)"
+             [style.border-left-color]="getCategoryColor(item.category)"
+             (mousedown)="onItemMouseDown($event, item)"
+             (click)="openItemDetail(item, $event)">
+          <strong>{{ item.title }}</strong>
+          <span class="cal-item-time">{{ formatTimeDisplay(item.startTime!) }} – {{ formatTimeDisplay(item.endTime!) }}</span>
+          <span class="cal-item-cat">{{ getCategoryLabel(item.category) }}</span>
+          <button class="cal-item-remove" (click)="removeItem(item); $event.stopPropagation()" (mousedown)="$event.stopPropagation()">
+            <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+          <!-- Resize handle -->
+          <div class="cal-item-resize" (mousedown)="onResizeMouseDown($event, item)"></div>
+        </div>
 
-            <!-- Drop placeholder when empty -->
-            <div class="time-slot-drop" *ngIf="scheduledSlots[slot].length === 0">
-              <span class="drop-hint">Drop here</span>
-            </div>
+        <!-- Quick add (shown at clicked position) -->
+        <div class="quick-add-form cal-quick-add" *ngIf="quickAddSlot"
+             [style.top.px]="quickAddTop">
+          <input class="quick-add-input" [(ngModel)]="quickAddTitle" placeholder="e.g. Travel by cab..."
+                 (keydown.enter)="submitQuickAdd(quickAddSlot!)" (keydown.escape)="cancelQuickAdd()">
+          <div class="quick-add-categories">
+            <button class="quick-add-cat" [class.quick-add-cat--active]="quickAddCategory === 'activity'" (click)="quickAddCategory = 'activity'">Activity</button>
+            <button class="quick-add-cat" [class.quick-add-cat--active]="quickAddCategory === 'transport'" (click)="quickAddCategory = 'transport'">Transport</button>
+            <button class="quick-add-cat" [class.quick-add-cat--active]="quickAddCategory === 'food'" (click)="quickAddCategory = 'food'">Food</button>
+            <button class="quick-add-cat" [class.quick-add-cat--active]="quickAddCategory === 'stay'" (click)="quickAddCategory = 'stay'">Stay</button>
+            <button class="quick-add-cat" [class.quick-add-cat--active]="quickAddCategory === 'other'" (click)="quickAddCategory = 'other'">Other</button>
+          </div>
+          <div class="quick-add-actions">
+            <button class="quick-add-submit" (click)="submitQuickAdd(quickAddSlot!)" [disabled]="!quickAddTitle.trim()">Add</button>
+            <button class="quick-add-cancel" (click)="cancelQuickAdd()">Cancel</button>
           </div>
         </div>
       </div>
@@ -79,11 +99,13 @@
     <!-- Right: Unscheduled sidebar -->
     <div class="unscheduled-col">
 
+      <h3 class="unscheduled-heading">Unscheduled</h3>
+
       <div class="unscheduled-dest-sections"
            cdkDropList
            id="unscheduled-list"
            [cdkDropListData]="unscheduledPlaces"
-           [cdkDropListConnectedTo]="allSlotIds"
+           [cdkDropListConnectedTo]="['schedule-drop-zone']"
            (cdkDropListDropped)="dropOnUnscheduled($event)">
 
         <div class="unscheduled-dest-section" *ngFor="let dest of destinations; let i = index">
@@ -92,32 +114,84 @@
           <div class="unscheduled-dest-header" [class.unscheduled-dest-header--active]="expandedDestIndex === i" (click)="toggleDest(i)">
             <span class="unscheduled-dest-chevron">{{ expandedDestIndex === i ? '▾' : '›' }}</span>
             <span class="unscheduled-dest-dot" [style.background]="getDestColor(i)"></span>
-            <span class="unscheduled-dest-label">Unscheduled · {{ dest.name }}</span>
+            <span class="unscheduled-dest-label">{{ dest.name }}</span>
             <span class="unscheduled-dest-count">{{ getPlacesForDest(dest).length }}</span>
           </div>
 
-          <!-- Expanded: draggable cards -->
+          <!-- Expanded: grouped by category -->
           <div class="unscheduled-dest-body" *ngIf="expandedDestIndex === i">
-            <div class="unscheduled-list" *ngIf="getPlacesForDest(dest).length > 0">
-              <div class="unscheduled-card" *ngFor="let place of getPlacesForDest(dest)"
-                   cdkDrag
-                   [cdkDragData]="place"
-                   [style.border-left-color]="getCategoryColor(place.category)">
-                <strong>{{ place.placeName }}</strong>
-                <span class="unscheduled-card-meta">
-                  <svg *ngIf="place.category === 'stay'" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
-                  </svg>
-                  <svg *ngIf="place.category === 'food'" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
-                  </svg>
-                  <svg *ngIf="place.category === 'activity'" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2">
-                    <polygon points="3 11 22 2 13 21 11 13 3 11"/>
-                  </svg>
-                  {{ getCategoryLabel(place.category) }}
-                </span>
-              </div>
-            </div>
+            <ng-container *ngIf="getPlacesForDest(dest).length > 0">
+              <!-- Activities group -->
+              <ng-container *ngIf="getPlacesForDestByCategory(dest, 'activity').length > 0">
+                <div class="unscheduled-category-heading">Activities</div>
+                <div class="unscheduled-list">
+                  <div class="unscheduled-card" *ngFor="let place of getPlacesForDestByCategory(dest, 'activity')"
+                       cdkDrag
+                       (cdkDragStarted)="onDragStarted()"
+                       [cdkDragData]="place"
+                       [style.border-left-color]="getCategoryColor(place.category)">
+                    <strong>{{ place.placeName }}</strong>
+                  </div>
+                </div>
+              </ng-container>
+
+              <!-- Food group -->
+              <ng-container *ngIf="getPlacesForDestByCategory(dest, 'food').length > 0">
+                <div class="unscheduled-category-heading">Food</div>
+                <div class="unscheduled-list">
+                  <div class="unscheduled-card" *ngFor="let place of getPlacesForDestByCategory(dest, 'food')"
+                       cdkDrag
+                       (cdkDragStarted)="onDragStarted()"
+                       [cdkDragData]="place"
+                       [style.border-left-color]="getCategoryColor(place.category)">
+                    <strong>{{ place.placeName }}</strong>
+                  </div>
+                </div>
+              </ng-container>
+
+              <!-- Stay group -->
+              <ng-container *ngIf="getPlacesForDestByCategory(dest, 'stay').length > 0">
+                <div class="unscheduled-category-heading">Stays</div>
+                <div class="unscheduled-list">
+                  <div class="unscheduled-card" *ngFor="let place of getPlacesForDestByCategory(dest, 'stay')"
+                       cdkDrag
+                       (cdkDragStarted)="onDragStarted()"
+                       [cdkDragData]="place"
+                       [style.border-left-color]="getCategoryColor(place.category)">
+                    <strong>{{ place.placeName }}</strong>
+                  </div>
+                </div>
+              </ng-container>
+
+              <!-- Transport group -->
+              <ng-container *ngIf="getPlacesForDestByCategory(dest, 'transport').length > 0">
+                <div class="unscheduled-category-heading">Transport</div>
+                <div class="unscheduled-list">
+                  <div class="unscheduled-card" *ngFor="let place of getPlacesForDestByCategory(dest, 'transport')"
+                       cdkDrag
+                       (cdkDragStarted)="onDragStarted()"
+                       [cdkDragData]="place"
+                       [style.border-left-color]="getCategoryColor(place.category)">
+                    <strong>{{ place.placeName }}</strong>
+                  </div>
+                </div>
+              </ng-container>
+
+              <!-- Other group -->
+              <ng-container *ngIf="getPlacesForDestByCategory(dest, 'other').length > 0">
+                <div class="unscheduled-category-heading">Other</div>
+                <div class="unscheduled-list">
+                  <div class="unscheduled-card" *ngFor="let place of getPlacesForDestByCategory(dest, 'other')"
+                       cdkDrag
+                       (cdkDragStarted)="onDragStarted()"
+                       [cdkDragData]="place"
+                       [style.border-left-color]="getCategoryColor(place.category)">
+                    <strong>{{ place.placeName }}</strong>
+                  </div>
+                </div>
+              </ng-container>
+            </ng-container>
+
             <div class="unscheduled-empty" *ngIf="getPlacesForDest(dest).length === 0">
               <p>All places scheduled!</p>
             </div>

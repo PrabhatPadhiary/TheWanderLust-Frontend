@@ -16,6 +16,8 @@ import { DeleteDestinationConfirmComponent, DeleteDestinationConfirmData } from 
 import { InviteModalComponent, InviteModalData } from './modals/invite-modal/invite-modal.component';
 import { EditTripModalComponent, EditTripModalData, EditTripModalResult } from './modals/edit-trip-modal/edit-trip-modal.component';
 import { ManageDestinationsModalComponent, ManageDestinationsModalData } from './modals/manage-destinations-modal/manage-destinations-modal.component';
+import { RescheduleWarningModalComponent, RescheduleWarningData } from './modals/reschedule-warning-modal/reschedule-warning-modal.component';
+import { ManageMembersModalComponent, ManageMembersModalData } from './modals/manage-members-modal/manage-members-modal.component';
 import { TripPlanModalComponent, TripPlanModalData } from './modals/trip-plan-modal/trip-plan-modal.component';
 
 @Component({
@@ -475,6 +477,7 @@ export class TripPlannerComponent implements OnInit {
   openManageDestModal(): void {
     const dialogRef = this.dialog.open(ManageDestinationsModalComponent, {
       panelClass: 'custom-dialog-container',
+      disableClose: true,
       data: {
         tripId: this.tripId,
         fromDate: this.fromDate,
@@ -515,6 +518,25 @@ export class TripPlannerComponent implements OnInit {
         if (this.activeDestIndex >= this.destinations.length) {
           this.activeDestIndex = 0;
         }
+      }
+    });
+  }
+
+  openManageMembersModal(): void {
+    const dialogRef = this.dialog.open(ManageMembersModalComponent, {
+      panelClass: 'custom-dialog-container',
+      disableClose: true,
+      data: {
+        tripId: this.tripId,
+        tripName: this.tripName,
+        members: this.members,
+        userRole: this.currentUserRole
+      } as ManageMembersModalData
+    });
+
+    dialogRef.afterClosed().subscribe((result: any) => {
+      if (result && result.members) {
+        this.members = result.members;
       }
     });
   }
@@ -602,13 +624,72 @@ export class TripPlannerComponent implements OnInit {
 
   private handleEditDest(index: number, result: AddDestinationDialogResult): void {
     const fmt = (d: Date) => d.toISOString().split('T')[0];
-    this.destinations[index] = {
-      ...this.destinations[index],
-      name: result.prediction.structured_formatting.main_text,
-      startDate: result.startDate ? fmt(result.startDate) : null,
-      endDate: result.endDate ? fmt(result.endDate) : null
-    };
-    this.autoUpdateTripDates();
+    const newStartDate = result.startDate ? fmt(result.startDate) : null;
+    const newEndDate = result.endDate ? fmt(result.endDate) : null;
+
+    // Check if the destination's own date range is shrinking
+    const oldDest = this.destinations[index];
+    const oldDestStart = oldDest.startDate;
+    const oldDestEnd = oldDest.endDate;
+
+    // A destination's range shrank if:
+    // - new start is later than old start, OR
+    // - new end is earlier than old end
+    const destRangeShrank = (newStartDate && oldDestStart && newStartDate > oldDestStart) ||
+                            (newEndDate && oldDestEnd && newEndDate < oldDestEnd);
+
+    // Compute what the new trip-wide date range would be (for the cleanup call)
+    const tempDestinations = this.destinations.map((d, i) => {
+      if (i === index) return { ...d, startDate: newStartDate, endDate: newEndDate };
+      return d;
+    });
+    let newTripStart: string | null = null;
+    let newTripEnd: string | null = null;
+    for (const dest of tempDestinations) {
+      if (dest.startDate && (!newTripStart || dest.startDate < newTripStart)) newTripStart = dest.startDate;
+      if (dest.endDate && (!newTripEnd || dest.endDate > newTripEnd)) newTripEnd = dest.endDate;
+    }
+
+    if (destRangeShrank && newTripStart && newTripEnd) {
+      // Show warning modal before proceeding
+      const destName = result.prediction.structured_formatting.main_text;
+      const warnRef = this.dialog.open(RescheduleWarningModalComponent, {
+        panelClass: 'custom-dialog-container',
+        data: { destinationName: destName } as RescheduleWarningData
+      });
+
+      warnRef.afterClosed().subscribe((confirmed: boolean) => {
+        if (!confirmed) return;
+
+        // Apply the edit
+        this.destinations[index] = {
+          ...this.destinations[index],
+          name: destName,
+          startDate: newStartDate,
+          endDate: newEndDate
+        };
+        this.autoUpdateTripDates();
+
+        // Clean up orphaned items using the new trip-wide range
+        this.tripService.deleteItineraryOutsideRange(this.tripId, newTripStart!, newTripEnd!).subscribe({
+          next: (res) => {
+            if (res.deleted > 0) {
+              this.toastr.info(`${res.deleted} item(s) removed from itinerary (outside new dates)`);
+            }
+          },
+          error: () => {}
+        });
+      });
+    } else {
+      // No risk of orphaning — just apply the edit
+      this.destinations[index] = {
+        ...this.destinations[index],
+        name: result.prediction.structured_formatting.main_text,
+        startDate: newStartDate,
+        endDate: newEndDate
+      };
+      this.autoUpdateTripDates();
+    }
   }
 
   openDeleteDestConfirm(index: number): void {

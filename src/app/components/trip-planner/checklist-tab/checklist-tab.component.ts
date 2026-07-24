@@ -120,7 +120,7 @@ export class ChecklistTabComponent implements OnInit, OnChanges {
   ) {}
 
   ngOnInit(): void {
-    if (this.tripId) this.loadItems();
+    // Loading is handled by ngOnChanges when tripId is set
   }
 
   ngOnChanges(changes: SimpleChanges): void {

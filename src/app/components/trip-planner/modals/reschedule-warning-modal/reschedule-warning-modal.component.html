@@ -1,0 +1,16 @@
+<div class="confirm-dialog">
+  <div class="dialog-icon">
+    <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#f59e0b" stroke-width="2">
+      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+      <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+    </svg>
+  </div>
+  <h4>Itinerary items will be affected</h4>
+  <p class="dialog-hint">
+    Changing the dates for <strong>{{ data.destinationName }}</strong> will remove scheduled itinerary items that fall outside the new date range. They'll need to be re-added manually.
+  </p>
+  <div class="dialog-actions">
+    <button class="dialog-cancel" (click)="cancel()">Keep dates</button>
+    <button class="dialog-confirm dialog-confirm--warning" (click)="confirm()">Continue & remove</button>
+  </div>
+</div>

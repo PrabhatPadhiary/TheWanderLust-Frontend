@@ -4,14 +4,13 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <nav class="sidebar-nav">
-      <a class="nav-item" [class.active]="activeTab === 'overview'" (click)="setActiveTab('overview')">Overview</a>
+      <a class="nav-item" [class.active]="activeTab === 'overview'" (click)="setActiveTab('overview')">Dashboard</a>
       <a class="nav-item" [class.active]="activeTab === 'itinerary'" (click)="setActiveTab('itinerary')">
         Itinerary
         <span class="badge" *ngIf="itinerary.length">{{ itinerary.length }}</span>
       </a>
       <a class="nav-item" [class.active]="activeTab === 'budget'" (click)="setActiveTab('budget')">Budget</a>
       <a class="nav-item" [class.active]="activeTab === 'checklist'" (click)="setActiveTab('checklist')">Checklist</a>
-      <a class="nav-item" [class.active]="activeTab === 'travellers'" (click)="setActiveTab('travellers')">Travellers</a>
     </nav>
     <button class="new-trip-btn" (click)="openNewTripFlow()">+ New Trip</button>
   </aside>
@@ -158,23 +157,28 @@
               <span class="meta-value">{{ travellers > 0 ? travellers + (travellers === 1 ? ' person' : ' people') : '—' }}</span>
             </div>
             <!-- Member avatars -->
-            <div class="members-stack" *ngIf="members.length > 0" (click)="showMembersDropdown = !showMembersDropdown; $event.stopPropagation()">
-              <div class="member-avatar" *ngFor="let m of members.slice(0, 5)">
-                {{ getMemberInitial(m.name) }}
-              </div>
-              <div class="member-avatar member-avatar--more" *ngIf="members.length > 5">
-                +{{ members.length - 5 }}
-              </div>
-              <!-- Members dropdown -->
-              <div class="members-dropdown" *ngIf="showMembersDropdown">
-                <div class="members-dropdown-item" *ngFor="let m of members">
-                  <div class="members-dropdown-avatar">{{ getMemberInitial(m.name) }}</div>
-                  <div class="members-dropdown-info">
-                    <span class="members-dropdown-name">{{ m.name | wlName }}</span>
-                    <span class="members-dropdown-role">{{ m.role === 'owner' ? 'Owner' : m.role === 'viewer' ? 'Viewer' : 'Editor' }}</span>
+            <div class="members-row">
+              <div class="members-stack" *ngIf="members.length > 0" (click)="showMembersDropdown = !showMembersDropdown; $event.stopPropagation()">
+                <div class="member-avatar" *ngFor="let m of members.slice(0, 5)">
+                  {{ getMemberInitial(m.name) }}
+                </div>
+                <div class="member-avatar member-avatar--more" *ngIf="members.length > 5">
+                  +{{ members.length - 5 }}
+                </div>
+                <!-- Members dropdown -->
+                <div class="members-dropdown" *ngIf="showMembersDropdown">
+                  <div class="members-dropdown-item" *ngFor="let m of members">
+                    <div class="members-dropdown-avatar">{{ getMemberInitial(m.name) }}</div>
+                    <div class="members-dropdown-info">
+                      <span class="members-dropdown-name">{{ m.name | wlName }}</span>
+                      <span class="members-dropdown-role">{{ m.role === 'owner' ? 'Owner' : m.role === 'viewer' ? 'Viewer' : 'Editor' }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
+              <button class="manage-dest-btn" (click)="openManageMembersModal(); $event.stopPropagation()" *ngIf="canEdit">
+                Manage / Invite travellers
+              </button>
             </div>
           </div>
 
@@ -340,44 +344,56 @@
 
             <!-- Info column -->
             <div class="place-detail-info">
-              <div class="place-detail-rating" *ngIf="selectedPlaceDetails.rating">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="#f59e0b" stroke="none">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                </svg>
-                <strong>{{ selectedPlaceDetails.rating }}</strong>
-                <span *ngIf="selectedPlaceDetails.userRatingsTotal">({{ selectedPlaceDetails.userRatingsTotal }} reviews)</span>
-              </div>
+              <div class="place-detail-info-card">
+                <div class="info-card-row" *ngIf="selectedPlaceDetails.rating">
+                  <div class="info-card-icon">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="#f59e0b" stroke="none">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                  </div>
+                  <div class="info-card-text">
+                    <strong>{{ selectedPlaceDetails.rating }}</strong>
+                    <span *ngIf="selectedPlaceDetails.userRatingsTotal">({{ selectedPlaceDetails.userRatingsTotal }} reviews)</span>
+                  </div>
+                </div>
 
-              <p class="place-detail-address" *ngIf="selectedPlaceDetails.formattedAddress">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                  <circle cx="12" cy="10" r="3"/>
-                </svg>
-                {{ selectedPlaceDetails.formattedAddress }}
-              </p>
+                <div class="info-card-row" *ngIf="selectedPlaceDetails.formattedAddress">
+                  <div class="info-card-icon">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                  </div>
+                  <div class="info-card-text">{{ selectedPlaceDetails.formattedAddress }}</div>
+                </div>
 
-              <p class="place-detail-phone" *ngIf="selectedPlaceDetails.formattedPhoneNumber">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
-                </svg>
-                {{ selectedPlaceDetails.formattedPhoneNumber }}
-              </p>
+                <div class="info-card-row" *ngIf="selectedPlaceDetails.formattedPhoneNumber">
+                  <div class="info-card-icon">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                    </svg>
+                  </div>
+                  <div class="info-card-text">{{ selectedPlaceDetails.formattedPhoneNumber }}</div>
+                </div>
 
-              <a class="place-detail-website" *ngIf="selectedPlaceDetails.website" [href]="selectedPlaceDetails.website" target="_blank">
-                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="12" cy="12" r="10"/>
-                  <line x1="2" y1="12" x2="22" y2="12"/>
-                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-                </svg>
-                Visit Website
-              </a>
+                <div class="info-card-row" *ngIf="selectedPlaceDetails.website">
+                  <div class="info-card-icon">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="2" y1="12" x2="22" y2="12"/>
+                      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                    </svg>
+                  </div>
+                  <a class="info-card-link" [href]="selectedPlaceDetails.website" target="_blank">Visit Website</a>
+                </div>
 
-              <!-- Opening Hours -->
-              <div class="place-detail-hours" *ngIf="selectedPlaceDetails.openingHours?.weekdayText?.length">
-                <h4>Opening Hours</h4>
-                <ul>
-                  <li *ngFor="let line of selectedPlaceDetails.openingHours!.weekdayText">{{ line }}</li>
-                </ul>
+                <!-- Opening Hours -->
+                <div class="info-card-hours" *ngIf="selectedPlaceDetails.openingHours?.weekdayText?.length">
+                  <h4>Opening Hours</h4>
+                  <ul>
+                    <li *ngFor="let line of selectedPlaceDetails.openingHours!.weekdayText">{{ line }}</li>
+                  </ul>
+                </div>
               </div>
 
               <a class="place-detail-maps-link"
@@ -460,20 +476,6 @@
       </app-checklist-tab>
     </div>
 
-    <!-- Travellers Tab -->
-    <div class="tab-content" *ngIf="!loading && activeTab === 'travellers'">
-      <app-travellers-tab
-        [tripId]="tripId"
-        [tripName]="tripName"
-        [destination]="destination"
-        [members]="members"
-        [travellers]="travellers"
-        [userRole]="currentUserRole"
-        [currency]="tripCurrency"
-        [totalBudget]="tripTotalBudget"
-        (membersChanged)="members = $event">
-      </app-travellers-tab>
-    </div>
 
 
   </main>

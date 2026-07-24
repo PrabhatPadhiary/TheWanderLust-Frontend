@@ -24,6 +24,9 @@ import { AddPlaceModalComponent } from './components/trip-planner/modals/add-pla
 import { AddDestinationDialogComponent } from './components/trip-planner/modals/add-destination-dialog/add-destination-dialog.component';
 import { DeleteTripConfirmComponent } from './components/trip-planner/modals/delete-trip-confirm/delete-trip-confirm.component';
 import { DeleteDestinationConfirmComponent } from './components/trip-planner/modals/delete-destination-confirm/delete-destination-confirm.component';
+import { RescheduleWarningModalComponent } from './components/trip-planner/modals/reschedule-warning-modal/reschedule-warning-modal.component';
+import { ManageMembersModalComponent } from './components/trip-planner/modals/manage-members-modal/manage-members-modal.component';
+import { ItineraryItemDetailComponent } from './components/trip-planner/modals/itinerary-item-detail/itinerary-item-detail.component';
 import { ManageDestinationsModalComponent } from './components/trip-planner/modals/manage-destinations-modal/manage-destinations-modal.component';
 import { InviteModalComponent } from './components/trip-planner/modals/invite-modal/invite-modal.component';
 import { ExploreModalComponent } from './components/trip-planner/modals/explore-modal/explore-modal.component';
@@ -64,6 +67,9 @@ import { MyJournalsComponent } from './components/my-journals/my-journals.compon
     AddDestinationDialogComponent,
     DeleteTripConfirmComponent,
     DeleteDestinationConfirmComponent,
+    RescheduleWarningModalComponent,
+    ManageMembersModalComponent,
+    ItineraryItemDetailComponent,
     ManageDestinationsModalComponent,
     InviteModalComponent,
     ExploreModalComponent,
