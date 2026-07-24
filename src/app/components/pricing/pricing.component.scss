@@ -157,3 +157,113 @@ h1 {
   .pricing-plans { grid-template-columns: 1fr; max-width: 420px; }
   .plan-card--featured { transform: none; &:hover { transform: translateY(-4px); } }
 }
+
+
+// ===== BETA BANNER =====
+.pricing-beta {
+  min-height: calc(100vh - 72px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 140px 40px 80px;
+  text-align: center;
+  background: #fff;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -80px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 600px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(45, 90, 39, 0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+}
+
+.pricing-beta-inner {
+  max-width: 580px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.beta-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #2d5a27;
+  background: rgba(45, 90, 39, 0.08);
+  padding: 6px 18px;
+  border-radius: 50px;
+  margin-bottom: 24px;
+}
+
+.pricing-beta h1 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 800;
+  color: #1a1a1a;
+  margin: 0 0 16px;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+
+.pricing-accent {
+  color: #2d5a27;
+}
+
+.pricing-beta p {
+  font-size: 1rem;
+  color: #666;
+  line-height: 1.7;
+  margin: 0 0 36px;
+}
+
+.beta-perks {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px 32px;
+  margin-bottom: 40px;
+}
+
+.beta-perk {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: #333;
+
+  svg {
+    color: #2d5a27;
+    flex-shrink: 0;
+  }
+}
+
+.beta-cta {
+  display: inline-block;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+  background: #2d5a27;
+  border: none;
+  padding: 14px 36px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  text-decoration: none;
+
+  &:hover {
+    background: #1e3d1a;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(45, 90, 39, 0.2);
+  }
+}

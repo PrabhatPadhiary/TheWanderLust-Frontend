@@ -27,11 +27,21 @@
   background: transparent;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   padding: 12px 0 10px;
+  max-height: 80px;
+  overflow: hidden;
+  transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.3s ease, border-color 0.3s ease;
+
+  &--collapsed {
+    max-height: 0;
+    padding: 0;
+    opacity: 0;
+    border-bottom-color: transparent;
+  }
 }
 
 .dest-header-inner {
   width: 100%;
-  padding: 0 5%;
+  padding: 0 32px;
   display: flex;
   align-items: center;
   gap: 20px;
@@ -108,6 +118,7 @@
 // ===== CONTENT SECTIONS WRAPPER =====
 .content-sections {
   background: #f8f9fa;
+  padding-bottom: 80px;
 }
 
 // ===== TAB BAR =====
@@ -121,19 +132,6 @@
   display: flex;
   width: 100%;
   padding: 0;
-}
-
-// Left-aligned spacer — pushes tab content to match the header/card left edge
-.section-tabs::before {
-  content: '';
-  flex: 0 0 5%;
-  min-width: 0;
-}
-
-.section-tabs::after {
-  content: '';
-  flex: 0 0 5%;
-  min-width: 0;
 }
 
 .section-tab {
@@ -171,8 +169,8 @@
 .tab-ink-bar {
   position: absolute;
   bottom: 0;
-  left: 5%;
-  width: calc(90% / 3);
+  left: 0;
+  width: calc(100% / 3);
   height: 3px;
   background: #e85d04;
   border-radius: 3px 3px 0 0;

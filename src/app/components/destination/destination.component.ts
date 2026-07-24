@@ -46,6 +46,8 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   // Active content tab
   activeSection: 'stays' | 'food' | 'attractions' = 'stays';
+  headerCollapsed = false;
+  private lastScrollY = 0;
 
   // Per-category loading flags
   foodLoading = false;
@@ -492,6 +494,35 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
   @HostListener('document:click')
   onDocumentClick(): void {
     this.placeDropdownId = null;
+  }
+
+  onCardsScroll(event: Event): void {
+    const el = event.target as HTMLElement;
+    const currentY = el.scrollTop;
+    const delta = currentY - this.lastScrollY;
+
+    // Only react to meaningful scroll (ignore small layout shifts from collapse)
+    if (Math.abs(delta) < 5) {
+      this.lastScrollY = currentY;
+      return;
+    }
+
+    const wasCollapsed = this.headerCollapsed;
+
+    if (delta > 0 && currentY > 60) {
+      this.headerCollapsed = true;
+    } else if (delta < -10) {
+      this.headerCollapsed = false;
+    }
+
+    // Trigger map resize if collapse state changed
+    if (wasCollapsed !== this.headerCollapsed && this.destMap) {
+      setTimeout(() => {
+        google.maps.event.trigger(this.destMap, 'resize');
+      }, 350);
+    }
+
+    this.lastScrollY = currentY;
   }
 
   openPlanTripModal(): void {

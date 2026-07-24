@@ -36,6 +36,9 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   scrolled = false;
   navIndex = 0;
   pillReady = false; // controls transition — off until after first paint
+  hideSearchBar = false;
+  isCommunityPage = false;
+  isStaticLandingPage = false;
   private searchSubject = new Subject<string>();
   private autocompleteService: any;
   private blurTimeout: any;
@@ -77,6 +80,10 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
     else if (url.startsWith('/community')) this.navIndex = 2;
     else if (url.startsWith('/pricing'))   this.navIndex = 3;
     else                                   this.navIndex = 0;
+
+    this.hideSearchBar = url.startsWith('/my-trips') || url.startsWith('/favourites') || url.startsWith('/my-journals');
+    this.isCommunityPage = url.startsWith('/community');
+    this.isStaticLandingPage = url.startsWith('/features') || url.startsWith('/pricing');
   }
 
   ngOnDestroy(): void {
@@ -179,7 +186,11 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
 
   onSignIn(): void {
     if (this.authService.isLoggedIn) {
-      this.router.navigate(['/my-trips']);
+      if (this.isCommunityPage) {
+        this.router.navigate(['/my-journals']);
+      } else {
+        this.router.navigate(['/my-trips']);
+      }
     } else {
       this.openAuthModal();
     }

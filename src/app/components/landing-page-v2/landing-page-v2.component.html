@@ -40,7 +40,7 @@
              (mousedown)="selectPlace(prediction)">
           <div class="dropdown-text">
             <span class="dropdown-main">{{ prediction.structured_formatting.main_text }}</span>
-            <span class="dropdown-secondary">{{ prediction.structured_formatting.secondary_text }}</span>
+            <span class="dropdown-secondary" *ngIf="prediction.structured_formatting.secondary_text">{{ prediction.structured_formatting.secondary_text }}</span>
           </div>
           <span class="dropdown-label">{{ getPlaceLabel(prediction) }}</span>
         </div>

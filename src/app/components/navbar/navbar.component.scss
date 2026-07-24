@@ -15,7 +15,7 @@
   z-index: 1000;
   display: flex;
   align-items: center;
-  padding: 0 40px;
+  padding: 0 24px;
   font-family: 'Poppins', sans-serif;
   transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 
@@ -59,9 +59,20 @@
   width: calc(100% - 240px) !important;
 
   .nav-action-btn {
-    width: 30px;
+    width: auto;
     height: 30px;
-    svg { width: 15px; height: 15px; }
+    padding: 0 8px;
+    svg { width: 14px; height: 14px; }
+
+    &.with-label {
+      gap: 5px;
+      padding: 0 10px;
+      span {
+        font-size: 0.75rem;
+        font-weight: 500;
+        color: #666;
+      }
+    }
   }
 
   .user-avatar-btn {
@@ -154,9 +165,9 @@
 }
 
 // ===== DESTINATION MODE =====
-// Left-aligned to match 5% content edge. Logo-only. Single search.
+// Left-aligned to match content edge. Logo + name. Single search centered.
 .app-navbar--destination {
-  padding: 0 5%;
+  padding: 0 24px;
 
   .navbar-brand {
     flex-shrink: 0;
@@ -173,11 +184,15 @@
 }
 
 // Single search bar (destination mode)
-.navbar-search--single {
-  flex: 1;
+.navbar-search.navbar-search--single {
+  position: absolute;
+  left: 48%;
+  transform: translateX(-50%);
   max-width: 360px;
-  margin: 0 24px 0 20px;
-  position: relative;
+  width: 100%;
+  text-align: center;
+  flex: none;
+  margin: 0;
 
   .single-search-bar {
     display: flex;
@@ -214,19 +229,25 @@
 
   .trip-name-display {
     cursor: default;
+    background: none;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    justify-content: center;
 
     &:focus-within {
-      background: rgba(0, 0, 0, 0.04);
-      border-color: rgba(0, 0, 0, 0.07);
+      background: none;
+      border-color: transparent;
       box-shadow: none;
     }
   }
 
   .trip-name-text {
-    font-size: 0.88rem;
+    font-size: 1.05rem;
     font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    color: #1a1a1a;
+    font-weight: 700;
+    color: #2d5a27;
+    letter-spacing: 0.2px;
   }
 }
 .navbar-search {
@@ -327,29 +348,35 @@
 
 // ===== TRIP INDICATOR =====
 .trip-indicator {
-  position: relative;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  position: absolute;
+  right: -46px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
   background: rgba(45, 90, 39, 0.1);
-  border: none;
+  border: 1.5px solid rgba(45, 90, 39, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  flex-shrink: 0;
   color: #2d5a27;
-  transition: background 0.15s;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
 
-  &:hover { background: rgba(45, 90, 39, 0.18); }
+  &:hover {
+    background: rgba(45, 90, 39, 0.2);
+    border-color: rgba(45, 90, 39, 0.4);
+    transform: translateY(-50%) scale(1.05);
+  }
 }
 
 .trip-indicator-badge {
   position: absolute;
-  top: -3px;
-  right: -3px;
-  width: 9px;
-  height: 9px;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
   background: #4caf50;
   border: 2px solid #fff;

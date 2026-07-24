@@ -9,7 +9,7 @@
     <!-- Sticky header band -->
     <div class="dest-sticky-band">
 
-      <header class="dest-header">
+      <header class="dest-header" [class.dest-header--collapsed]="headerCollapsed">
         <div class="dest-header-inner">
           <div class="dest-header-text">
             <h1 class="dest-title">{{ destination.name }}</h1>
@@ -67,7 +67,7 @@
   <div class="dest-split-layout">
 
     <!-- Left: scrollable cards -->
-    <div class="dest-cards-col">
+    <div class="dest-cards-col" (scroll)="onCardsScroll($event)">
       <ng-container *ngIf="!loading && destination">
         <div class="content-sections">
 

@@ -7,15 +7,12 @@
   <!-- ===== LOGO ===== -->
   <div class="navbar-brand" (click)="goHome()">
     <img src="assets/images/logo/wayraa_logo_notext.svg" alt="Wayraa" class="brand-logo-img">
-    <span class="brand-name" *ngIf="!isDestination">wayraa</span>
+    <span class="brand-name">wayraa</span>
   </div>
 
   <!-- ===== TRIP PLANNER: trip name in place of search ===== -->
   <div class="navbar-search navbar-search--single" *ngIf="isTripPlanner">
     <div class="single-search-bar trip-name-display">
-      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" class="search-icon">
-        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
-      </svg>
       <span class="trip-name-text">{{ tripName || destinationName || 'Trip Planner' }}</span>
     </div>
   </div>
@@ -47,42 +44,19 @@
              (focus)="searchActive = true; showDropdown = predictions.length > 0"
              (blur)="onBlur(); searchActive = false">
     </div>
-    <div class="search-dropdown" *ngIf="showDropdown && predictions.length > 0">
-      <div class="dropdown-item" *ngFor="let prediction of predictions" (mousedown)="selectPlace(prediction)">
-        <span class="dropdown-main">{{ prediction.structured_formatting.main_text }}</span>
-        <span class="dropdown-secondary">{{ prediction.structured_formatting.secondary_text }}</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== APP: split search bar ===== -->
-  <div class="navbar-search" *ngIf="!isLanding && !isDestination && !isTripPlanner">
-    <div class="split-search-bar">
-      <div class="search-left">
-        <span class="search-pin">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-            <circle cx="12" cy="10" r="3"></circle>
-          </svg>
-        </span>
-        <input type="text"
-               [value]="!searchActive ? destinationName : ''"
-               [placeholder]="destinationName || 'Search destination...'"
-               (input)="onSearchInput($event)"
-               (focus)="searchActive = true; showDropdown = predictions.length > 0"
-               (blur)="onBlur(); searchActive = false">
-      </div>
-      <div class="search-divider"></div>
-      <div class="search-right">
-        <span class="search-icon-small">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
-            <circle cx="11" cy="11" r="8"></circle>
-            <path d="M21 21l-4.35-4.35"></path>
-          </svg>
-        </span>
-        <input type="text"
-               placeholder="Search stays, food, attractions..."
-               (input)="onLocalSearch($event)">
+    <!-- Active trip indicator — Dynamic Island style, hugs the search bar -->
+    <div class="trip-indicator" *ngIf="existingTrip && !isTripPlanner && !isLanding"
+         (click)="navigateToTrip()"
+         (mouseenter)="showTripTooltip = true"
+         (mouseleave)="showTripTooltip = false">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+      </svg>
+      <span class="trip-indicator-badge"></span>
+      <div class="trip-tooltip" *ngIf="showTripTooltip">
+        <span class="trip-tooltip-label">Active trip</span>
+        <strong>{{ getTripCapsuleLabel() }}</strong>
+        <span class="trip-tooltip-cta">Continue Planning →</span>
       </div>
     </div>
     <div class="search-dropdown" *ngIf="showDropdown && predictions.length > 0">
@@ -95,22 +69,6 @@
 
   <!-- ===== RIGHT ACTIONS ===== -->
   <div class="navbar-actions">
-
-    <!-- Active trip indicator (destination page only) -->
-    <div class="trip-indicator" *ngIf="existingTrip && !isTripPlanner && !isLanding"
-         (click)="navigateToTrip()"
-         (mouseenter)="showTripTooltip = true"
-         (mouseleave)="showTripTooltip = false">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
-        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
-      </svg>
-      <span class="trip-indicator-badge"></span>
-      <div class="trip-tooltip" *ngIf="showTripTooltip">
-        <span class="trip-tooltip-label">Active trip</span>
-        <strong>{{ getTripCapsuleLabel() }}</strong>
-        <span class="trip-tooltip-cta">Continue Planning →</span>
-      </div>
-    </div>
 
     <!-- Favourites (app mode only) -->
     <button class="nav-action-btn" [class.with-label]="!isLanding"
@@ -137,26 +95,30 @@
 
     <!-- My Journals (app mode, logged in only) -->
     <button class="nav-action-btn" [class.with-label]="!isLanding"
-            *ngIf="authService.isLoggedIn"
+            *ngIf="!isLanding && authService.isLoggedIn"
             (click)="onJournalsClick()" title="My Journals">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
         <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
       </svg>
-      <span *ngIf="!isTripPlanner && !isLanding">My Journals</span>
+      <span *ngIf="!isLanding">My Journals</span>
     </button>
 
     <!-- Landing Sign In / My Trips single button -->
-    <button class="sign-in-btn" *ngIf="isLanding" (click)="onSignIn()">
+    <button class="sign-in-btn" *ngIf="isLanding && !isStaticLandingPage" (click)="onSignIn()">
       <span *ngIf="!authService.isLoggedIn">Sign In</span>
-      <span *ngIf="authService.isLoggedIn">My Trips</span>
+      <span *ngIf="authService.isLoggedIn && !isCommunityPage">My Trips</span>
+      <span *ngIf="authService.isLoggedIn && isCommunityPage">My Journals</span>
     </button>
+
+    <!-- Features/Pricing: Sign In only (no My Trips button) -->
+    <button class="sign-in-btn" *ngIf="isLanding && isStaticLandingPage && !authService.isLoggedIn" (click)="onSignIn()">Sign In</button>
 
     <!-- App guest: Sign In -->
     <button class="sign-in-btn" *ngIf="!isLanding && !authService.isLoggedIn" (click)="onSignIn()">Sign In</button>
 
-    <!-- App logged in: user avatar + dropdown -->
-    <div class="user-menu-wrapper" *ngIf="!isLanding && authService.isLoggedIn">
+    <!-- User avatar + dropdown (all pages when logged in) -->
+    <div class="user-menu-wrapper" *ngIf="authService.isLoggedIn">
       <button class="user-avatar-btn" (click)="toggleUserMenu()" (blur)="closeUserMenu()">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
