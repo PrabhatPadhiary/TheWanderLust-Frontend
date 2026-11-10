@@ -5,3 +5,7 @@ dist/
 *.kiro
 *.vscode
 *.vs
+
+# macOS Finder metadata
+.DS_Store
+**/.DS_Store
