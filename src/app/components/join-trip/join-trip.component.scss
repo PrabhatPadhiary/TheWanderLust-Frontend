@@ -18,6 +18,41 @@
   text-align: center;
 }
 
+.join-app-banner {
+  background: #fff3eb;
+  border: 1px solid #ffd9c2;
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+
+  p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #4a5a66;
+  }
+}
+
+.join-app-btn {
+  width: 100%;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  background: #e85d04;
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:active {
+    background: #b3380a;
+  }
+}
+
 .join-state {
   display: flex;
   flex-direction: column;

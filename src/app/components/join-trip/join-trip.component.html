@@ -1,5 +1,16 @@
 <div class="join-trip-page">
   <div class="join-trip-card">
+    <!-- Android: hand the invite to the app -->
+    <div class="join-app-banner" *ngIf="isAndroid && inviteId && status !== 'joining' && status !== 'success'">
+      <ng-container *ngIf="!appMissing; else noApp">
+        <p>Have the Wayraa app? Join this trip there.</p>
+        <button class="join-app-btn" (click)="openInApp()">Open in Wayraa app</button>
+      </ng-container>
+      <ng-template #noApp>
+        <p>The Wayraa app isn't installed on this phone. You can still join on the web below.</p>
+      </ng-template>
+    </div>
+
     <!-- Loading -->
     <div class="join-state" *ngIf="status === 'loading'">
       <div class="join-spinner"></div>

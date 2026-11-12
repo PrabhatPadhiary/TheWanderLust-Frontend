@@ -14,7 +14,12 @@ export class JoinTripComponent implements OnInit {
   errorMessage = '';
   invitation: InvitationPreviewResponse | null = null;
 
-  private inviteId = '';
+  /** Android visitors get an "Open in Wayraa" button that hands the invite to the app. */
+  isAndroid = /Android/i.test(navigator.userAgent);
+  /** Set when the app link fell back here because the app isn't installed. */
+  appMissing = false;
+
+  inviteId = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -26,6 +31,7 @@ export class JoinTripComponent implements OnInit {
   ngOnInit(): void {
     // Route is /join/:tripId but the param is now an invitation ID
     this.inviteId = this.route.snapshot.paramMap.get('tripId') || '';
+    this.appMissing = this.route.snapshot.queryParamMap.get('noapp') === '1';
 
     if (!this.inviteId) {
       this.status = 'error';
@@ -94,6 +100,18 @@ export class JoinTripComponent implements OnInit {
         }
       }
     });
+  }
+
+  /**
+   * Opens the invite in the Android app (wayraa://join/<id>). If the app isn't
+   * installed, Chrome follows the fallback URL back to this page with ?noapp=1.
+   * Set via location.href because Angular's sanitizer blocks intent: links in [href].
+   */
+  openInApp(): void {
+    const id = encodeURIComponent(this.inviteId);
+    const fallback = encodeURIComponent(`${window.location.origin}/join/${id}?noapp=1`);
+    window.location.href =
+      `intent://join/${id}#Intent;scheme=wayraa;package=com.wayraa.mobile;S.browser_fallback_url=${fallback};end`;
   }
 
   get roleLabel(): string {
