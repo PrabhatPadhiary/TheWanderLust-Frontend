@@ -64,6 +64,9 @@ export class JoinTripComponent implements OnInit {
           this.errorMessage = 'This invite link has expired. Ask the trip owner for a new one.';
         } else if (err?.error?.includes?.('already been used')) {
           this.errorMessage = 'This invite link has already been used.';
+        } else if (err?.status === 400 && typeof err?.error === 'string' && err.error.length < 200) {
+          // e.g. "This invite link has been turned off…" or "This trip is full…"
+          this.errorMessage = err.error;
         } else {
           this.errorMessage = 'Something went wrong. Please try again.';
         }
