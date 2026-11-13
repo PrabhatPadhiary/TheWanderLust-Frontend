@@ -12,6 +12,7 @@ import { JournalDetailComponent } from './components/community/journal-detail/jo
 import { FeaturesComponent } from './components/features/features.component';
 import { PricingComponent } from './components/pricing/pricing.component';
 import { MyJournalsComponent } from './components/my-journals/my-journals.component';
+import { LegalComponent } from './components/legal/legal.component';
 
 const routes: Routes = [
   { path: '', component: LandingPageV2Component },
@@ -29,6 +30,9 @@ const routes: Routes = [
   { path: 'my-journals', component: MyJournalsComponent },
   { path: 'features', component: FeaturesComponent },
   { path: 'pricing', component: PricingComponent },
+  // Linked from the mobile app and from Google's sign-in consent screen.
+  { path: 'privacy', component: LegalComponent, data: { doc: 'privacy' }, title: 'Privacy Policy · Wayraa' },
+  { path: 'terms', component: LegalComponent, data: { doc: 'terms' }, title: 'Terms of Use · Wayraa' },
 ];
 
 @NgModule({

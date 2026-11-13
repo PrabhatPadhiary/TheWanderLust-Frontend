@@ -1,0 +1,258 @@
+<header class="legal-top">
+  <a routerLink="/" class="legal-brand" aria-label="Wayraa home">
+    <img src="assets/images/logo/wayraa_logo_notext.svg" alt="" width="32" height="32" />
+    <span>Wayraa</span>
+  </a>
+  <nav class="legal-switch" aria-label="Legal documents">
+    <a routerLink="/privacy" routerLinkActive="active">Privacy</a>
+    <a routerLink="/terms" routerLinkActive="active">Terms</a>
+  </nav>
+</header>
+
+<main class="legal">
+  <!-- ─────────────────────────── PRIVACY POLICY ─────────────────────────── -->
+  <article *ngIf="doc === 'privacy'">
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated {{ LAST_UPDATED }}</p>
+
+    <p class="lead">
+      Wayraa helps you plan trips with friends and share travel stories. This page explains what
+      information we collect, why, who can see it, and how to delete it. In short: we use your
+      information to run Wayraa, we don't sell it, and we don't show ads.
+    </p>
+
+    <h2>1. Who we are</h2>
+    <p>
+      "Wayraa", "we" and "us" mean the Wayraa mobile app and the website wayraa.com. For anything
+      about your privacy, email <a [href]="'mailto:' + SUPPORT_EMAIL">{{ SUPPORT_EMAIL }}</a>.
+    </p>
+
+    <h2>2. What we collect</h2>
+    <ul>
+      <li>
+        <strong>Your account:</strong> your name, email address and profile photo. You sign in with
+        Google or with an email and password. Sign-in is handled by Google Firebase
+        Authentication; we never see your Google password.
+      </li>
+      <li>
+        <strong>Trips you plan:</strong> destinations and stops, dates, number of travellers, saved
+        places, your day-by-day itinerary, notes, checklists, budgets and expenses (including who
+        paid for what).
+      </li>
+      <li>
+        <strong>Stories and journals:</strong> what you write, the places you mention and the photos
+        you add, and whether each one is public or private.
+      </li>
+      <li>
+        <strong>Photos you upload</strong> (profile, journals and stories).
+      </li>
+      <li>
+        <strong>Your location, only if you allow it</strong> and only while you're using the app, to
+        show places near you and how far away they are. We use it for that search and don't keep a
+        history of where you've been. You can turn it off any time in your phone's settings.
+      </li>
+      <li>
+        <strong>Other things you do in Wayraa:</strong> places you save as favourites, people you
+        block, and content you report.
+      </li>
+      <li>
+        <strong>Technical information:</strong> like most online services, our servers record basic
+        technical details such as your IP address, device and app version, and errors. We use these
+        to keep Wayraa secure (for example, to stop abuse) and to fix problems.
+      </li>
+    </ul>
+
+    <h2>3. How we use it</h2>
+    <ul>
+      <li>To run Wayraa: your account, your trips, your stories and the people you plan with.</li>
+      <li>To show place information, maps, photos and distances.</li>
+      <li>To keep your trip in sync for everyone on it, as changes happen.</li>
+      <li>To keep the community safe: handling reports, blocking, and removing content that breaks our rules.</li>
+      <li>To answer you when you contact us.</li>
+    </ul>
+    <p><strong>We don't sell your information, we don't show ads, and we don't build advertising profiles.</strong></p>
+
+    <h2>4. Who can see what</h2>
+    <ul>
+      <li>
+        <strong>Trips:</strong> the people on the trip. Anyone who has the trip's invite link can
+        join, so share it only with people you trust; the trip owner can remove people and reset the
+        link. People on a trip can see its plans, who made changes, and who has it open at the moment.
+      </li>
+      <li>
+        <strong>Public stories and journals:</strong> anyone using Wayraa. <strong>Private</strong> ones
+        and drafts: only you.
+      </li>
+      <li>
+        <strong>Your name and photo</strong> are shown to people on your trips and next to the stories
+        you publish.
+      </li>
+    </ul>
+
+    <h2>5. Services we use</h2>
+    <p>We rely on a few trusted companies to run Wayraa. They process information only to provide their service to us:</p>
+    <ul>
+      <li><strong>Google Firebase</strong> for sign-in.</li>
+      <li>
+        <strong>Google Maps Platform</strong> for place search, place details, photos and maps. Place
+        searches you make are sent to Google. Google's use of this information is covered by the
+        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>.
+      </li>
+      <li><strong>Cloudinary</strong> to store and resize photos.</li>
+      <li><strong>Render</strong> and <strong>Neon</strong> to host our servers and database.</li>
+      <li><strong>Cloudflare</strong> to deliver our website.</li>
+    </ul>
+    <p>These services may store information outside your country, for example in the United States or the European Union.</p>
+
+    <h2>6. Keeping and deleting your information</h2>
+    <p>
+      We keep your information while your account exists. You can delete your account at any time in
+      the app under <strong>Profile → Delete account</strong>, or by emailing us. When you do:
+    </p>
+    <ul>
+      <li>your profile, your stories and journals, and their photos are deleted;</li>
+      <li>trips only you are on are deleted;</li>
+      <li>trips you own that others are on are passed to another person on the trip, so their plans aren't lost;</li>
+      <li>you're removed from other people's trips, and your sign-in is removed.</li>
+    </ul>
+    <p>Copies in backups and server logs are removed over a short period afterwards.</p>
+
+    <h2>7. Your choices</h2>
+    <ul>
+      <li>See and edit your profile in the app at any time.</li>
+      <li>Make a story private, or delete it.</li>
+      <li>Turn off location access in your phone's settings.</li>
+      <li>Block or report people and content.</li>
+      <li>
+        Ask us for a copy of your information, to correct it, or to delete it, by emailing
+        <a [href]="'mailto:' + SUPPORT_EMAIL">{{ SUPPORT_EMAIL }}</a>. Depending on where you live, you
+        may have further rights under local law, and we'll respect them.
+      </li>
+    </ul>
+
+    <h2>8. Children</h2>
+    <p>
+      Wayraa isn't meant for children under 13 (or the minimum age for online services where you
+      live). If you believe a child has given us their information, contact us and we'll delete it.
+    </p>
+
+    <h2>9. Security</h2>
+    <p>
+      We use encrypted connections (HTTPS), require sign-in for your trips, and limit access to your
+      information to what's needed to run Wayraa. No system is perfectly secure, but we work to
+      protect your information and will fix problems quickly.
+    </p>
+
+    <h2>10. Changes to this policy</h2>
+    <p>
+      If we change this policy we'll update the date at the top, and for important changes we'll let
+      you know in the app.
+    </p>
+
+    <h2>11. Contact</h2>
+    <p>Questions or requests: <a [href]="'mailto:' + SUPPORT_EMAIL">{{ SUPPORT_EMAIL }}</a>.</p>
+  </article>
+
+  <!-- ──────────────────────────── TERMS OF USE ──────────────────────────── -->
+  <article *ngIf="doc === 'terms'">
+    <h1>Terms of Use</h1>
+    <p class="updated">Last updated {{ LAST_UPDATED }}</p>
+
+    <p class="lead">
+      These terms are the rules for using Wayraa, the mobile app and wayraa.com. By creating an
+      account or using Wayraa, you agree to them and to our <a routerLink="/privacy">Privacy Policy</a>.
+    </p>
+
+    <h2>1. Wayraa is in beta</h2>
+    <p>
+      Wayraa is new and still being built. Features may change or be removed, and things may
+      sometimes not work as expected. Wayraa is currently free to use.
+    </p>
+
+    <h2>2. Your account</h2>
+    <ul>
+      <li>You need to be at least 13 (or the minimum age for online services where you live).</li>
+      <li>Give accurate information and keep your sign-in secure. You're responsible for what happens in your account.</li>
+      <li>You can delete your account at any time in the app (Profile → Delete account).</li>
+    </ul>
+
+    <h2>3. Your content</h2>
+    <p>
+      Trips, stories, journals and photos you add stay yours. So that Wayraa can work, you allow us to
+      store, display and share your content as you choose: with the people on your trips, and with
+      everyone for stories you make public. Only add photos and text you have the right to share.
+    </p>
+
+    <h2>4. Community rules</h2>
+    <p>Don't post or share anything that:</p>
+    <ul>
+      <li>is illegal, or encourages harm or violence;</li>
+      <li>harasses, threatens, bullies or targets anyone;</li>
+      <li>is hateful toward people for who they are;</li>
+      <li>is sexually explicit, or sexualises minors in any way;</li>
+      <li>shares someone else's private information without their permission;</li>
+      <li>is spam, a scam, or pretends to be someone else.</li>
+    </ul>
+    <p>
+      You can report content and block people in the app. We may remove content and suspend or close
+      accounts that break these rules.
+    </p>
+
+    <h2>5. Shared trips</h2>
+    <p>
+      Anyone with a trip's invite link can join that trip, so share it only with people you trust. The
+      trip owner can remove people and reset the link. Editors can change the trip; viewers can only
+      look at it.
+    </p>
+
+    <h2>6. Places and travel information</h2>
+    <p>
+      Place details, photos, opening hours, ratings and travel times come from Google and from other
+      travellers, and may be wrong or out of date. Distances such as "2.5 km from centre" are measured
+      in a straight line. Always check important details before you travel. Wayraa doesn't sell or
+      book travel, and isn't responsible for your trips, bookings, or how costs are split in your group.
+    </p>
+
+    <h2>7. Google Maps</h2>
+    <p>
+      Wayraa uses Google Maps features and content. Your use of them is also subject to the
+      <a href="https://maps.google.com/help/terms_maps/" target="_blank" rel="noopener">Google Maps Terms of Service</a>
+      and the <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>.
+    </p>
+
+    <h2>8. Using Wayraa fairly</h2>
+    <p>
+      Don't misuse Wayraa: for example, don't try to break into it, overload it, copy its data
+      automatically (scraping), or use it to spam others.
+    </p>
+
+    <h2>9. Ending your use</h2>
+    <p>
+      You can stop using Wayraa and delete your account at any time. We may suspend or close accounts
+      that break these terms.
+    </p>
+
+    <h2>10. Disclaimer</h2>
+    <p>
+      Wayraa is provided "as is". To the extent the law allows, we aren't responsible for indirect
+      losses, or for losses caused by information in the app, by other users, or by services we
+      don't control.
+    </p>
+
+    <h2>11. Changes to these terms</h2>
+    <p>
+      If we change these terms we'll update the date at the top, and for important changes we'll let
+      you know in the app. If you keep using Wayraa after that, the new terms apply.
+    </p>
+
+    <h2>12. Contact</h2>
+    <p>Questions: <a [href]="'mailto:' + SUPPORT_EMAIL">{{ SUPPORT_EMAIL }}</a>.</p>
+  </article>
+</main>
+
+<footer class="legal-foot">
+  <span>© 2026 Wayraa</span>
+  <a routerLink="/privacy">Privacy</a>
+  <a routerLink="/terms">Terms</a>
+  <a [href]="'mailto:' + SUPPORT_EMAIL">{{ SUPPORT_EMAIL }}</a>
+</footer>

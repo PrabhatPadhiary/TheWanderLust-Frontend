@@ -37,6 +37,7 @@ import { WlNamePipe } from './pipes/wl-name.pipe';
 import { TripPlanModalComponent } from './components/trip-planner/modals/trip-plan-modal/trip-plan-modal.component';
 import { MyTripsComponent } from './components/my-trips/my-trips.component';
 import { JoinTripComponent } from './components/join-trip/join-trip.component';
+import { LegalComponent } from './components/legal/legal.component';
 import { AddToTripBtnComponent } from './components/add-to-trip-btn/add-to-trip-btn.component';
 import { AddToTripModalComponent } from './components/add-to-trip-modal/add-to-trip-modal.component';
 import { ItineraryTabComponent } from './components/trip-planner/itinerary-tab/itinerary-tab.component';
@@ -80,6 +81,7 @@ import { MyJournalsComponent } from './components/my-journals/my-journals.compon
     TripPlanModalComponent,
     MyTripsComponent,
     JoinTripComponent,
+    LegalComponent,
     AddToTripBtnComponent,
     AddToTripModalComponent,
     ItineraryTabComponent,
