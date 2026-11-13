@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.wayraa.mobile",
+      "sha256_cert_fingerprints": [
+        "A3:9A:57:0D:9D:13:BC:2B:CB:CC:12:C1:6A:82:DA:60:69:63:C7:8A:7C:20:9B:9F:E2:62:90:BE:1A:C0:45:F9"
+      ]
+    }
+  }
+]
