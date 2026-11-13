@@ -104,6 +104,15 @@
       <span *ngIf="!isLanding">My Journals</span>
     </button>
 
+    <!-- Android beta download (landing page) -->
+    <a class="get-app-btn" *ngIf="isLanding" routerLink="/download" title="Get the Android app (Beta)">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>
+      </svg>
+      <span>Get the app</span>
+      <span class="get-app-beta">Beta</span>
+    </a>
+
     <!-- Landing Sign In / My Trips single button -->
     <button class="sign-in-btn" *ngIf="isLanding && !isStaticLandingPage" (click)="onSignIn()">
       <span *ngIf="!authService.isLoggedIn">Sign In</span>

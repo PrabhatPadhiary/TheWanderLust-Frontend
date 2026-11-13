@@ -1,0 +1,59 @@
+<header class="dl-top">
+  <a routerLink="/" class="dl-brand" aria-label="Wayraa home">
+    <img src="assets/images/logo/wayraa_logo_notext.svg" alt="" width="32" height="32" />
+    <span>Wayraa</span>
+  </a>
+</header>
+
+<main class="dl">
+  <section class="dl-hero">
+    <img class="dl-icon" src="assets/images/logo/wayraa_logo_notext.svg" alt="" width="88" height="88" />
+    <span class="dl-badge">Beta</span>
+    <h1>Wayraa for Android</h1>
+    <p class="dl-lead">
+      Plan trips with friends, see changes live as they happen, and share your travel stories.
+      This is an early version: things may change, and your feedback helps.
+    </p>
+
+    <a class="dl-button" [href]="APK_URL" download>
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>
+      </svg>
+      Download for Android (Beta)
+    </a>
+    <p class="dl-meta">Version {{ VERSION }} · {{ SIZE }} · Updated {{ UPDATED }}</p>
+
+    <p class="dl-note" *ngIf="isIOS">
+      You're on an iPhone. The iPhone app is coming soon; until then you can use Wayraa on
+      <a routerLink="/">wayraa.com</a> in Safari.
+    </p>
+    <p class="dl-note" *ngIf="!isAndroid && !isIOS">
+      On a computer? Open <strong>wayraa.com/download</strong> on your Android phone to install it there.
+    </p>
+  </section>
+
+  <section class="dl-card">
+    <h2>How to install</h2>
+    <ol>
+      <li>Tap <strong>Download for Android</strong> above (best in Chrome).</li>
+      <li>If Chrome says the file might be harmful, tap <strong>Download anyway</strong>. Wayraa isn't on the Play Store yet, so Android shows this for every app downloaded from a website.</li>
+      <li>Open the downloaded file. If asked, allow installing apps from Chrome (you only do this once).</li>
+      <li>If Google Play Protect shows a warning, tap <strong>More details → Install anyway</strong>.</li>
+    </ol>
+    <p class="dl-small">
+      Already have Wayraa? Install the new version the same way: it updates in place and you stay signed in.
+    </p>
+  </section>
+
+  <section class="dl-card dl-card--soft">
+    <h2>iPhone</h2>
+    <p>The iPhone app is on its way. Until then, everything works on <a routerLink="/">wayraa.com</a> in Safari.</p>
+  </section>
+</main>
+
+<footer class="dl-foot">
+  <span>© 2026 Wayraa</span>
+  <a routerLink="/privacy">Privacy</a>
+  <a routerLink="/terms">Terms</a>
+  <a href="mailto:support@wayraa.com">support&#64;wayraa.com</a>
+</footer>

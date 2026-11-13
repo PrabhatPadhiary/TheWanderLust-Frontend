@@ -1,0 +1,196 @@
+// /download: get the Android beta. Same look as the legal pages.
+$navy: #043247;
+$orange: #e85d04;
+$deep: #b3380a;
+$text: #1f2933;
+$muted: #5b6b78;
+$line: #edf0f3;
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background: #fffbf8;
+  font-family: 'Poppins', sans-serif;
+  color: $text;
+}
+
+.dl-top {
+  display: flex;
+  align-items: center;
+  padding: 14px 24px;
+  border-bottom: 1px solid $line;
+}
+
+.dl-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: $navy;
+  font-weight: 700;
+  font-size: 1.15rem;
+}
+
+.dl {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 48px 24px 56px;
+}
+
+.dl-hero {
+  text-align: center;
+}
+
+.dl-icon {
+  display: block;
+  margin: 0 auto 14px;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(4, 50, 71, 0.12);
+  padding: 10px;
+}
+
+.dl-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 999px;
+  background: #fff3eb;
+  border: 1px solid #ffd9c2;
+  color: $deep;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 12px 0 8px;
+  font-size: 2.3rem;
+  line-height: 1.2;
+  color: $navy;
+}
+
+.dl-lead {
+  margin: 0 auto 28px;
+  max-width: 480px;
+  color: $muted;
+  line-height: 1.6;
+}
+
+.dl-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 30px;
+  border-radius: 999px;
+  background: $orange;
+  color: #fff;
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 10px 24px rgba(232, 93, 4, 0.3);
+  transition: transform 0.15s ease, background 0.15s ease;
+
+  &:hover {
+    background: $deep;
+    transform: translateY(-1px);
+  }
+}
+
+.dl-meta {
+  margin: 12px 0 0;
+  color: $muted;
+  font-size: 0.85rem;
+}
+
+.dl-note {
+  margin: 22px auto 0;
+  max-width: 460px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: #e6f4fb;
+  color: $navy;
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.dl-card {
+  margin-top: 36px;
+  padding: 24px 26px;
+  border-radius: 20px;
+  background: #fff;
+  border: 1px solid $line;
+  line-height: 1.6;
+
+  h2 {
+    margin: 0 0 12px;
+    font-size: 1.2rem;
+    color: $navy;
+  }
+
+  ol {
+    margin: 0;
+    padding-left: 22px;
+  }
+
+  li {
+    margin-bottom: 10px;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  strong {
+    color: $navy;
+  }
+
+  &--soft {
+    margin-top: 16px;
+    background: #fff3eb;
+    border-color: #ffd9c2;
+  }
+}
+
+.dl-small {
+  margin-top: 14px !important;
+  color: $muted;
+  font-size: 0.9rem;
+}
+
+a:not(.dl-button):not(.dl-brand) {
+  color: $orange;
+  font-weight: 600;
+}
+
+.dl-foot {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 20px;
+  padding: 24px;
+  border-top: 1px solid $line;
+  color: $muted;
+  font-size: 0.9rem;
+
+  a {
+    color: $muted !important;
+    font-weight: 400 !important;
+    text-decoration: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .dl {
+    padding: 32px 18px 44px;
+  }
+
+  h1 {
+    font-size: 1.8rem;
+  }
+
+  .dl-button {
+    width: 100%;
+    justify-content: center;
+  }
+}

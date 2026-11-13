@@ -13,6 +13,7 @@ import { FeaturesComponent } from './components/features/features.component';
 import { PricingComponent } from './components/pricing/pricing.component';
 import { MyJournalsComponent } from './components/my-journals/my-journals.component';
 import { LegalComponent } from './components/legal/legal.component';
+import { DownloadComponent } from './components/download/download.component';
 
 const routes: Routes = [
   { path: '', component: LandingPageV2Component },
@@ -33,6 +34,7 @@ const routes: Routes = [
   // Linked from the mobile app and from Google's sign-in consent screen.
   { path: 'privacy', component: LegalComponent, data: { doc: 'privacy' }, title: 'Privacy Policy · Wayraa' },
   { path: 'terms', component: LegalComponent, data: { doc: 'terms' }, title: 'Terms of Use · Wayraa' },
+  { path: 'download', component: DownloadComponent, title: 'Get Wayraa for Android (Beta)' },
 ];
 
 @NgModule({
