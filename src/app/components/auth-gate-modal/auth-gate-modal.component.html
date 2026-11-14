@@ -8,8 +8,8 @@
 
     <div class="options-view">
         <h2 *ngIf="data?.destination">Plan your trip to <strong>{{ data!.destination }}</strong></h2>
-        <h2 *ngIf="!data?.destination">Sign in to continue</h2>
-        <p class="subtitle">Sign in to save your itinerary and access it anywhere.</p>
+        <h2 *ngIf="!data?.destination">{{ mode === 'signup' ? 'Create your account' : 'Sign in to continue' }}</h2>
+        <p class="subtitle">Your trips, stories and favourites, on the web and in the app.</p>
         <div class="auth-buttons">
             <button class="auth-btn google-btn" (click)="loginWithGoogle()" [disabled]="isLoading">
                 <svg class="google-icon" viewBox="0 0 24 24" width="20" height="20">
@@ -18,8 +18,39 @@
                     <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
                     <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
                 </svg>
-                {{ isLoading ? 'Signing in...' : 'Login with Google' }}
+                Continue with Google
             </button>
         </div>
+
+        <div class="or-divider"><span>or</span></div>
+
+        <!-- Email: sign in, or create an account -->
+        <form class="email-form" (ngSubmit)="submitEmail()" novalidate>
+            <input *ngIf="mode === 'signup'" class="auth-input" type="text" name="name" [(ngModel)]="name"
+                   placeholder="Your name" autocomplete="name" maxlength="60" [disabled]="isLoading">
+            <input class="auth-input" type="email" name="email" [(ngModel)]="email"
+                   placeholder="Email" autocomplete="email" [disabled]="isLoading">
+            <input class="auth-input" type="password" name="password" [(ngModel)]="password"
+                   [placeholder]="mode === 'signup' ? 'Password (at least 6 characters)' : 'Password'"
+                   [autocomplete]="mode === 'signup' ? 'new-password' : 'current-password'" [disabled]="isLoading">
+
+            <p class="auth-error" *ngIf="emailError" role="alert">{{ emailError }}</p>
+            <p class="auth-note" *ngIf="resetSent" role="status">{{ resetSent }}</p>
+
+            <button class="auth-btn email-btn" type="submit" [disabled]="isLoading">
+                {{ isLoading ? 'Please wait…' : (mode === 'signup' ? 'Create account' : 'Sign in') }}
+            </button>
+        </form>
+
+        <div class="auth-links">
+            <button type="button" class="link-btn" *ngIf="mode === 'signin'" (click)="forgotPassword()">Forgot password?</button>
+            <span *ngIf="mode === 'signin'">New to Wayraa? <button type="button" class="link-btn strong" (click)="setMode('signup')">Create an account</button></span>
+            <span *ngIf="mode === 'signup'">Already have an account? <button type="button" class="link-btn strong" (click)="setMode('signin')">Sign in</button></span>
+        </div>
+
+        <p class="legal-note">
+            By continuing you agree to our <a routerLink="/terms" (click)="closeModal()">Terms</a>
+            and <a routerLink="/privacy" (click)="closeModal()">Privacy Policy</a>.
+        </p>
     </div>
 </div>

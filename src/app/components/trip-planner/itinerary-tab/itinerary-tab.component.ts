@@ -705,12 +705,12 @@ export class ItineraryTabComponent implements OnInit, OnChanges, OnDestroy, Afte
   }
 
   getDestColor(index: number): string {
-    const colors = ['#4ade80', '#f97316', '#818cf8', '#f472b6', '#facc15', '#22d3ee'];
+    const colors = ['#67C194', '#E75528', '#A6BDD3', '#99B4CD', '#E75528', '#6089B0'];
     return colors[index % colors.length];
   }
 
   getDayDestColor(day: { date: Date | null, dayNumber: number }): string {
-    if (!day.date || this.destinations.length === 0) return '#4ade80';
+    if (!day.date || this.destinations.length === 0) return '#67C194';
     const dayTime = day.date.getTime();
     for (let i = 0; i < this.destinations.length; i++) {
       const dest = this.destinations[i];
@@ -739,12 +739,12 @@ export class ItineraryTabComponent implements OnInit, OnChanges, OnDestroy, Afte
   }
 
   getCategoryColor(category: string): string {
-    if (category === 'activity') return '#60a5fa';
-    if (category === 'food') return '#fbbf24';
-    if (category === 'stay') return '#4ade80';
-    if (category === 'transport') return '#a78bfa';
-    if (category === 'other') return '#94a3b8';
-    return '#94a3b8';
+    if (category === 'activity') return '#91AEC9';
+    if (category === 'food') return '#E96036';
+    if (category === 'stay') return '#67C194';
+    if (category === 'transport') return '#AEC3D7';
+    if (category === 'other') return '#94A7B8';
+    return '#94A7B8';
   }
 
   getCategoryLabel(category: string): string {

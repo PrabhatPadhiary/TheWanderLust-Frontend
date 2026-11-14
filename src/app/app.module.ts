@@ -58,9 +58,14 @@ import { FeaturesComponent } from './components/features/features.component';
 import { PricingComponent } from './components/pricing/pricing.component';
 import { MyJournalsComponent } from './components/my-journals/my-journals.component';
 
+import { ProfileComponent } from './components/profile/profile.component';
+import { SettingsComponent } from './components/settings/settings.component';
+
 @NgModule({
   declarations: [
     AppComponent,
+    ProfileComponent,
+    SettingsComponent,
     DestinationComponent,
     PlaceDetailPanelComponent,
     AuthGateModalComponent,

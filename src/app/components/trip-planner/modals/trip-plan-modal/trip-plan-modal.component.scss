@@ -12,14 +12,14 @@
   h2 {
     font-size: 1.3rem;
     font-weight: 600;
-    color: #1a1a1a;
+    color: #1C2833;
     margin: 0 0 6px;
-    strong { color: #2d5a27; }
+    strong { color: #2B3F51; }
   }
 
   .subtitle {
     font-size: 0.88rem;
-    color: #888;
+    color: #7B8A97;
     margin: 0 0 28px;
   }
 }
@@ -31,11 +31,11 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #999;
+  color: #7F8D99;
   padding: 4px;
   border-radius: 50%;
   transition: background 0.2s;
-  &:hover { background: #f0f0f0; color: #333; }
+  &:hover { background: #E8EDF0; color: #2F3B46; }
 }
 
 .field-group {
@@ -45,14 +45,14 @@
     display: block;
     font-size: 0.82rem;
     font-weight: 600;
-    color: #555;
+    color: #475969;
     margin-bottom: 8px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 
     .optional {
       font-weight: 400;
-      color: #aaa;
+      color: #A3ACB1;
       text-transform: none;
       letter-spacing: 0;
     }
@@ -73,16 +73,16 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.95rem;
   padding: 11px 16px;
-  border: 1.5px solid #e8e8e8;
+  border: 1.5px solid #DCE3E8;
   border-radius: 10px;
-  color: #1a1a1a;
+  color: #1C2833;
   background: #fff;
   outline: none;
   box-sizing: border-box;
   transition: border-color 0.2s;
 
-  &:focus { border-color: #2d5a27; }
-  &::placeholder { color: #bbb; }
+  &:focus { border-color: #2B3F51; }
+  &::placeholder { color: #B6BDC0; }
 }
 
 .destination-display {
@@ -90,17 +90,17 @@
   align-items: center;
   gap: 8px;
   padding: 12px 16px;
-  background: #f7f7f7;
+  background: #F6F7F8;
   border-radius: 10px;
   font-size: 0.95rem;
   font-weight: 500;
-  color: #1a1a1a;
-  svg { color: #2d5a27; flex-shrink: 0; }
+  color: #1C2833;
+  svg { color: #2B3F51; flex-shrink: 0; }
 }
 
 .field-hint {
   font-size: 0.78rem;
-  color: #aaa;
+  color: #A3ACB1;
   margin: 6px 0 0;
 }
 
@@ -108,8 +108,8 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.78rem;
   font-weight: 500;
-  color: #888;
-  background: #f0f0f0;
+  color: #7B8A97;
+  background: #E8EDF0;
   border: none;
   border-radius: 20px;
   padding: 4px 12px;
@@ -117,12 +117,12 @@
   transition: all 0.2s;
 
   &.active {
-    background: #2d5a27;
+    background: #2B3F51;
     color: #fff;
   }
 
   &:hover:not(.active) {
-    background: #e0e0e0;
+    background: #DCE3E8;
   }
 }
 
@@ -148,7 +148,7 @@
 
   .date-label {
     font-size: 0.75rem;
-    color: #aaa;
+    color: #A3ACB1;
     font-weight: 500;
     text-transform: none;
     letter-spacing: 0;
@@ -159,23 +159,23 @@
     font-family: 'Poppins', sans-serif;
     font-size: 0.9rem;
     padding: 10px 14px;
-    border: 1.5px solid #e8e8e8;
+    border: 1.5px solid #DCE3E8;
     border-radius: 10px;
-    color: #1a1a1a;
+    color: #1C2833;
     background: #fff;
     outline: none;
     width: 100%;
     box-sizing: border-box;
     transition: border-color 0.2s;
 
-    &:focus { border-color: #2d5a27; }
-    &:disabled { background: #f7f7f7; }
+    &:focus { border-color: #2B3F51; }
+    &:disabled { background: #F6F7F8; }
   }
 }
 
 .date-separator {
   font-size: 1rem;
-  color: #ccc;
+  color: #C8CDD0;
   margin-top: 20px;
 }
 
@@ -189,20 +189,20 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid #DCE3E8;
   background: #fff;
   font-size: 1.2rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #333;
+  color: #2F3B46;
   transition: all 0.2s;
   font-family: 'Poppins', sans-serif;
 
   &:hover:not(:disabled) {
-    border-color: #2d5a27;
-    color: #2d5a27;
+    border-color: #2B3F51;
+    color: #2B3F51;
   }
 
   &:disabled {
@@ -214,20 +214,20 @@
 .counter-value {
   font-size: 1.3rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: #1C2833;
   min-width: 28px;
   text-align: center;
 }
 
 .counter-label {
   font-size: 0.9rem;
-  color: #888;
+  color: #7B8A97;
 }
 
 .start-btn {
   width: 100%;
   padding: 14px;
-  background: #2d5a27;
+  background: #2B3F51;
   color: #fff;
   border: none;
   border-radius: 12px;
@@ -238,5 +238,5 @@
   margin-top: 8px;
   transition: background 0.2s;
 
-  &:hover { background: #1e3d1a; }
+  &:hover { background: #1C2833; }
 }

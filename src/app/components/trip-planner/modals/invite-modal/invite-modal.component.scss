@@ -17,7 +17,7 @@
     margin: 0;
     font-size: 1rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #1C2833;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -29,15 +29,15 @@
   height: 28px;
   border-radius: 50%;
   border: none;
-  background: #f5f5f5;
+  background: #F6F8F9;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #888;
+  color: #7B8A97;
   flex-shrink: 0;
   transition: background 0.15s;
-  &:hover { background: #eee; color: #1a1a1a; }
+  &:hover { background: #EDEEEF; color: #1C2833; }
 }
 
 .invite-body {
@@ -47,14 +47,14 @@
 
 .invite-desc {
   font-size: 0.82rem;
-  color: #888;
+  color: #7B8A97;
   margin: 0 0 18px;
 }
 
 .invite-label {
   font-size: 0.72rem;
   font-weight: 600;
-  color: #aaa;
+  color: #A3ACB1;
   text-transform: uppercase;
   letter-spacing: 0.4px;
   margin-bottom: 8px;
@@ -74,25 +74,25 @@
   align-items: center;
   gap: 6px;
   padding: 14px 12px;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid #DCE3E8;
   border-radius: 12px;
   background: #fff;
   cursor: pointer;
   font-family: 'Poppins', sans-serif;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #555;
+  color: #475969;
   transition: all 0.2s;
 
   &:hover {
-    border-color: #2d5a27;
-    background: #f8fcf7;
+    border-color: #2B3F51;
+    background: #F9FAFA;
   }
 
   &.active {
-    border-color: #2d5a27;
-    background: #eaf3e8;
-    color: #2d5a27;
+    border-color: #2B3F51;
+    background: #EEF2F4;
+    color: #2B3F51;
   }
 
   svg {
@@ -101,19 +101,19 @@
 
   &.active svg {
     opacity: 1;
-    stroke: #2d5a27;
+    stroke: #2B3F51;
   }
 }
 
 .role-hint {
   font-size: 0.68rem;
   font-weight: 400;
-  color: #999;
+  color: #7F8D99;
   text-align: center;
 }
 
 .invite-role-btn.active .role-hint {
-  color: #4a8a44;
+  color: #44688A;
 }
 
 // ===== GENERATE BUTTON =====
@@ -122,7 +122,7 @@
   font-size: 0.85rem;
   font-weight: 600;
   color: #fff;
-  background: #2d5a27;
+  background: #2B3F51;
   border: none;
   border-radius: 10px;
   padding: 12px 20px;
@@ -130,19 +130,19 @@
   transition: background 0.15s;
   margin-bottom: 6px;
 
-  &:hover { background: #245020; }
+  &:hover { background: #25394B; }
   &:disabled { opacity: 0.6; cursor: not-allowed; }
 }
 
 .invite-error {
   font-size: 0.78rem;
-  color: #dc2626;
+  color: #C8352B;
   margin: 8px 0 0;
 }
 
 .invite-expires {
   font-size: 0.7rem;
-  color: #aaa;
+  color: #A3ACB1;
   margin: 8px 0 0;
 }
 
@@ -156,9 +156,9 @@
   flex: 1;
   font-family: 'Poppins', sans-serif;
   font-size: 0.82rem;
-  color: #1a1a1a;
-  background: #f8f9fa;
-  border: 1.5px solid #e0e0e0;
+  color: #1C2833;
+  background: #F6F8F9;
+  border: 1.5px solid #DCE3E8;
   border-radius: 10px;
   padding: 10px 14px;
   outline: none;
@@ -167,7 +167,7 @@
   min-width: 0;
 
   &:focus {
-    border-color: #2d5a27;
+    border-color: #2B3F51;
   }
 }
 
@@ -178,8 +178,8 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #2d5a27;
-  background: #eaf3e8;
+  color: #2B3F51;
+  background: #EEF2F4;
   border: none;
   border-radius: 10px;
   padding: 10px 16px;
@@ -188,10 +188,10 @@
   flex-shrink: 0;
   transition: background 0.15s;
 
-  &:hover { background: #d4eacf; }
+  &:hover { background: #D1DDE8; }
 
   &.copied {
-    background: #2d5a27;
+    background: #2B3F51;
     color: #fff;
   }
 }

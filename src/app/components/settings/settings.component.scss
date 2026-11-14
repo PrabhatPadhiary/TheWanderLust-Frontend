@@ -1,0 +1,115 @@
+$frost: #EEF2F4;
+$ink: #1C2833;
+$slate: #3F5A73;
+$slate-dark: #2B3F51;
+$muted: #4F6070;
+$faint: #7F8D99;
+$line: #DCE3E8;
+$error: #C8352B;
+
+:host { display: block; background: $frost; min-height: 100vh; }
+
+.settings-page {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 100px 24px 60px;
+  font-family: 'Poppins', sans-serif;
+  color: $ink;
+}
+
+.head {
+  margin-bottom: 8px;
+  h1 { margin: 14px 0 2px; font-size: 1.8rem; font-weight: 700; }
+  p { margin: 0; color: $muted; font-size: 0.9rem; }
+}
+.back-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 9px 18px 9px 12px; border: none; border-radius: 999px;
+  background: #fff; color: $slate-dark; font-family: inherit; font-weight: 600; cursor: pointer;
+  &:hover { background: #E8EDF0; }
+}
+
+section { margin-top: 26px; }
+h2 {
+  margin: 0 0 10px 4px;
+  font-size: 0.78rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: $muted;
+}
+
+.group { background: #fff; border: 1px solid #E9EDF1; border-radius: 20px; overflow: hidden; }
+
+.row {
+  width: 100%; box-sizing: border-box;
+  display: flex; align-items: center; gap: 14px;
+  min-height: 56px; padding: 10px 18px;
+  background: none; border: none; border-bottom: 1px solid #EEF1F4;
+  font-family: inherit; font-size: 0.95rem; text-align: left; color: $ink; text-decoration: none;
+  &:last-child { border-bottom: none; }
+  &:is(button, a) { cursor: pointer; &:hover { background: #F8FAFB; } }
+
+  .row-label { flex: 1; font-weight: 500; }
+  .row-value { color: $muted; font-size: 0.85rem; text-align: right; }
+  .chev { color: $faint; font-size: 1.3rem; line-height: 1; }
+
+  &.static { flex-wrap: wrap; .row-value { flex-basis: 100%; text-align: left; margin-top: -4px; } }
+  &.muted { color: $faint; font-size: 0.88rem; }
+  &.danger .row-label { color: $error; font-weight: 600; }
+}
+
+.person {
+  .avatar {
+    width: 36px; height: 36px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+    background: $slate; color: #fff; font-size: 0.8rem; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+    img { width: 100%; height: 100%; object-fit: cover; }
+  }
+}
+.pill-btn {
+  padding: 7px 16px; border-radius: 999px; border: none; background: #F0F3F5;
+  font-family: inherit; font-weight: 600; color: $ink; cursor: pointer;
+  &:hover { background: #E3E9ED; }
+  &:disabled { opacity: 0.6; cursor: default; }
+}
+
+.delete-link {
+  display: block; margin: 18px auto 0;
+  background: none; border: none; color: $error; font-family: inherit; font-weight: 600; font-size: 0.85rem; cursor: pointer;
+  &:hover { text-decoration: underline; }
+}
+
+// Delete account dialog
+.backdrop {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(28, 40, 51, 0.45);
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+}
+.dialog {
+  width: 100%; max-width: 440px; box-sizing: border-box;
+  background: #fff; border-radius: 24px; padding: 28px;
+  font-family: 'Poppins', sans-serif; color: $ink;
+
+  .warn-icon {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: #FBEEEC; color: $error; font-weight: 700; font-size: 1.3rem;
+    display: flex; align-items: center; justify-content: center; margin-bottom: 12px;
+  }
+  h3 { margin: 0; font-size: 1.3rem; }
+  .hint { color: $muted; font-size: 0.88rem; margin: 4px 0 10px; }
+  ul { margin: 0 0 14px; padding-left: 18px; font-size: 0.86rem; line-height: 1.6; }
+  label { font-size: 0.86rem; font-weight: 600; }
+  input {
+    width: 100%; box-sizing: border-box; margin-top: 6px;
+    padding: 11px 14px; border: 1.5px solid $line; border-radius: 12px;
+    font-family: inherit; font-size: 0.95rem; outline: none; text-transform: uppercase;
+    &:focus { border-color: $slate; }
+  }
+  .error { color: $error; font-size: 0.84rem; margin: 8px 0 0; }
+}
+.delete-btn {
+  width: 100%; margin-top: 16px; padding: 13px; border: none; border-radius: 999px;
+  background: #C4392A; color: #fff; font-family: inherit; font-weight: 600; font-size: 0.95rem; cursor: pointer;
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+}
+.keep-btn {
+  display: block; margin: 10px auto 0; background: none; border: none;
+  color: $muted; font-family: inherit; font-weight: 600; cursor: pointer;
+}

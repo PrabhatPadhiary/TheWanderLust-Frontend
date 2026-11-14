@@ -1,0 +1,94 @@
+<app-navbar></app-navbar>
+
+<div class="settings-page">
+  <header class="head">
+    <button class="back-btn" (click)="back()">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Profile
+    </button>
+    <h1>Settings</h1>
+    <p>Account, privacy and the app</p>
+  </header>
+
+  <!-- Account -->
+  <section>
+    <h2>Account</h2>
+    <div class="group">
+      <div class="row">
+        <span class="row-label">Email</span>
+        <span class="row-value">{{ auth.currentUser?.email }}</span>
+      </div>
+      <div class="row">
+        <span class="row-label">Signed in with</span>
+        <span class="row-value">{{ signInLabel }}</span>
+      </div>
+      <button class="row" *ngIf="methods.password" (click)="changePassword()">
+        <span class="row-label">Change password</span>
+        <span class="row-value">We'll email you a link</span>
+        <span class="chev">›</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Privacy and safety -->
+  <section>
+    <h2>Privacy and safety</h2>
+    <div class="group">
+      <div class="row static">
+        <span class="row-label">Blocked people</span>
+        <span class="row-value">Their stories and comments are hidden from you</span>
+      </div>
+      <div class="row muted" *ngIf="blockedLoading">Loading…</div>
+      <div class="row muted" *ngIf="!blockedLoading && !blocked.length">No one blocked. You can block someone from a story's menu.</div>
+      <div class="row person" *ngFor="let p of blocked">
+        <span class="avatar">
+          <img *ngIf="p.photoUrl" [src]="p.photoUrl" alt="">
+          <ng-container *ngIf="!p.photoUrl">{{ initials(p.name) }}</ng-container>
+        </span>
+        <span class="row-label">{{ p.name || 'Traveller' }}</span>
+        <button class="pill-btn" (click)="unblock(p)" [disabled]="unblocking === p.id">
+          {{ unblocking === p.id ? 'Unblocking…' : 'Unblock' }}
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section>
+    <h2>About</h2>
+    <div class="group">
+      <a class="row" routerLink="/privacy"><span class="row-label">Privacy policy</span><span class="chev">›</span></a>
+      <a class="row" routerLink="/terms"><span class="row-label">Terms of use</span><span class="chev">›</span></a>
+      <a class="row" routerLink="/download"><span class="row-label">Get the Android app</span><span class="row-value">Beta</span><span class="chev">›</span></a>
+    </div>
+  </section>
+
+  <section>
+    <div class="group">
+      <button class="row danger" (click)="logOut()"><span class="row-label">Log out</span></button>
+    </div>
+    <button class="delete-link" (click)="openDelete()">Delete account</button>
+  </section>
+</div>
+
+<!-- Delete account: what happens, then type DELETE -->
+<div class="backdrop" *ngIf="deleteOpen" (click)="!deleting && (deleteOpen = false)">
+  <div class="dialog" (click)="$event.stopPropagation()" role="dialog" aria-modal="true" aria-labelledby="del-title">
+    <div class="warn-icon">!</div>
+    <h3 id="del-title">Delete your account?</h3>
+    <p class="hint">This can't be undone. Here's what happens:</p>
+    <ul>
+      <li>Your profile, sign-in, favourites and journals are deleted.</li>
+      <li>Trips only you are on are deleted.</li>
+      <li>Trips shared with friends stay with them; the longest-standing editor becomes the owner.</li>
+      <li>Expenses you paid on shared trips stay, shown as "Former traveller".</li>
+    </ul>
+    <label for="del-input">Type DELETE to confirm</label>
+    <input id="del-input" [(ngModel)]="deleteText" placeholder="DELETE" autocomplete="off" [disabled]="deleting">
+    <p class="error" *ngIf="deleteError">{{ deleteError }}</p>
+    <button class="delete-btn" (click)="confirmDelete()" [disabled]="!canDelete">
+      {{ deleting ? 'Deleting…' : 'Delete my account' }}
+    </button>
+    <button class="keep-btn" (click)="deleteOpen = false" [disabled]="deleting">Keep my account</button>
+  </div>
+</div>

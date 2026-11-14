@@ -1,5 +1,5 @@
 .manage-dest-modal {
-  background: #1e293b;
+  background: #1E2D3B;
   border-radius: 20px;
   padding: 32px;
   width: 520px;
@@ -153,11 +153,11 @@
 }
 
 .mdm-dest-delete {
-  color: rgba(239, 68, 68, 0.7);
+  color: rgba(219, 101, 88, 0.7);
 
   &:hover {
-    background: rgba(239, 68, 68, 0.12);
-    color: #ef4444;
+    background: rgba(219, 101, 88, 0.12);
+    color: #DB6558;
   }
 
   svg { stroke: currentColor; }

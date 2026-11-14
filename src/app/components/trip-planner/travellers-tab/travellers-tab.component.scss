@@ -12,14 +12,14 @@
   h2 {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #1C2833;
     margin: 0 0 4px;
   }
 }
 
 .trav-meta {
   font-size: 0.78rem;
-  color: #888;
+  color: #7B8A97;
   margin: 0;
 }
 
@@ -30,14 +30,14 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #2d5a27;
-  background: #eaf3e8;
+  color: #2B3F51;
+  background: #EEF2F4;
   border: none;
   border-radius: 10px;
   padding: 10px 16px;
   cursor: pointer;
   transition: background 0.15s;
-  &:hover { background: #d4eacf; }
+  &:hover { background: #D1DDE8; }
 }
 
 // ===== SECTIONS =====
@@ -48,7 +48,7 @@
 .trav-section-label {
   font-size: 0.72rem;
   font-weight: 700;
-  color: #aaa;
+  color: #A3ACB1;
   text-transform: uppercase;
   letter-spacing: 0.6px;
   margin-bottom: 12px;
@@ -56,7 +56,7 @@
 
 .trav-section-sub {
   font-weight: 400;
-  color: #ccc;
+  color: #C8CDD0;
   text-transform: none;
   letter-spacing: 0;
   margin-left: 6px;
@@ -69,14 +69,14 @@
   gap: 14px;
   padding: 14px 18px;
   background: #fff;
-  border: 1.5px solid #f0f0f0;
+  border: 1.5px solid #E8EDF0;
   border-radius: 14px;
   margin-bottom: 10px;
   transition: border-color 0.2s;
 
   &--you {
-    border-color: #2d5a27;
-    background: #f9fcf8;
+    border-color: #2B3F51;
+    background: #F9FAFB;
   }
 }
 
@@ -84,7 +84,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: #2d5a27;
+  background: #2B3F51;
   color: #fff;
   display: flex;
   align-items: center;
@@ -105,7 +105,7 @@
 .trav-member-name {
   font-size: 0.9rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: #1C2833;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -114,15 +114,15 @@
 .trav-you-tag {
   font-size: 0.65rem;
   font-weight: 500;
-  color: #2d5a27;
-  background: #eaf3e8;
+  color: #2B3F51;
+  background: #EEF2F4;
   padding: 1px 6px;
   border-radius: 8px;
 }
 
 .trav-member-meta {
   font-size: 0.75rem;
-  color: #999;
+  color: #7F8D99;
 }
 
 .trav-member-actions {
@@ -140,16 +140,16 @@
   white-space: nowrap;
 
   &.trav-role--owner {
-    background: #2d5a27;
+    background: #2B3F51;
     color: #fff;
   }
   &.trav-role--member {
-    background: #eaf3e8;
-    color: #2d5a27;
+    background: #EEF2F4;
+    color: #2B3F51;
   }
   &.trav-role--viewer {
-    background: #f0f0f0;
-    color: #888;
+    background: #E8EDF0;
+    color: #7B8A97;
   }
 }
 
@@ -164,14 +164,14 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.72rem;
   font-weight: 600;
-  color: #2d5a27;
-  background: #eaf3e8;
+  color: #2B3F51;
+  background: #EEF2F4;
   border: none;
   border-radius: 20px;
   padding: 5px 10px;
   cursor: pointer;
   transition: background 0.15s;
-  &:hover { background: #d4eacf; }
+  &:hover { background: #D1DDE8; }
 }
 
 .trav-role-dropdown {
@@ -179,7 +179,7 @@
   top: calc(100% + 6px);
   right: 0;
   background: #fff;
-  border: 1px solid #eee;
+  border: 1px solid #EDEEEF;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   z-index: 50;
@@ -195,21 +195,21 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.78rem;
   font-weight: 500;
-  color: #555;
+  color: #475969;
   background: #fff;
   border: none;
   padding: 10px 14px;
   cursor: pointer;
   transition: background 0.12s;
 
-  &:hover { background: #f8f9fa; }
+  &:hover { background: #F6F8F9; }
   &.active {
-    color: #2d5a27;
+    color: #2B3F51;
     font-weight: 600;
-    background: #f3f9f2;
+    background: #F4F6F7;
   }
   &:not(:last-child) {
-    border-bottom: 1px solid #f5f5f5;
+    border-bottom: 1px solid #F6F8F9;
   }
 }
 
@@ -218,14 +218,14 @@
   height: 28px;
   border-radius: 50%;
   border: none;
-  background: #fef2f2;
-  color: #dc2626;
+  background: #FDF4F3;
+  color: #C8352B;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: background 0.15s;
-  &:hover { background: #fee2e2; }
+  &:hover { background: #FAE8E6; }
 }
 
 // ===== INVITE VIA LINK =====
@@ -244,8 +244,8 @@
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  background: #fffbf0;
-  border: 1.5px solid #fde68a;
+  background: #FDF4F2;
+  border: 1.5px solid #F3AA94;
   border-radius: 12px;
   margin-bottom: 8px;
 }
@@ -254,12 +254,12 @@
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: #fef3c7;
+  background: #F9D6CC;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: #d97706;
+  color: #C94016;
 }
 
 .trav-pending-info {
@@ -272,20 +272,20 @@
 
 .trav-pending-role {
   font-size: 0.82rem;
-  color: #1a1a1a;
+  color: #1C2833;
   strong { font-weight: 600; }
 }
 
 .trav-pending-meta {
   font-size: 0.7rem;
-  color: #aaa;
+  color: #A3ACB1;
 }
 
 .trav-pending-badge {
   font-size: 0.68rem;
   font-weight: 600;
-  color: #d97706;
-  background: #fef3c7;
+  color: #C94016;
+  background: #F9D6CC;
   padding: 3px 9px;
   border-radius: 12px;
   white-space: nowrap;
@@ -296,21 +296,21 @@
   height: 26px;
   border-radius: 50%;
   border: none;
-  background: #fef2f2;
-  color: #dc2626;
+  background: #FDF4F3;
+  color: #C8352B;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   flex-shrink: 0;
   transition: background 0.15s;
-  &:hover { background: #fee2e2; }
+  &:hover { background: #FAE8E6; }
 }
 
 // ===== INVITE CARD =====
 .trav-invite-card {
-  background: #f3f9f2;
-  border: 1.5px solid #c6e7c1;
+  background: #F4F6F7;
+  border: 1.5px solid #C5D4E3;
   border-radius: 14px;
   padding: 18px;
 }
@@ -325,9 +325,9 @@
   flex: 1;
   font-family: 'Poppins', sans-serif;
   font-size: 0.8rem;
-  color: #1a1a1a;
-  background: #f8f9fa;
-  border: 1.5px solid #e0e0e0;
+  color: #1C2833;
+  background: #F6F8F9;
+  border: 1.5px solid #DCE3E8;
   border-radius: 10px;
   padding: 9px 12px;
   outline: none;
@@ -338,16 +338,16 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.8rem;
   font-weight: 600;
-  color: #2d5a27;
-  background: #eaf3e8;
+  color: #2B3F51;
+  background: #EEF2F4;
   border: none;
   border-radius: 10px;
   padding: 9px 14px;
   cursor: pointer;
   white-space: nowrap;
   transition: background 0.15s;
-  &:hover { background: #d4eacf; }
-  &.copied { background: #2d5a27; color: #fff; }
+  &:hover { background: #D1DDE8; }
+  &.copied { background: #2B3F51; color: #fff; }
 }
 
 .trav-invite-role-row {
@@ -359,12 +359,12 @@
 
 .trav-invite-role-label {
   font-size: 0.75rem;
-  color: #888;
+  color: #7B8A97;
 }
 
 .trav-invite-toggle {
   display: flex;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid #DCE3E8;
   border-radius: 10px;
   overflow: hidden;
 }
@@ -376,7 +376,7 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #888;
+  color: #7B8A97;
   background: #fff;
   border: none;
   padding: 8px 14px;
@@ -384,11 +384,11 @@
   transition: all 0.15s;
 
   &.active {
-    background: #eaf3e8;
-    color: #2d5a27;
+    background: #EEF2F4;
+    color: #2B3F51;
   }
   &:not(:last-child) {
-    border-right: 1.5px solid #e0e0e0;
+    border-right: 1.5px solid #DCE3E8;
   }
 }
 
@@ -397,19 +397,19 @@
   font-size: 0.82rem;
   font-weight: 600;
   color: #fff;
-  background: #2d5a27;
+  background: #2B3F51;
   border: none;
   border-radius: 10px;
   padding: 10px 20px;
   cursor: pointer;
   transition: background 0.15s;
-  &:hover { background: #245020; }
+  &:hover { background: #25394B; }
   &:disabled { opacity: 0.6; cursor: not-allowed; }
 }
 
 .trav-invite-hint {
   font-size: 0.7rem;
-  color: #aaa;
+  color: #A3ACB1;
   margin: 0;
 }
 
@@ -441,15 +441,15 @@
 
 .trav-share--whatsapp { background: #25d366; color: #fff; }
 .trav-share--telegram { background: #0088cc; color: #fff; }
-.trav-share--twitter { background: #1a1a1a; color: #fff; }
-.trav-share--email { background: #f0f0f0; color: #555; }
-.trav-share--native { background: #eaf3e8; color: #2d5a27; }
+.trav-share--twitter { background: #1C2833; color: #fff; }
+.trav-share--email { background: #E8EDF0; color: #475969; }
+.trav-share--native { background: #EEF2F4; color: #2B3F51; }
 
 .trav-new-link-btn {
   font-family: 'Poppins', sans-serif;
   font-size: 0.72rem;
   font-weight: 600;
-  color: #2d5a27;
+  color: #2B3F51;
   background: none;
   border: none;
   cursor: pointer;
@@ -457,7 +457,7 @@
   text-decoration: underline;
   text-underline-offset: 2px;
   align-self: flex-start;
-  &:hover { color: #1e3d1a; }
+  &:hover { color: #1C2833; }
 }
 
 // ===== SPLIT ROW =====
@@ -475,7 +475,7 @@
 // ===== SPENDING CARD =====
 .trav-spend-card {
   background: #fff;
-  border: 1.5px solid #eee;
+  border: 1.5px solid #EDEEEF;
   border-radius: 14px;
   padding: 16px;
 }
@@ -497,7 +497,7 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: #2d5a27;
+  background: #2B3F51;
   color: #fff;
   display: flex;
   align-items: center;
@@ -511,18 +511,18 @@
   flex: 1;
   font-size: 0.82rem;
   font-weight: 500;
-  color: #1a1a1a;
+  color: #1C2833;
 }
 
 .trav-spend-amount {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #1C2833;
 }
 
 .trav-spend-divider {
   height: 1px;
-  background: #f0f0f0;
+  background: #E8EDF0;
   margin: 10px 0;
 }
 
@@ -543,19 +543,19 @@
 
 .trav-settle-arrow {
   font-size: 0.75rem;
-  color: #999;
+  color: #7F8D99;
 }
 
 .trav-settle-text {
   flex: 1;
   font-size: 0.78rem;
-  color: #666;
+  color: #4F6070;
 }
 
 .trav-settle-amount {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #dc2626;
+  color: #C8352B;
 }
 
 .trav-settled {
@@ -565,7 +565,7 @@
   gap: 8px;
   padding: 12px;
   font-size: 0.82rem;
-  color: #16a34a;
+  color: #3E8E63;
   font-weight: 500;
 }
 
@@ -583,7 +583,7 @@
 }
 
 .sk-line {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, #E8EDF0 25%, #DCE3E8 50%, #E8EDF0 75%);
   background-size: 400px 100%;
   animation: sk-shimmer 1.4s ease infinite;
   border-radius: 6px;
@@ -603,7 +603,7 @@
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, #E8EDF0 25%, #DCE3E8 50%, #E8EDF0 75%);
   background-size: 400px 100%;
   animation: sk-shimmer 1.4s ease infinite;
   flex-shrink: 0;
@@ -617,7 +617,7 @@
   gap: 14px;
   padding: 14px 18px;
   background: #fff;
-  border: 1.5px solid #f0f0f0;
+  border: 1.5px solid #E8EDF0;
   border-radius: 14px;
   margin-bottom: 10px;
 }
@@ -631,15 +631,15 @@
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  background: #fffbf0;
-  border: 1.5px solid #fde68a;
+  background: #FDF4F2;
+  border: 1.5px solid #F3AA94;
   border-radius: 12px;
   margin-bottom: 8px;
 }
 
 .sk-invite-card {
-  background: #f3f9f2;
-  border: 1.5px solid #c6e7c1;
+  background: #F4F6F7;
+  border: 1.5px solid #C5D4E3;
   border-radius: 14px;
   padding: 18px;
 }

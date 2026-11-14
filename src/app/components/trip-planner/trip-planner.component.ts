@@ -319,7 +319,7 @@ export class TripPlannerComponent implements OnInit {
   }
 
   getDestColor(): string {
-    const colors = ['#4ade80', '#8b5cf6', '#3b82f6', '#f59e0b', '#ec4899'];
+    const colors = ['#67C194', '#8CAAC6', '#769ABB', '#E64A1A', '#EB6F49'];
     return colors[this.activeDestIndex % colors.length];
   }
 

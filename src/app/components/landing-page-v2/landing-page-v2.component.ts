@@ -1,6 +1,7 @@
 import { Component, ElementRef, HostListener, OnInit, AfterViewInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { JournalService, JournalFeedItem } from '../../services/journal.service';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 
@@ -23,13 +24,38 @@ export class LandingPageV2Component implements OnInit, AfterViewInit {
   private autocompleteService: any;
   private blurTimeout: any;
 
+  /** The latest real stories from the community, for the landing section. */
+  stories: JournalFeedItem[] = [];
+
   constructor(
     public authService: AuthService,
-    private router: Router
+    private router: Router,
+    private journalService: JournalService
   ) {}
 
   ngOnInit(): void {
     this.initPlacesAutocomplete();
+    // Real stories only: the newest three with a photo (the section hides if none load).
+    this.journalService.getFeed().subscribe({
+      next: (items) => {
+        this.stories = (items || []).filter(j => j.photos?.length).slice(0, 3);
+      },
+      error: () => { this.stories = []; },
+    });
+  }
+
+  storyExcerpt(body: string): string {
+    const text = (body || '').trim();
+    return text.length > 140 ? text.slice(0, 140).trimEnd() + '…' : text;
+  }
+
+  storyDate(j: JournalFeedItem): string {
+    return new Date(j.publishedAt || j.createdAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+  }
+
+  storyColor(name: string): string {
+    const colors = ['#2B3F51', '#3F5A73', '#A53412', '#4F6070', '#D9481C'];
+    return colors[(name || 'T').charCodeAt(0) % colors.length];
   }
 
   ngAfterViewInit(): void {

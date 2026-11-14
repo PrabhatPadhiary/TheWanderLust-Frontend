@@ -48,31 +48,20 @@
       </div>
     </div>
 
-    <!-- Trust indicators -->
+    <!-- What you get (facts, no made-up numbers). -->
     <div class="hero-trust">
-      <div class="trust-avatars">
-        <div class="avatar-stack">
-          <span class="avatar" style="background: #4caf50;">A</span>
-          <span class="avatar" style="background: #ff7043;">M</span>
-          <span class="avatar" style="background: #42a5f5;">R</span>
-          <span class="avatar" style="background: #ab47bc;">S</span>
-          <span class="avatar" style="background: #ffa726;">K</span>
-        </div>
-        <span class="trust-text">2,400+ travelers have planned trips</span>
-      </div>
       <div class="trust-stats">
         <span class="trust-stat">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
-          </svg>
-          10K+ trips planned
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/></svg>
+          Free while in beta
         </span>
         <span class="trust-stat">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"/>
-            <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
-          </svg>
-          500+ destinations
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Plan together with friends
+        </span>
+        <span class="trust-stat">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          Real Google ratings and photos
         </span>
       </div>
     </div>
@@ -233,66 +222,30 @@
 </section>
 
 <!-- ===== FROM THE COMMUNITY SECTION ===== -->
-<section class="community-section">
+<section class="community-section" *ngIf="stories.length">
   <div class="section-container">
     <span class="section-label">From the community</span>
-    <h2 class="section-title">Stories from fellow travelers</h2>
-    <p class="section-subtitle">Real trips, real experiences — shared by our community.</p>
+    <h2 class="section-title">Stories from fellow travellers</h2>
+    <p class="section-subtitle">The latest trips shared on Wayraa.</p>
 
     <div class="blog-grid">
-      <div class="blog-card">
+      <a class="blog-card" *ngFor="let j of stories" [routerLink]="['/community/journal', j.id]">
         <div class="blog-card-image">
-          <img src="assets/images/background/card-bg1.jpg" alt="Lofoten, Norway" loading="lazy">
+          <img [src]="j.photos![0].url" [alt]="j.destination" loading="lazy">
         </div>
         <div class="blog-card-body">
-          <span class="blog-card-tag">Kerala</span>
-          <h3>Monsoon magic in Wayanad — the waterfalls were unreal</h3>
-          <p>Zero expectations, completely blown away. Soochipara falls at full force, misty tea estates, and barely another tourist in sight.</p>
+          <span class="blog-card-tag">{{ j.destination }}</span>
+          <h3>{{ j.title }}</h3>
+          <p>{{ storyExcerpt(j.body) }}</p>
           <div class="blog-card-author">
-            <span class="author-avatar" style="background: #e85d04;">R</span>
+            <span class="author-avatar" [style.background]="storyColor(j.author.name)">{{ (j.author.name || 'T').charAt(0).toUpperCase() }}</span>
             <div class="author-info">
-              <span class="author-name">Rahul Menon</span>
-              <span class="author-date">Jun 2024</span>
+              <span class="author-name">{{ j.author.name || 'Traveller' }}</span>
+              <span class="author-date">{{ storyDate(j) }}</span>
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="blog-card">
-        <div class="blog-card-image">
-          <img src="assets/images/background/card-bg2.jpg" alt="Dubai, UAE" loading="lazy">
-        </div>
-        <div class="blog-card-body">
-          <span class="blog-card-tag">UAE</span>
-          <h3>First timer in Dubai — what I wish I knew beforehand</h3>
-          <p>The desert safari at sunset was the highlight. Skip the mall and walk the old spice souk instead — completely different vibe.</p>
-          <div class="blog-card-author">
-            <span class="author-avatar" style="background: #2563eb;">P</span>
-            <div class="author-info">
-              <span class="author-name">Priya Sharma</span>
-              <span class="author-date">May 2024</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="blog-card">
-        <div class="blog-card-image">
-          <img src="assets/images/background/card-bg3.jpg" alt="Coorg, Karnataka" loading="lazy">
-        </div>
-        <div class="blog-card-body">
-          <span class="blog-card-tag">Karnataka</span>
-          <h3>A weekend in Coorg with the family — coffee trails and cozy stays</h3>
-          <p>Perfect 2-night getaway. Coffee plantation walk in the morning, sat by the Cauvery in the evening. Kids loved every minute.</p>
-          <div class="blog-card-author">
-            <span class="author-avatar" style="background: #16a34a;">A</span>
-            <div class="author-info">
-              <span class="author-name">Ananya Roy</span>
-              <span class="author-date">Apr 2024</span>
-            </div>
-          </div>
-        </div>
-      </div>
+      </a>
     </div>
 
     <div class="community-cta-row">
@@ -302,115 +255,6 @@
           <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
         </svg>
       </a>
-    </div>
-  </div>
-</section>
-
-<!-- ===== USER REVIEWS SECTION ===== -->
-<section class="reviews-section" id="reviews">
-  <div class="section-container">
-    <span class="section-label">What travelers say</span>
-    <h2 class="section-title">Loved by explorers worldwide</h2>
-    <p class="section-subtitle">Real feedback from people who planned their trips with Wayraa.</p>
-
-    <!-- Stats row -->
-    <div class="reviews-stats-row">
-      <div class="reviews-stat-card">
-        <span class="rstat-num">4.9</span>
-        <div class="rstat-stars">★★★★★</div>
-        <span class="rstat-label">Average rating</span>
-      </div>
-      <div class="reviews-stat-card">
-        <span class="rstat-num">2,400+</span>
-        <span class="rstat-label">Happy travelers</span>
-      </div>
-      <div class="reviews-stat-card">
-        <span class="rstat-num">10K+</span>
-        <span class="rstat-label">Trips planned</span>
-      </div>
-      <div class="reviews-stat-card">
-        <span class="rstat-num">98%</span>
-        <span class="rstat-label">Would recommend</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Horizontal scroll track — no padding so cards bleed to edges with fade -->
-  <div class="reviews-scroll-wrap">
-    <div class="reviews-scroll-track">
-
-      <div class="rcard">
-        <p class="rcard-text">"Wayraa completely changed how I plan trips. I used to spend hours across 6 different tabs — now everything is in one place. Planned our Bali trip in under an hour."</p>
-        <div class="rcard-footer">
-          <span class="rcard-avatar" style="background: linear-gradient(135deg,#e85d04,#ff8c42)">S</span>
-          <div class="rcard-author">
-            <strong>Sneha Patel</strong>
-            <span>Mumbai · Bali</span>
-          </div>
-          <span class="rcard-stars">★★★★★</span>
-        </div>
-      </div>
-
-      <div class="rcard rcard--tinted">
-        <p class="rcard-text">"The map view on the destination page is incredible. I could see all restaurants and hotels plotted out and just tap to add them to my itinerary."</p>
-        <div class="rcard-footer">
-          <span class="rcard-avatar" style="background: linear-gradient(135deg,#2563eb,#60a5fa)">R</span>
-          <div class="rcard-author">
-            <strong>Rahul Sharma</strong>
-            <span>Delhi · Goa</span>
-          </div>
-          <span class="rcard-stars">★★★★★</span>
-        </div>
-      </div>
-
-      <div class="rcard">
-        <p class="rcard-text">"Our group of 5 used it to plan a week in Thailand. The collaborative features meant no one was left out of decisions. 10/10 would use again."</p>
-        <div class="rcard-footer">
-          <span class="rcard-avatar" style="background: linear-gradient(135deg,#16a34a,#4ade80)">A</span>
-          <div class="rcard-author">
-            <strong>Ananya Roy</strong>
-            <span>Bangalore · Thailand</span>
-          </div>
-          <span class="rcard-stars">★★★★★</span>
-        </div>
-      </div>
-
-      <div class="rcard rcard--tinted">
-        <p class="rcard-text">"Budget tracking saved our trip. We could see exactly what we were spending in real time and adjust plans on the go. Never went over budget."</p>
-        <div class="rcard-footer">
-          <span class="rcard-avatar" style="background: linear-gradient(135deg,#7c3aed,#a78bfa)">K</span>
-          <div class="rcard-author">
-            <strong>Karan Mehta</strong>
-            <span>Pune · Europe</span>
-          </div>
-          <span class="rcard-stars">★★★★★</span>
-        </div>
-      </div>
-
-      <div class="rcard">
-        <p class="rcard-text">"I love that it pulls real Google ratings and photos. I can actually trust the recommendations instead of relying on random blogs."</p>
-        <div class="rcard-footer">
-          <span class="rcard-avatar" style="background: linear-gradient(135deg,#db2777,#f472b6)">P</span>
-          <div class="rcard-author">
-            <strong>Priya Nair</strong>
-            <span>Chennai · Rajasthan</span>
-          </div>
-          <span class="rcard-stars">★★★★☆</span>
-        </div>
-      </div>
-
-      <div class="rcard rcard--tinted">
-        <p class="rcard-text">"Finally a travel app that doesn't feel like a spreadsheet. The design is clean, everything is intuitive, and the destination pages are stunning."</p>
-        <div class="rcard-footer">
-          <span class="rcard-avatar" style="background: linear-gradient(135deg,#0891b2,#67e8f9)">V</span>
-          <div class="rcard-author">
-            <strong>Varun Joshi</strong>
-            <span>Hyderabad · Manali</span>
-          </div>
-          <span class="rcard-stars">★★★★★</span>
-        </div>
-      </div>
-
     </div>
   </div>
 </section>

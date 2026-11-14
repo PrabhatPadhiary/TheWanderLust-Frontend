@@ -52,7 +52,7 @@
   padding: 0 20px !important;
   box-shadow: none !important;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  background: rgba(245, 246, 250, 0.75) !important;
+  background: rgba(246, 248, 249, 0.75) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
   left: 240px !important;
@@ -70,7 +70,7 @@
       span {
         font-size: 0.75rem;
         font-weight: 500;
-        color: #666;
+        color: #4F6070;
       }
     }
   }
@@ -79,7 +79,7 @@
     width: 28px !important;
     height: 28px !important;
     background: none !important;
-    border: 1px solid #e0e0e0 !important;
+    border: 1px solid #DCE3E8 !important;
     svg { width: 14px; height: 14px; }
   }
 }
@@ -103,7 +103,7 @@
   .brand-name {
     font-family: 'Poppins', sans-serif;
     font-size: 1.5rem;
-    color: #02334a;
+    color: #2B3F51;
     line-height: 1;
   }
 }
@@ -134,7 +134,7 @@
   padding: 8px 0;
   font-size: 0.88rem;
   font-weight: 500;
-  color: #555;
+  color: #475969;
   border-radius: 50px;
   cursor: pointer;
   transition: color 0.25s ease;
@@ -145,8 +145,8 @@
   white-space: nowrap;
   text-align: center;
 
-  &:hover { color: #1a1a1a; }
-  &.active { color: #e85d04; font-weight: 700; }
+  &:hover { color: #1C2833; }
+  &.active { color: #D9481C; font-weight: 700; }
 }
 
 // The sliding pill — sits behind all links
@@ -206,12 +206,12 @@
 
     &:focus-within {
       background: #fff;
-      border-color: #1a1a1a;
+      border-color: #1C2833;
       box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
     }
 
     .search-icon {
-      color: #999;
+      color: #7F8D99;
       flex-shrink: 0;
     }
 
@@ -221,9 +221,9 @@
       background: transparent;
       font-size: 0.88rem;
       font-family: 'Poppins', sans-serif;
-      color: #1a1a1a;
+      color: #1C2833;
       outline: none;
-      &::placeholder { color: #aaa; }
+      &::placeholder { color: #A3ACB1; }
     }
   }
 
@@ -246,7 +246,7 @@
     font-size: 1.05rem;
     font-family: 'Poppins', sans-serif;
     font-weight: 700;
-    color: #2d5a27;
+    color: #2B3F51;
     letter-spacing: 0.2px;
   }
 }
@@ -267,7 +267,7 @@
 
     &:focus-within {
       background: #fff;
-      border-color: #1a1a1a;
+      border-color: #1C2833;
       box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
     }
 
@@ -279,7 +279,7 @@
       gap: 10px;
 
       span {
-        color: #666;
+        color: #4F6070;
         display: flex;
         align-items: center;
         flex-shrink: 0;
@@ -292,16 +292,16 @@
         background: transparent;
         font-size: 0.88rem;
         font-family: 'Poppins', sans-serif;
-        color: #1a1a1a;
+        color: #1C2833;
         outline: none;
-        &::placeholder { color: #999; }
+        &::placeholder { color: #7F8D99; }
       }
     }
 
     .search-divider {
       width: 1px;
       height: 22px;
-      background: #ddd;
+      background: #DADEE0;
       flex-shrink: 0;
     }
   }
@@ -314,7 +314,7 @@
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-    border: 1px solid #eee;
+    border: 1px solid #EDEEEF;
     overflow: hidden;
     z-index: 100;
 
@@ -324,9 +324,9 @@
       padding: 11px 16px;
       cursor: pointer;
       transition: background 0.1s;
-      &:hover { background: #fff8f5; }
-      .dropdown-main { font-size: 0.85rem; font-weight: 600; color: #1a1a1a; }
-      .dropdown-secondary { font-size: 0.72rem; color: #888; }
+      &:hover { background: #FEF8F6; }
+      .dropdown-main { font-size: 0.85rem; font-weight: 600; color: #1C2833; }
+      .dropdown-secondary { font-size: 0.72rem; color: #7B8A97; }
     }
   }
 }
@@ -339,7 +339,7 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: #1C2833;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -355,18 +355,18 @@
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  background: rgba(45, 90, 39, 0.1);
-  border: 1.5px solid rgba(45, 90, 39, 0.2);
+  background: rgba(43, 63, 81, 0.1);
+  border: 1.5px solid rgba(43, 63, 81, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #2d5a27;
+  color: #2B3F51;
   transition: background 0.15s, border-color 0.15s, transform 0.15s;
 
   &:hover {
-    background: rgba(45, 90, 39, 0.2);
-    border-color: rgba(45, 90, 39, 0.4);
+    background: rgba(43, 63, 81, 0.2);
+    border-color: rgba(43, 63, 81, 0.4);
     transform: translateY(-50%) scale(1.05);
   }
 }
@@ -378,16 +378,16 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #4caf50;
+  background: #537FA8;
   border: 2px solid #fff;
-  box-shadow: 0 0 0 1.5px rgba(76, 175, 80, 0.4);
+  box-shadow: 0 0 0 1.5px rgba(83, 127, 168, 0.4);
 }
 
 .trip-tooltip {
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  background: #1a1a1a;
+  background: #1C2833;
   color: #fff;
   border-radius: 10px;
   padding: 10px 14px;
@@ -407,7 +407,7 @@
     right: 12px;
     width: 10px;
     height: 10px;
-    background: #1a1a1a;
+    background: #1C2833;
     transform: rotate(45deg);
     border-radius: 2px;
   }
@@ -416,7 +416,7 @@
 .trip-tooltip-label {
   font-size: 0.68rem;
   font-weight: 600;
-  color: #4caf50;
+  color: #537FA8;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -433,7 +433,7 @@
 
 .trip-tooltip-cta {
   font-size: 0.75rem;
-  color: #aaa;
+  color: #A3ACB1;
   margin-top: 2px;
 }
 
@@ -454,7 +454,7 @@
 
 .sign-in-btn {
   padding: 10px 24px;
-  background: #1a1a1a;
+  background: #1C2833;
   color: #fff;
   border: none;
   border-radius: 50px;
@@ -466,7 +466,7 @@
   white-space: nowrap;
 
   &:hover {
-    background: #333;
+    background: #2F3B46;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
@@ -481,13 +481,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #555;
+  color: #475969;
   transition: all 0.15s;
   padding: 0 10px;
 
   svg { width: 22px; height: 22px; flex-shrink: 0; }
 
-  &:hover { background: rgba(0, 0, 0, 0.05); color: #1a1a1a; }
+  &:hover { background: rgba(0, 0, 0, 0.05); color: #1C2833; }
 
   &.with-label {
     gap: 8px;
@@ -510,9 +510,9 @@
   width: 38px;
   height: 38px;
   border-radius: 50%;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid #DCE3E8;
   background: #fff;
-  color: #555;
+  color: #475969;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -520,7 +520,7 @@
   font-family: 'Poppins', sans-serif;
   transition: all 0.15s;
 
-  &:hover { border-color: #e85d04; color: #e85d04; }
+  &:hover { border-color: #D9481C; color: #D9481C; }
 }
 
 .user-dropdown {
@@ -531,18 +531,18 @@
   background: #fff;
   border-radius: 12px;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-  border: 1px solid #eee;
+  border: 1px solid #EDEEEF;
   overflow: hidden;
   z-index: 200;
 }
 
 .user-dropdown-header {
   padding: 14px 16px;
-  strong { display: block; font-size: 0.88rem; color: #1a1a1a; }
-  span { font-size: 0.75rem; color: #888; }
+  strong { display: block; font-size: 0.88rem; color: #1C2833; }
+  span { font-size: 0.75rem; color: #7B8A97; }
 }
 
-.user-dropdown-divider { height: 1px; background: #f0f0f0; }
+.user-dropdown-divider { height: 1px; background: #E8EDF0; }
 
 .user-dropdown-item {
   display: block;
@@ -552,13 +552,13 @@
   background: none;
   text-align: left;
   font-size: 0.85rem;
-  color: #333;
+  color: #2F3B46;
   cursor: pointer;
   font-family: 'Poppins', sans-serif;
   transition: background 0.1s;
 
-  &:hover { background: #f8f8f8; }
-  &.logout { color: #e74c3c; &:hover { background: #fef2f2; } }
+  &:hover { background: #F7F8F9; }
+  &.logout { color: #D9594A; &:hover { background: #FDF4F3; } }
 }
 
 // ===== RESPONSIVE =====
@@ -584,8 +584,8 @@
   margin-right: 10px;
   padding: 8px 14px;
   border-radius: 999px;
-  border: 1.5px solid #e85d04;
-  color: #e85d04;
+  border: 1.5px solid #D9481C;
+  color: #D9481C;
   font-family: 'Poppins', sans-serif;
   font-size: 0.85rem;
   font-weight: 600;
@@ -594,7 +594,7 @@
   transition: background 0.15s ease, color 0.15s ease;
 
   &:hover {
-    background: #e85d04;
+    background: #D9481C;
     color: #fff;
   }
 }
@@ -602,8 +602,8 @@
 .get-app-beta {
   padding: 1px 7px;
   border-radius: 999px;
-  background: #fff3eb;
-  color: #b3380a;
+  background: #FDF1ED;
+  color: #AA3613;
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 1px;
@@ -614,4 +614,13 @@
   .get-app-btn > span:not(.get-app-beta) {
     display: none;
   }
+}
+
+// Your photo in the account button (when you have one).
+.user-avatar-btn { overflow: hidden; }
+.user-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
 }

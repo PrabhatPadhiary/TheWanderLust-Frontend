@@ -1,12 +1,12 @@
 // Accent color — using the same green as the main app instead of orange
-$accent: #2d5a27;
-$accent-light: rgba(45, 90, 39, 0.08);
-$accent-hover: #1e3d1a;
+$accent: #2B3F51;
+$accent-light: rgba(43, 63, 81, 0.08);
+$accent-hover: #1C2833;
 
 :host {
   display: block;
   font-family: 'Poppins', sans-serif;
-  background: #f8f9fa;
+  background: #F6F8F9;
   min-height: 100vh;
 }
 
@@ -32,7 +32,7 @@ $accent-hover: #1e3d1a;
 
   p {
     font-size: 0.88rem;
-    color: #aaa;
+    color: #A3ACB1;
     font-weight: 500;
     margin: 0;
   }
@@ -41,7 +41,7 @@ $accent-hover: #1e3d1a;
 .wj-edit-spinner {
   width: 30px;
   height: 30px;
-  border: 3px solid #f0f0f0;
+  border: 3px solid #E8EDF0;
   border-top-color: $accent;
   border-radius: 50%;
   animation: wj-spin 0.7s linear infinite;
@@ -59,15 +59,15 @@ $accent-hover: #1e3d1a;
   padding: 24px 0 32px;
   position: sticky;
   top: 0;
-  background: #f8f9fa;
+  background: #F6F8F9;
   z-index: 100;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #E8EDF0;
   margin-bottom: 32px;
 
   h1 {
     font-size: 1.3rem;
     font-weight: 800;
-    color: #1a1a1a;
+    color: #1C2833;
     margin: 0;
     flex: 1;
   }
@@ -77,17 +77,17 @@ $accent-hover: #1e3d1a;
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  border: 1px solid #e8e8e8;
+  border: 1px solid #DCE3E8;
   background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #555;
+  color: #475969;
   transition: all 0.15s;
   flex-shrink: 0;
 
-  &:hover { border-color: #333; color: #1a1a1a; }
+  &:hover { border-color: #2F3B46; color: #1C2833; }
 }
 
 .wj-header-actions {
@@ -98,16 +98,16 @@ $accent-hover: #1e3d1a;
 .wj-draft-btn {
   padding: 10px 20px;
   background: #fff;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid #DCE3E8;
   border-radius: 50px;
   font-family: 'Poppins', sans-serif;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #555;
+  color: #475969;
   cursor: pointer;
   transition: all 0.15s;
 
-  &:hover { border-color: #333; color: #1a1a1a; }
+  &:hover { border-color: #2F3B46; color: #1C2833; }
 }
 
 .wj-publish-btn {
@@ -115,7 +115,7 @@ $accent-hover: #1e3d1a;
   align-items: center;
   gap: 6px;
   padding: 10px 24px;
-  background: #1a1a1a;
+  background: #1C2833;
   border: none;
   border-radius: 50px;
   font-family: 'Poppins', sans-serif;
@@ -125,7 +125,7 @@ $accent-hover: #1e3d1a;
   cursor: pointer;
   transition: all 0.15s;
 
-  &:hover:not(:disabled) { background: #333; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+  &:hover:not(:disabled) { background: #2F3B46; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
   &:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
 }
 
@@ -152,7 +152,7 @@ $accent-hover: #1e3d1a;
   align-items: center;
   gap: 14px;
   background: #fff;
-  border: 1.5px solid #e8e8e8;
+  border: 1.5px solid #DCE3E8;
   border-radius: 16px;
   padding: 18px 22px;
   transition: border-color 0.2s;
@@ -178,8 +178,8 @@ $accent-hover: #1e3d1a;
   flex-direction: column;
   gap: 2px;
 
-  strong { font-size: 0.9rem; color: #1a1a1a; }
-  span { font-size: 0.75rem; color: #aaa; }
+  strong { font-size: 0.9rem; color: #1C2833; }
+  span { font-size: 0.75rem; color: #A3ACB1; }
 }
 
 .wj-custom-select {
@@ -195,19 +195,19 @@ $accent-hover: #1e3d1a;
   justify-content: space-between;
   gap: 10px;
   padding: 10px 16px;
-  border: 1.5px solid #e8e8e8;
+  border: 1.5px solid #DCE3E8;
   border-radius: 10px;
-  background: #fafafa;
+  background: #F8FAFB;
   font-size: 0.82rem;
   font-weight: 500;
-  color: #1a1a1a;
+  color: #1C2833;
   transition: border-color 0.2s, box-shadow 0.2s;
 
-  svg { color: #888; flex-shrink: 0; transition: transform 0.2s; }
+  svg { color: #7B8A97; flex-shrink: 0; transition: transform 0.2s; }
 
   .wj-custom-select:focus & {
     border-color: $accent;
-    box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.08);
+    box-shadow: 0 0 0 3px rgba(43, 63, 81, 0.08);
   }
 }
 
@@ -217,7 +217,7 @@ $accent-hover: #1e3d1a;
   left: 0;
   right: 0;
   background: #fff;
-  border: 1px solid #eee;
+  border: 1px solid #EDEEEF;
   border-radius: 12px;
   box-shadow: 0 12px 36px rgba(0, 0, 0, 0.1);
   z-index: 200;
@@ -234,22 +234,22 @@ $accent-hover: #1e3d1a;
   cursor: pointer;
   transition: background 0.1s;
 
-  &:hover { background: #f8faf7; }
+  &:hover { background: #F8F9F9; }
 
   &.selected {
-    background: rgba(45, 90, 39, 0.06);
+    background: rgba(43, 63, 81, 0.06);
     .wj-option-text { color: $accent; font-weight: 600; }
   }
 
   .wj-option-text {
     font-size: 0.84rem;
-    color: #1a1a1a;
+    color: #1C2833;
     font-weight: 500;
   }
 
   .wj-option-meta {
     font-size: 0.7rem;
-    color: #aaa;
+    color: #A3ACB1;
     flex-shrink: 0;
     margin-left: 12px;
   }
@@ -261,7 +261,7 @@ $accent-hover: #1e3d1a;
   align-items: center;
   gap: 14px;
   background: #fff;
-  border: 1px solid #eee;
+  border: 1px solid #EDEEEF;
   border-radius: 14px;
   padding: 14px 22px;
   margin-bottom: 20px;
@@ -269,7 +269,7 @@ $accent-hover: #1e3d1a;
   > label {
     font-size: 0.75rem;
     font-weight: 600;
-    color: #888;
+    color: #7B8A97;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     white-space: nowrap;
@@ -285,31 +285,31 @@ $accent-hover: #1e3d1a;
     align-items: center;
     gap: 6px;
     padding: 8px 18px;
-    border: 1.5px solid #e8e8e8;
+    border: 1.5px solid #DCE3E8;
     border-radius: 50px;
     background: #fff;
     font-family: 'Poppins', sans-serif;
     font-size: 0.8rem;
     font-weight: 500;
-    color: #888;
+    color: #7B8A97;
     cursor: pointer;
     transition: all 0.15s;
 
     &.active {
-      border-color: #1a1a1a;
-      color: #1a1a1a;
-      background: #f8f8f8;
+      border-color: #1C2833;
+      color: #1C2833;
+      background: #F7F8F9;
       font-weight: 700;
     }
 
-    &:hover:not(.active) { border-color: #ccc; }
+    &:hover:not(.active) { border-color: #C8CDD0; }
   }
 }
 
 // ===== SECTIONS =====
 .wj-section {
   background: #fff;
-  border: 1px solid #eee;
+  border: 1px solid #EDEEEF;
   border-radius: 18px;
   padding: 28px;
   margin-bottom: 20px;
@@ -325,7 +325,7 @@ $accent-hover: #1e3d1a;
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background: #1a1a1a;
+    background: #1C2833;
     color: #fff;
     font-size: 0.75rem;
     font-weight: 800;
@@ -338,7 +338,7 @@ $accent-hover: #1e3d1a;
   h2 {
     font-size: 1.05rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #1C2833;
     margin: 0;
   }
 }
@@ -360,25 +360,25 @@ $accent-hover: #1e3d1a;
   label {
     font-size: 0.75rem;
     font-weight: 600;
-    color: #888;
+    color: #7B8A97;
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
 
   input, select {
     padding: 12px 16px;
-    border: 1.5px solid #e8e8e8;
+    border: 1.5px solid #DCE3E8;
     border-radius: 10px;
     font-family: 'Poppins', sans-serif;
     font-size: 0.88rem;
-    color: #1a1a1a;
-    background: #fafafa;
+    color: #1C2833;
+    background: #F8FAFB;
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
 
-    &:focus { border-color: $accent; background: #fff; box-shadow: 0 0 0 3px rgba(45, 90, 39, 0.06); }
+    &:focus { border-color: $accent; background: #fff; box-shadow: 0 0 0 3px rgba(43, 63, 81, 0.06); }
     &:disabled { opacity: 0.6; cursor: not-allowed; }
-    &::placeholder { color: #bbb; }
+    &::placeholder { color: #B6BDC0; }
   }
 
   select {
@@ -403,36 +403,36 @@ $accent-hover: #1e3d1a;
 
 .wj-title-input {
   border: none;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid #E8EDF0;
   padding: 12px 0;
   font-family: 'Poppins', sans-serif;
   font-size: 1.4rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #1C2833;
   outline: none;
   background: transparent;
   transition: border-color 0.2s;
 
   &:focus { border-color: $accent; }
-  &::placeholder { color: #ccc; font-weight: 600; }
+  &::placeholder { color: #C8CDD0; font-weight: 600; }
 }
 
 .wj-body-input {
-  border: 1.5px solid #e8e8e8;
+  border: 1.5px solid #DCE3E8;
   border-radius: 12px;
   padding: 16px;
   font-family: 'Poppins', sans-serif;
   font-size: 0.92rem;
-  color: #1a1a1a;
+  color: #1C2833;
   line-height: 1.7;
-  background: #fafafa;
+  background: #F8FAFB;
   outline: none;
   resize: vertical;
   min-height: 200px;
   transition: border-color 0.2s;
 
   &:focus { border-color: $accent; background: #fff; }
-  &::placeholder { color: #bbb; }
+  &::placeholder { color: #B6BDC0; }
 }
 
 // ===== STORY PHOTOS =====
@@ -443,7 +443,7 @@ $accent-hover: #1e3d1a;
     display: block;
     font-size: 0.75rem;
     font-weight: 600;
-    color: #888;
+    color: #7B8A97;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 10px;
@@ -454,15 +454,15 @@ $accent-hover: #1e3d1a;
     font-weight: 400;
     text-transform: none;
     letter-spacing: 0;
-    color: #bbb;
+    color: #B6BDC0;
     margin-left: 6px;
   }
 }
 
 // ===== IMAGE ERROR BANNER =====
 .wj-image-errors {
-  background: #fff5f5;
-  border: 1px solid #fca5a5;
+  background: #FDF7F7;
+  border: 1px solid #EFB8B2;
   border-radius: 10px;
   padding: 12px 14px;
   margin-bottom: 12px;
@@ -473,9 +473,9 @@ $accent-hover: #1e3d1a;
     gap: 6px;
     font-size: 0.78rem;
     font-weight: 600;
-    color: #b91c1c;
+    color: #B03325;
     margin-bottom: 6px;
-    svg { flex-shrink: 0; stroke: #b91c1c; }
+    svg { flex-shrink: 0; stroke: #B03325; }
   }
 
   ul {
@@ -483,7 +483,7 @@ $accent-hover: #1e3d1a;
     padding: 0;
     li {
       font-size: 0.75rem;
-      color: #b91c1c;
+      color: #B03325;
       line-height: 1.6;
     }
   }
@@ -491,15 +491,15 @@ $accent-hover: #1e3d1a;
   .wj-error-dismiss {
     font-size: 0.72rem;
     font-weight: 600;
-    color: #b91c1c;
+    color: #B03325;
     background: none;
-    border: 1px solid #fca5a5;
+    border: 1px solid #EFB8B2;
     border-radius: 6px;
     padding: 4px 10px;
     cursor: pointer;
     font-family: inherit;
     transition: background 0.15s;
-    &:hover { background: #fee2e2; }
+    &:hover { background: #FAE8E6; }
   }
 }
 
@@ -543,7 +543,7 @@ $accent-hover: #1e3d1a;
 .wj-photo-add {
   width: 100px;
   height: 100px;
-  border: 2px dashed #e0e0e0;
+  border: 2px dashed #DCE3E8;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -551,7 +551,7 @@ $accent-hover: #1e3d1a;
   justify-content: center;
   gap: 4px;
   cursor: pointer;
-  color: #bbb;
+  color: #B6BDC0;
   transition: all 0.2s;
 
   span { font-size: 0.65rem; }
@@ -572,11 +572,11 @@ $accent-hover: #1e3d1a;
   align-items: center;
   gap: 6px;
   padding: 8px 14px;
-  background: #f4f4f4;
-  border: 1.5px solid #e8e8e8;
+  background: #F3F4F5;
+  border: 1.5px solid #DCE3E8;
   border-radius: 50px;
   font-size: 0.8rem;
-  color: #555;
+  color: #475969;
   cursor: pointer;
   transition: all 0.15s;
 
@@ -590,7 +590,7 @@ $accent-hover: #1e3d1a;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #888;
+    color: #7B8A97;
     flex-shrink: 0;
   }
 
@@ -602,7 +602,7 @@ $accent-hover: #1e3d1a;
     border-radius: 50%;
     border: none;
     background: rgba(0,0,0,0.08);
-    color: #888;
+    color: #7B8A97;
     font-size: 0.6rem;
     display: flex;
     align-items: center;
@@ -610,7 +610,7 @@ $accent-hover: #1e3d1a;
     cursor: pointer;
     margin-left: 2px;
 
-    &:hover { background: #e74c3c; color: #fff; }
+    &:hover { background: #D9594A; color: #fff; }
   }
 }
 
@@ -618,7 +618,7 @@ $accent-hover: #1e3d1a;
   padding: 20px;
   text-align: center;
 
-  p { font-size: 0.85rem; color: #aaa; margin: 0; }
+  p { font-size: 0.85rem; color: #A3ACB1; margin: 0; }
 }
 
 .wj-add-place-row {
@@ -633,32 +633,32 @@ $accent-hover: #1e3d1a;
   input {
     width: 100%;
     padding: 10px 16px;
-    border: 1.5px solid #e8e8e8;
+    border: 1.5px solid #DCE3E8;
     border-radius: 10px;
     font-family: 'Poppins', sans-serif;
     font-size: 0.85rem;
-    color: #1a1a1a;
+    color: #1C2833;
     outline: none;
-    background: #fafafa;
+    background: #F8FAFB;
 
     &:focus { border-color: $accent; background: #fff; }
-    &::placeholder { color: #bbb; }
+    &::placeholder { color: #B6BDC0; }
   }
 
   .wj-add-place-btn {
     padding: 10px 18px;
     background: transparent;
-    border: 1.5px solid #1a1a1a;
+    border: 1.5px solid #1C2833;
     border-radius: 50px;
     font-family: 'Poppins', sans-serif;
     font-size: 0.8rem;
     font-weight: 600;
-    color: #1a1a1a;
+    color: #1C2833;
     cursor: pointer;
     white-space: nowrap;
     transition: all 0.15s;
 
-    &:hover { background: #1a1a1a; color: #fff; }
+    &:hover { background: #1C2833; color: #fff; }
   }
 }
 
@@ -668,7 +668,7 @@ $accent-hover: #1e3d1a;
   left: 0;
   right: 0;
   background: #fff;
-  border: 1px solid #eee;
+  border: 1px solid #EDEEEF;
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   z-index: 200;
@@ -685,17 +685,17 @@ $accent-hover: #1e3d1a;
   cursor: pointer;
   transition: background 0.1s;
 
-  &:hover { background: #f8faf7; }
+  &:hover { background: #F8F9F9; }
 
   .wj-place-dropdown-name {
     font-size: 0.85rem;
     font-weight: 600;
-    color: #1a1a1a;
+    color: #1C2833;
   }
 
   .wj-place-dropdown-vicinity {
     font-size: 0.72rem;
-    color: #888;
+    color: #7B8A97;
   }
 }
 
@@ -709,7 +709,7 @@ $accent-hover: #1e3d1a;
     display: block;
     font-size: 0.75rem;
     font-weight: 600;
-    color: #888;
+    color: #7B8A97;
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin-bottom: 10px;
@@ -724,13 +724,13 @@ $accent-hover: #1e3d1a;
 
 .wj-vibe-pill {
   padding: 8px 16px;
-  border: 1.5px solid #e8e8e8;
+  border: 1.5px solid #DCE3E8;
   border-radius: 50px;
   background: #fff;
   font-family: 'Poppins', sans-serif;
   font-size: 0.78rem;
   font-weight: 500;
-  color: #888;
+  color: #7B8A97;
   cursor: pointer;
   transition: all 0.15s;
 
@@ -741,25 +741,25 @@ $accent-hover: #1e3d1a;
     font-weight: 700;
   }
 
-  &:hover:not(.selected) { border-color: #ccc; color: #555; }
+  &:hover:not(.selected) { border-color: #C8CDD0; color: #475969; }
 }
 
 .wj-protips-input {
   width: 100%;
-  border: 1.5px solid #e8e8e8;
+  border: 1.5px solid #DCE3E8;
   border-radius: 12px;
   padding: 14px 16px;
   font-family: 'Poppins', sans-serif;
   font-size: 0.88rem;
-  color: #1a1a1a;
+  color: #1C2833;
   line-height: 1.6;
-  background: #fafafa;
+  background: #F8FAFB;
   outline: none;
   resize: vertical;
   transition: border-color 0.2s;
 
   &:focus { border-color: $accent; background: #fff; }
-  &::placeholder { color: #bbb; }
+  &::placeholder { color: #B6BDC0; }
 }
 
 // ===== BOTTOM ACTIONS =====
@@ -768,7 +768,7 @@ $accent-hover: #1e3d1a;
   justify-content: flex-end;
   gap: 12px;
   padding: 24px 0;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #EDEEEF;
   margin-top: 12px;
 }
 

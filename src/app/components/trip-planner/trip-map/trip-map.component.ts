@@ -108,9 +108,9 @@ export class TripMapComponent implements AfterViewInit, OnChanges {
   }
 
   private getCategoryColor(category: string): string {
-    if (category === 'stay') return '#2563eb';
-    if (category === 'food') return '#dc2626';
-    return '#16a34a';
+    if (category === 'stay') return '#6089B0';
+    if (category === 'food') return '#C8352B';
+    return '#3E8E63';
   }
 
   private updateMarkers(): void {
@@ -140,7 +140,7 @@ export class TripMapComponent implements AfterViewInit, OnChanges {
 
       // Info window on click
       const infoWindow = new google.maps.InfoWindow({
-        content: `<div style="font-family:Poppins,sans-serif;padding:4px 0;margin:0;line-height:1.3"><div style="font-size:12px;font-weight:600;color:#1a1a1a;margin:0">${place.placeName}</div><div style="font-size:11px;color:#888;margin-top:2px">${place.vicinity || ''}</div></div>`,
+        content: `<div style="font-family:Poppins,sans-serif;padding:4px 0;margin:0;line-height:1.3"><div style="font-size:12px;font-weight:600;color:#1C2833;margin:0">${place.placeName}</div><div style="font-size:11px;color:#7B8A97;margin-top:2px">${place.vicinity || ''}</div></div>`,
         disableAutoPan: true
       });
 
@@ -182,7 +182,7 @@ export class TripMapComponent implements AfterViewInit, OnChanges {
     // Reset all markers to normal size
     this.markerMap.forEach((marker, id) => {
       const place = this.placesWithCoords.find(p => p.placeId === id);
-      const color = place ? this.getCategoryColor(place.category) : '#2563eb';
+      const color = place ? this.getCategoryColor(place.category) : '#6089B0';
       marker.setIcon({
         url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="24" height="32" viewBox="0 0 24 32"><path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 20 12 20s12-11 12-20C24 5.4 18.6 0 12 0z" fill="${color}"/><circle cx="12" cy="12" r="5" fill="white"/></svg>`)}`,
         scaledSize: new google.maps.Size(28, 36),
@@ -194,7 +194,7 @@ export class TripMapComponent implements AfterViewInit, OnChanges {
     // Highlight the selected one with a distinct orange/amber color
     if (placeId && this.markerMap.has(placeId)) {
       const marker = this.markerMap.get(placeId)!;
-      const highlightColor = '#f59e0b';
+      const highlightColor = '#E64A1A';
 
       marker.setIcon({
         url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="36" height="48" viewBox="0 0 36 48"><circle cx="18" cy="18" r="17" fill="${highlightColor}" opacity="0.25"/><path d="M18 2C9.2 2 2 9.2 2 18c0 12 16 28 16 28s16-16 16-28C34 9.2 26.8 2 18 2z" fill="${highlightColor}" stroke="white" stroke-width="2"/><circle cx="18" cy="18" r="6" fill="white"/></svg>`)}`,

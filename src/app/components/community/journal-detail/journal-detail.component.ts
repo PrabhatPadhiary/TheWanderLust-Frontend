@@ -81,7 +81,7 @@ export class JournalDetailComponent implements OnInit {
   }
 
   get authorColor(): string {
-    const colors = ['#02334a', '#4a1942', '#1a365d', '#744210', '#1e3a5f', '#3d0c45'];
+    const colors = ['#2B3F51', '#213242', '#273C50', '#742710', '#293F54', '#1B2936'];
     const name = this.journal?.author.name ?? '';
     return colors[name.charCodeAt(0) % colors.length];
   }
@@ -181,7 +181,7 @@ export class JournalDetailComponent implements OnInit {
   }
 
   getCommentColor(comment: JournalComment): string {
-    const colors = ['#02334a', '#4a1942', '#1a365d', '#744210', '#1e3a5f', '#3d0c45'];
+    const colors = ['#2B3F51', '#213242', '#273C50', '#742710', '#293F54', '#1B2936'];
     return colors[comment.author.name?.charCodeAt(0) % colors.length];
   }
 

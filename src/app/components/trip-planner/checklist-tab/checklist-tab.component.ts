@@ -50,8 +50,8 @@ export class ChecklistTabComponent implements OnInit, OnChanges {
     money: 'Money', safety: 'Safety', other: 'Other'
   };
   readonly categoryColors: Record<string, string> = {
-    packing: '#2563eb', bookings: '#7c3aed', documents: '#0891b2',
-    money: '#d97706', safety: '#dc2626', other: '#6b7280'
+    packing: '#6089B0', bookings: '#6F95B8', documents: '#3D5E7D',
+    money: '#C94016', safety: '#C8352B', other: '#6B7980'
   };
 
   get canEdit(): boolean { return this.userRole === 'owner' || this.userRole === 'member'; }

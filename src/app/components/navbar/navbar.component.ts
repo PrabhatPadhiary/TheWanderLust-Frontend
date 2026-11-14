@@ -168,6 +168,11 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
     this.router.navigate(['/favourites']);
   }
 
+  goTo(path: string): void {
+    this.showUserMenu = false;
+    this.router.navigate([path]);
+  }
+
   onTripsClick(): void {
     if (!this.authService.isLoggedIn) {
       this.openAuthModal();

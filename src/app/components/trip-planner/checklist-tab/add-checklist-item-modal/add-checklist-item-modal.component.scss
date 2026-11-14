@@ -13,10 +13,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 20px 24px 16px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #E8EDF0;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #1C2833;
 }
 
 .cl-modal-close {
@@ -24,13 +24,13 @@
   height: 28px;
   border-radius: 50%;
   border: none;
-  background: #f5f5f5;
+  background: #F6F8F9;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #888;
-  &:hover { background: #eee; }
+  color: #7B8A97;
+  &:hover { background: #EDEEEF; }
 }
 
 .cl-modal-body {
@@ -48,7 +48,7 @@
   label {
     font-size: 0.72rem;
     font-weight: 600;
-    color: #888;
+    color: #7B8A97;
     text-transform: uppercase;
     letter-spacing: 0.4px;
   }
@@ -57,19 +57,19 @@
     font-family: 'Poppins', sans-serif;
     font-size: 0.88rem;
     padding: 10px 12px;
-    border: 1.5px solid #e0e0e0;
+    border: 1.5px solid #DCE3E8;
     border-radius: 10px;
     outline: none;
-    color: #1a1a1a;
+    color: #1C2833;
     transition: border-color 0.2s;
-    &:focus { border-color: #2d5a27; }
-    &::placeholder { color: #bbb; }
+    &:focus { border-color: #2B3F51; }
+    &::placeholder { color: #B6BDC0; }
   }
 }
 
 .cl-optional {
   font-weight: 400;
-  color: #bbb;
+  color: #B6BDC0;
   text-transform: none;
   letter-spacing: 0;
 }
@@ -87,9 +87,9 @@
   font-weight: 600;
   padding: 6px 12px;
   border-radius: 20px;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid #DCE3E8;
   background: #fff;
-  color: #666;
+  color: #4F6070;
   cursor: pointer;
   transition: all 0.15s;
 
@@ -119,7 +119,7 @@
   }
   ::ng-deep .mdc-notched-outline__leading,
   ::ng-deep .mdc-notched-outline__trailing,
-  ::ng-deep .mdc-notched-outline__notch { border-color: #e0e0e0 !important; }
+  ::ng-deep .mdc-notched-outline__notch { border-color: #DCE3E8 !important; }
   ::ng-deep input {
     font-family: 'Poppins', sans-serif;
     font-size: 0.85rem !important;
@@ -131,13 +131,13 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.85rem;
   padding: 10px 12px;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid #DCE3E8;
   border-radius: 10px;
   background: #fff;
-  color: #1a1a1a;
+  color: #1C2833;
   cursor: pointer;
   outline: none;
-  &:focus { border-color: #2d5a27; }
+  &:focus { border-color: #2B3F51; }
 }
 
 // Assign pills (modal)
@@ -155,8 +155,8 @@
   gap: 6px;
   padding: 6px 12px;
   border-radius: 20px;
-  background: #f0f0f0;
-  color: #555;
+  background: #E8EDF0;
+  color: #475969;
   font-size: 0.75rem;
   font-weight: 600;
   font-family: 'Poppins', sans-serif;
@@ -164,17 +164,17 @@
   cursor: pointer;
   transition: all 0.15s;
 
-  &:hover { border-color: #2d5a27; }
+  &:hover { border-color: #2B3F51; }
   &--selected {
-    background: #eaf3e8;
-    color: #2d5a27;
-    border-color: #2d5a27;
+    background: #EEF2F4;
+    color: #2B3F51;
+    border-color: #2B3F51;
   }
   &--more {
-    background: #f8f8f8;
-    color: #888;
+    background: #F7F8F9;
+    color: #7B8A97;
     font-size: 0.7rem;
-    &:hover { background: #eee; }
+    &:hover { background: #EDEEEF; }
   }
 }
 
@@ -182,7 +182,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: #2d5a27;
+  background: #2B3F51;
   color: #fff;
   font-size: 0.55rem;
   font-weight: 700;
@@ -194,7 +194,7 @@
 
 .cl-assign-dropdown-modal {
   background: #fff;
-  border: 1px solid #eee;
+  border: 1px solid #EDEEEF;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   margin-top: 8px;
@@ -209,22 +209,22 @@
   padding: 9px 14px;
   font-family: 'Poppins', sans-serif;
   font-size: 0.8rem;
-  color: #555;
+  color: #475969;
   background: #fff;
   border: none;
   cursor: pointer;
   transition: background 0.12s;
 
-  &:hover { background: #f8f9fa; }
-  &.active { color: #2d5a27; font-weight: 600; background: #f3f9f2; }
-  &:not(:last-child) { border-bottom: 1px solid #f5f5f5; }
+  &:hover { background: #F6F8F9; }
+  &.active { color: #2B3F51; font-weight: 600; background: #F4F6F7; }
+  &:not(:last-child) { border-bottom: 1px solid #F6F8F9; }
 }
 
 .cl-assign-opt-avatar {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #2d5a27;
+  background: #2B3F51;
   color: #fff;
   font-size: 0.6rem;
   font-weight: 700;
@@ -233,7 +233,7 @@
   justify-content: center;
   flex-shrink: 0;
 
-  &--none { background: #e0e0e0; color: #888; }
+  &--none { background: #DCE3E8; color: #7B8A97; }
 }
 
 // Footer
@@ -242,7 +242,7 @@
   justify-content: flex-end;
   gap: 10px;
   padding: 16px 24px 20px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid #E8EDF0;
 }
 
 .cl-cancel-btn {
@@ -250,12 +250,12 @@
   font-size: 0.85rem;
   font-weight: 500;
   padding: 9px 20px;
-  background: #f4f4f4;
-  color: #555;
+  background: #F3F4F5;
+  color: #475969;
   border: none;
   border-radius: 20px;
   cursor: pointer;
-  &:hover { background: #eee; }
+  &:hover { background: #EDEEEF; }
   &:disabled { opacity: 0.5; }
 }
 
@@ -264,11 +264,11 @@
   font-size: 0.85rem;
   font-weight: 600;
   padding: 9px 20px;
-  background: #2d5a27;
+  background: #2B3F51;
   color: #fff;
   border: none;
   border-radius: 20px;
   cursor: pointer;
-  &:hover { background: #245020; }
+  &:hover { background: #25394B; }
   &:disabled { opacity: 0.4; cursor: default; }
 }

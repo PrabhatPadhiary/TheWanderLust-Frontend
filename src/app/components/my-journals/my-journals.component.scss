@@ -12,9 +12,9 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: #f4f4f4;
+    background: #F3F4F5;
     border: none;
-    color: #333;
+    color: #2F3B46;
     font-size: 0.92rem;
     font-weight: 600;
     cursor: pointer;
@@ -23,19 +23,19 @@
     margin-bottom: 20px;
     font-family: 'Poppins', sans-serif;
     transition: background 0.2s, color 0.2s;
-    &:hover { background: #e8f5e9; color: #2d5a27; }
+    &:hover { background: #E9EFF4; color: #2B3F51; }
   }
 
   h1 {
     font-size: 1.8rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #1C2833;
     margin: 0 0 6px;
   }
 
   p {
     font-size: 0.9rem;
-    color: #888;
+    color: #7B8A97;
     margin: 0;
   }
 }
@@ -54,21 +54,21 @@
   font-size: 0.85rem;
   font-weight: 600;
   color: #fff;
-  background: #02334a;
+  background: #2B3F51;
   border: none;
   border-radius: 10px;
   padding: 10px 18px;
   cursor: pointer;
   transition: background 0.15s;
   white-space: nowrap;
-  &:hover { background: #034d6e; }
+  &:hover { background: #25394C; }
 }
 
 // ===== FILTER TABS =====
 .filter-tabs {
   display: flex;
   gap: 4px;
-  background: #f0f0f0;
+  background: #E8EDF0;
   border-radius: 50px;
   padding: 3px;
   margin-bottom: 24px;
@@ -85,13 +85,13 @@
     font-family: 'Poppins', sans-serif;
     font-size: 0.8rem;
     font-weight: 500;
-    color: #888;
+    color: #7B8A97;
     cursor: pointer;
     transition: all 0.15s;
 
     &.active {
       background: #fff;
-      color: #1a1a1a;
+      color: #1C2833;
       font-weight: 700;
       box-shadow: 0 1px 4px rgba(0,0,0,0.08);
     }
@@ -101,13 +101,13 @@
 .filter-count {
   font-size: 0.68rem;
   font-weight: 700;
-  background: #e8e8e8;
-  color: #666;
+  background: #DCE3E8;
+  color: #4F6070;
   padding: 1px 6px;
   border-radius: 50px;
 
   .active & {
-    background: #02334a;
+    background: #2B3F51;
     color: #fff;
   }
 }
@@ -119,13 +119,13 @@
   align-items: center;
   gap: 12px;
   padding: 60px 0;
-  color: #888;
+  color: #7B8A97;
 
   .spinner {
     width: 32px;
     height: 32px;
-    border: 3px solid #eee;
-    border-top-color: #02334a;
+    border: 3px solid #EDEEEF;
+    border-top-color: #2B3F51;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
@@ -142,11 +142,11 @@
   align-items: center;
   gap: 12px;
   padding: 80px 0;
-  color: #aaa;
+  color: #A3ACB1;
   text-align: center;
 
   svg { opacity: 0.4; }
-  h3 { font-size: 1.1rem; color: #555; margin: 0; }
+  h3 { font-size: 1.1rem; color: #475969; margin: 0; }
   p { font-size: 0.88rem; margin: 0; }
 }
 
@@ -156,12 +156,12 @@
   font-size: 0.85rem;
   font-weight: 600;
   color: #fff;
-  background: #02334a;
+  background: #2B3F51;
   border: none;
   border-radius: 50px;
   padding: 10px 24px;
   cursor: pointer;
-  &:hover { background: #034d6e; }
+  &:hover { background: #25394C; }
 }
 
 // ===== JOURNALS LIST =====
@@ -176,7 +176,7 @@
   align-items: flex-start;
   gap: 16px;
   background: #fff;
-  border: 1px solid #eee;
+  border: 1px solid #EDEEEF;
   border-radius: 14px;
   padding: 16px;
   cursor: pointer;
@@ -203,11 +203,11 @@
   }
 
   &--empty {
-    background: #f5f5f5;
+    background: #F6F8F9;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #ccc;
+    color: #C8CDD0;
   }
 }
 
@@ -225,7 +225,7 @@
   h3 {
     font-size: 0.95rem;
     font-weight: 600;
-    color: #1a1a1a;
+    color: #1C2833;
     margin: 0;
     flex: 1;
     white-space: nowrap;
@@ -242,33 +242,33 @@
   flex-shrink: 0;
 
   &.status-published {
-    background: rgba(2, 51, 74, 0.08);
-    color: #02334a;
+    background: rgba(43, 63, 81, 0.08);
+    color: #2B3F51;
   }
 
   &.status-draft {
-    background: rgba(245, 158, 11, 0.1);
-    color: #b45309;
+    background: rgba(230, 74, 26, 0.1);
+    color: #AA3613;
   }
 }
 
 .journal-item-dest {
   font-size: 0.78rem;
-  color: #02334a;
+  color: #2B3F51;
   font-weight: 500;
   margin: 0 0 4px;
 }
 
 .journal-item-excerpt {
   font-size: 0.8rem;
-  color: #888;
+  color: #7B8A97;
   line-height: 1.5;
   margin: 0 0 8px;
 }
 
 .journal-item-meta {
   font-size: 0.72rem;
-  color: #bbb;
+  color: #B6BDC0;
   display: flex;
   gap: 4px;
 }
@@ -283,18 +283,18 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #aaa;
+  color: #A3ACB1;
   transition: background 0.15s, color 0.15s;
   flex-shrink: 0;
 
-  &:hover { background: #f0f0f0; color: #333; }
+  &:hover { background: #E8EDF0; color: #2F3B46; }
 }
 
 // ===== DROPDOWN MENU =====
 .journal-menu-dropdown {
   position: fixed;
   background: #fff;
-  border: 1px solid #ebebeb;
+  border: 1px solid #E9ECED;
   border-radius: 10px;
   box-shadow: 0 6px 24px rgba(0,0,0,0.12), 0 2px 6px rgba(0,0,0,0.05);
   z-index: 9999;
@@ -312,14 +312,14 @@
   padding: 8px 12px 4px;
   font-size: 0.62rem;
   font-weight: 600;
-  color: #bbb;
+  color: #B6BDC0;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .journal-menu-divider {
   height: 1px;
-  background: #f0f0f0;
+  background: #E8EDF0;
   margin: 3px 0;
 }
 
@@ -334,16 +334,16 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.78rem;
   font-weight: 500;
-  color: #444;
+  color: #3F4649;
   cursor: pointer;
   text-align: left;
   transition: background 0.12s;
 
-  &:hover { background: #f7f7f7; }
+  &:hover { background: #F6F7F8; }
 
   &--danger {
-    color: #e53e3e;
-    &:hover { background: #fff5f5; }
+    color: #D9594A;
+    &:hover { background: #FDF7F7; }
   }
 }
 
@@ -351,14 +351,14 @@
   width: 22px;
   height: 22px;
   border-radius: 5px;
-  background: #f5f5f5;
+  background: #F6F8F9;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 
   .journal-menu-item--danger & {
-    background: #fff0f0;
+    background: #FCF4F3;
   }
 }
 
@@ -382,8 +382,8 @@
   box-shadow: 0 20px 60px rgba(0,0,0,0.15);
   font-family: 'Poppins', sans-serif;
 
-  h4 { margin: 0 0 8px; font-size: 1rem; font-weight: 700; color: #1a1a1a; }
-  p  { font-size: 0.85rem; color: #666; margin: 0 0 20px; strong { color: #1a1a1a; } }
+  h4 { margin: 0 0 8px; font-size: 1rem; font-weight: 700; color: #1C2833; }
+  p  { font-size: 0.85rem; color: #4F6070; margin: 0 0 20px; strong { color: #1C2833; } }
 }
 
 .delete-actions {
@@ -398,11 +398,11 @@
   font-weight: 500;
   padding: 9px 20px;
   border-radius: 20px;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid #DCE3E8;
   background: #fff;
-  color: #555;
+  color: #475969;
   cursor: pointer;
-  &:hover { background: #f5f5f5; }
+  &:hover { background: #F6F8F9; }
 }
 
 .btn-danger {
@@ -412,11 +412,11 @@
   padding: 9px 20px;
   border-radius: 20px;
   border: none;
-  background: #e53e3e;
+  background: #D9594A;
   color: #fff;
   cursor: pointer;
   transition: background 0.15s;
-  &:hover { background: #c53030; }
+  &:hover { background: #C53F30; }
   &:disabled { opacity: 0.4; cursor: default; }
 }
 

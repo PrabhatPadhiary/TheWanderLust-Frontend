@@ -12,15 +12,15 @@
   h2 {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #1C2833;
     margin: 0 0 4px;
-    span { color: #2d5a27; }
+    span { color: #2B3F51; }
   }
 }
 
 .budget-meta {
   font-size: 0.78rem;
-  color: #888;
+  color: #7B8A97;
   margin: 0;
 }
 
@@ -32,14 +32,14 @@
   font-size: 0.82rem;
   font-weight: 600;
   padding: 8px 16px;
-  background: #1a1a1a;
+  background: #1C2833;
   color: #fff;
   border: none;
   border-radius: 20px;
   cursor: pointer;
   transition: background 0.15s;
   flex-shrink: 0;
-  &:hover { background: #333; }
+  &:hover { background: #2F3B46; }
 }
 
 // ===== METRICS =====
@@ -52,35 +52,35 @@
 
 .metric-card {
   background: #fff;
-  border: 1px solid #eee;
+  border: 1px solid #EDEEEF;
   border-radius: 14px;
   padding: 18px;
   display: flex;
   flex-direction: column;
   gap: 6px;
 
-  &--spent { background: #f4faf3; border-color: #d4eacf; }
-  &--over  { background: #fff5f5; border-color: #fecaca; }
+  &--spent { background: #F5F7F8; border-color: #D1DDE8; }
+  &--over  { background: #FDF7F7; border-color: #F6D6D2; }
 
   &--budget {
     border-style: dashed;
-    border-color: #ddd;
+    border-color: #DADEE0;
   }
 
   &--budget-set {
     border-style: solid;
-    border-color: #eee;
+    border-color: #EDEEEF;
   }
 }
 
 .metric-value--empty {
-  color: #ccc;
+  color: #C8CDD0;
 }
 
 .metric-label {
   font-size: 0.7rem;
   font-weight: 600;
-  color: #aaa;
+  color: #A3ACB1;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -88,30 +88,30 @@
 .metric-value {
   font-size: 1.6rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #1C2833;
   line-height: 1.1;
 }
 
 .metric-sub {
   font-size: 0.72rem;
-  color: #999;
+  color: #7F8D99;
   cursor: pointer;
-  &:hover { color: #2d5a27; text-decoration: underline; }
+  &:hover { color: #2B3F51; text-decoration: underline; }
 }
 
 .metric-set-btn {
   font-family: 'Poppins', sans-serif;
   font-size: 0.75rem;
   font-weight: 600;
-  color: #2d5a27;
-  background: #eaf3e8;
+  color: #2B3F51;
+  background: #EEF2F4;
   border: none;
   border-radius: 16px;
   padding: 4px 12px;
   cursor: pointer;
   width: fit-content;
   transition: background 0.15s;
-  &:hover { background: #d4eacf; }
+  &:hover { background: #D1DDE8; }
 }
 
 // ===== BUDGET PANEL =====
@@ -141,10 +141,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 20px 24px 16px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #E8EDF0;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #1C2833;
 }
 
 .budget-panel-close {
@@ -152,13 +152,13 @@
   height: 28px;
   border-radius: 50%;
   border: none;
-  background: #f5f5f5;
+  background: #F6F8F9;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #888;
-  &:hover { background: #eee; }
+  color: #7B8A97;
+  &:hover { background: #EDEEEF; }
 }
 
 .budget-panel-body {
@@ -170,11 +170,11 @@
 
 .budget-panel-hint {
   font-size: 0.82rem;
-  color: #888;
+  color: #7B8A97;
   margin: 0;
   line-height: 1.5;
 
-  strong { color: #1a1a1a; font-weight: 600; }
+  strong { color: #1C2833; font-weight: 600; }
 }
 
 .budget-panel-currency-row {
@@ -186,7 +186,7 @@
 .budget-panel-label {
   font-size: 0.82rem;
   font-weight: 600;
-  color: #555;
+  color: #475969;
   flex-shrink: 0;
 }
 
@@ -194,35 +194,35 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.85rem;
   font-weight: 500;
-  color: #1a1a1a;
-  background: #fafafa;
-  border: 1.5px solid #e0e0e0;
+  color: #1C2833;
+  background: #F8FAFB;
+  border: 1.5px solid #DCE3E8;
   border-radius: 8px;
   padding: 6px 10px;
   cursor: pointer;
   outline: none;
   transition: border-color 0.2s;
-  &:focus { border-color: #2d5a27; }
+  &:focus { border-color: #2B3F51; }
 }
 
 .budget-panel-input-wrap {
   display: flex;
   align-items: center;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid #DCE3E8;
   border-radius: 12px;
   overflow: hidden;
   transition: border-color 0.2s;
 
-  &:focus-within { border-color: #2d5a27; }
+  &:focus-within { border-color: #2B3F51; }
 }
 
 .budget-panel-currency {
   padding: 0 14px;
   font-size: 1rem;
   font-weight: 600;
-  color: #555;
-  background: #fafafa;
-  border-right: 1.5px solid #e8e8e8;
+  color: #475969;
+  background: #F8FAFB;
+  border-right: 1.5px solid #DCE3E8;
   height: 44px;
   display: flex;
   align-items: center;
@@ -237,11 +237,11 @@
   padding: 10px 14px;
   border: none;
   outline: none;
-  color: #1a1a1a;
+  color: #1C2833;
   background: transparent;
   min-width: 0;
 
-  &::placeholder { color: #ccc; font-weight: 400; }
+  &::placeholder { color: #C8CDD0; font-weight: 400; }
 }
 
 .budget-panel-footer {
@@ -249,7 +249,7 @@
   justify-content: flex-end;
   gap: 10px;
   padding: 16px 24px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid #E8EDF0;
 }
 
 .budget-panel-cancel {
@@ -258,11 +258,11 @@
   font-weight: 500;
   padding: 9px 20px;
   border-radius: 20px;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid #DCE3E8;
   background: #fff;
-  color: #555;
+  color: #475969;
   cursor: pointer;
-  &:hover { background: #f5f5f5; }
+  &:hover { background: #F6F8F9; }
 }
 
 .budget-panel-save {
@@ -272,18 +272,18 @@
   padding: 9px 22px;
   border-radius: 20px;
   border: none;
-  background: #1a1a1a;
+  background: #1C2833;
   color: #fff;
   cursor: pointer;
   transition: background 0.15s;
-  &:hover { background: #333; }
+  &:hover { background: #2F3B46; }
   &:disabled { opacity: 0.4; cursor: default; }
 }
 
 // ===== PROGRESS =====
 .budget-progress-card {
   background: #fff;
-  border: 1px solid #eee;
+  border: 1px solid #EDEEEF;
   border-radius: 14px;
   padding: 16px 20px;
   margin-bottom: 20px;
@@ -293,18 +293,18 @@
   display: flex;
   justify-content: space-between;
   font-size: 0.72rem;
-  color: #aaa;
+  color: #A3ACB1;
   margin-bottom: 8px;
 }
 
 .progress-spent-label {
   font-weight: 600;
-  color: #555;
+  color: #475969;
 }
 
 .progress-bar-track {
   height: 10px;
-  background: #f0f0f0;
+  background: #E8EDF0;
   border-radius: 10px;
   overflow: hidden;
   display: flex;
@@ -329,7 +329,7 @@
   align-items: center;
   gap: 5px;
   font-size: 0.72rem;
-  color: #666;
+  color: #4F6070;
 }
 
 .legend-dot {
@@ -346,9 +346,9 @@
   align-items: center;
   gap: 12px;
   padding: 60px 0;
-  color: #ccc;
+  color: #C8CDD0;
 
-  p { font-size: 0.9rem; color: #aaa; margin: 0; }
+  p { font-size: 0.9rem; color: #A3ACB1; margin: 0; }
 }
 
 // ===== BODY (two columns) =====
@@ -374,7 +374,7 @@
   span {
     font-size: 0.72rem;
     font-weight: 700;
-    color: #aaa;
+    color: #A3ACB1;
     text-transform: uppercase;
     letter-spacing: 0.6px;
   }
@@ -383,7 +383,7 @@
 // ===== CATEGORIES =====
 .budget-categories {
   background: #fff;
-  border: 1px solid #eee;
+  border: 1px solid #EDEEEF;
   border-radius: 14px;
   padding: 18px;
 }
@@ -424,24 +424,24 @@
 .category-name {
   font-size: 0.82rem;
   font-weight: 600;
-  color: #1a1a1a;
+  color: #1C2833;
   flex: 1;
 }
 
 .category-spent {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #1C2833;
 }
 
 .category-budget {
   font-size: 0.72rem;
-  color: #bbb;
+  color: #B6BDC0;
 }
 
 .category-bar-track {
   height: 5px;
-  background: #f0f0f0;
+  background: #E8EDF0;
   border-radius: 5px;
   overflow: hidden;
 }
@@ -454,7 +454,7 @@
 
 .categories-empty-hint {
   font-size: 0.75rem;
-  color: #999;
+  color: #7F8D99;
   font-style: italic;
   margin: 12px 0 0;
 }
@@ -462,7 +462,7 @@
 // ===== PER PERSON =====
 .budget-per-person-card {
   background: #fff;
-  border: 1px solid #eee;
+  border: 1px solid #EDEEEF;
   border-radius: 14px;
   padding: 18px;
 }
@@ -478,7 +478,7 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  background: #2d5a27;
+  background: #2B3F51;
   color: #fff;
   display: flex;
   align-items: center;
@@ -492,25 +492,25 @@
   flex: 1;
   font-size: 0.85rem;
   font-weight: 500;
-  color: #1a1a1a;
+  color: #1C2833;
 }
 
 .person-amount {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #1C2833;
 }
 
 .split-note {
   font-size: 0.72rem;
-  color: #aaa;
+  color: #A3ACB1;
   margin: 8px 0 0;
 }
 
 // ===== EXPENSE LOG =====
 .budget-expenses {
   background: #fff;
-  border: 1px solid #eee;
+  border: 1px solid #EDEEEF;
   border-radius: 14px;
   padding: 18px;
   max-height: 480px;
@@ -529,14 +529,14 @@
   font-weight: 500;
   padding: 3px 10px;
   border-radius: 20px;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #DCE3E8;
   background: #fff;
-  color: #666;
+  color: #4F6070;
   cursor: pointer;
   transition: all 0.12s;
 
-  &.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
-  &:hover:not(.active) { border-color: #1a1a1a; }
+  &.active { background: #1C2833; color: #fff; border-color: #1C2833; }
+  &:hover:not(.active) { border-color: #1C2833; }
 }
 
 .expense-list {
@@ -551,9 +551,9 @@
   gap: 10px;
   padding: 10px;
   border-radius: 10px;
-  border: 1px solid #f5f5f5;
+  border: 1px solid #F6F8F9;
   transition: border-color 0.15s;
-  &:hover { border-color: #e0e0e0; }
+  &:hover { border-color: #DCE3E8; }
 }
 
 .expense-icon {
@@ -576,7 +576,7 @@
 
   strong {
     font-size: 0.85rem;
-    color: #1a1a1a;
+    color: #1C2833;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -586,19 +586,19 @@
 
 .expense-meta {
   font-size: 0.72rem;
-  color: #999;
+  color: #7F8D99;
 }
 
 .expense-notes {
   font-size: 0.7rem;
-  color: #2d5a27;
+  color: #2B3F51;
   font-style: italic;
 }
 
 .expense-amount {
   font-size: 0.88rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #1C2833;
   flex-shrink: 0;
 }
 
@@ -611,16 +611,16 @@
   width: 26px;
   height: 26px;
   border-radius: 7px;
-  border: 1px solid #eee;
+  border: 1px solid #EDEEEF;
   background: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #888;
+  color: #7B8A97;
   transition: all 0.12s;
-  &:hover { border-color: #2d5a27; color: #2d5a27; background: #f4faf3; }
-  &--del:hover { border-color: #e53e3e; color: #e53e3e; background: #fff5f5; }
+  &:hover { border-color: #2B3F51; color: #2B3F51; background: #F5F7F8; }
+  &--del:hover { border-color: #D9594A; color: #D9594A; background: #FDF7F7; }
 }
 
 // ===== SKELETONS =====
@@ -632,7 +632,7 @@
 .sk-line,
 .sk-icon,
 .sk-bar {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e4e4e4 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, #E8EDF0 25%, #E2E5E6 50%, #E8EDF0 75%);
   background-size: 800px 100%;
   animation: sk-shimmer 1.4s infinite linear;
   border-radius: 6px;
@@ -648,7 +648,7 @@
 // panel skeleton (used for both columns)
 .sk-panel {
   background: #fff;
-  border: 1px solid #eee;
+  border: 1px solid #EDEEEF;
   border-radius: 14px;
   padding: 18px;
 }
@@ -693,7 +693,7 @@
   align-items: center;
   gap: 10px;
   padding: 10px 0;
-  border-bottom: 1px solid #f5f5f5;
+  border-bottom: 1px solid #F6F8F9;
 
   &:last-child { border-bottom: none; }
 }
@@ -735,10 +735,10 @@
   align-items: center;
   justify-content: space-between;
   padding: 18px 20px 14px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #E8EDF0;
   font-size: 0.95rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #1C2833;
 }
 
 .exp-modal-close {
@@ -746,14 +746,14 @@
   border: none;
   cursor: pointer;
   font-size: 1rem;
-  color: #888;
+  color: #7B8A97;
   width: 28px;
   height: 28px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  &:hover { background: #f0f0f0; }
+  &:hover { background: #E8EDF0; }
 }
 
 .expense-modal-body {
@@ -771,7 +771,7 @@
   label {
     font-size: 0.72rem;
     font-weight: 600;
-    color: #888;
+    color: #7B8A97;
     text-transform: uppercase;
     letter-spacing: 0.4px;
   }
@@ -780,13 +780,13 @@
     font-family: 'Poppins', sans-serif;
     font-size: 0.88rem;
     padding: 9px 12px;
-    border: 1.5px solid #e0e0e0;
+    border: 1.5px solid #DCE3E8;
     border-radius: 10px;
     outline: none;
-    color: #1a1a1a;
+    color: #1C2833;
     transition: border-color 0.2s;
-    &:focus { border-color: #2d5a27; }
-    &::placeholder { color: #bbb; }
+    &:focus { border-color: #2B3F51; }
+    &::placeholder { color: #B6BDC0; }
   }
 
   &--row {
@@ -808,18 +808,18 @@
   font-weight: 500;
   padding: 5px 12px;
   border-radius: 20px;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid #DCE3E8;
   background: #fff;
-  color: #555;
+  color: #475969;
   cursor: pointer;
   transition: all 0.12s;
 
   &.active {
-    background: var(--cat-color, #1a1a1a);
-    border-color: var(--cat-color, #1a1a1a);
+    background: var(--cat-color, #1C2833);
+    border-color: var(--cat-color, #1C2833);
     color: #fff;
   }
-  &:hover:not(.active) { border-color: #aaa; }
+  &:hover:not(.active) { border-color: #A3ACB1; }
 }
 
 .expense-modal-footer {
@@ -827,7 +827,7 @@
   justify-content: flex-end;
   gap: 10px;
   padding: 14px 20px;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid #E8EDF0;
 }
 
 .exp-cancel {
@@ -836,11 +836,11 @@
   font-weight: 500;
   padding: 9px 20px;
   border-radius: 20px;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid #DCE3E8;
   background: #fff;
-  color: #555;
+  color: #475969;
   cursor: pointer;
-  &:hover { background: #f5f5f5; }
+  &:hover { background: #F6F8F9; }
 }
 
 .exp-save {
@@ -850,11 +850,11 @@
   padding: 9px 20px;
   border-radius: 20px;
   border: none;
-  background: #1a1a1a;
+  background: #1C2833;
   color: #fff;
   cursor: pointer;
   transition: background 0.15s;
-  &:hover { background: #333; }
+  &:hover { background: #2F3B46; }
   &:disabled { opacity: 0.4; cursor: default; }
 }
 
@@ -867,22 +867,22 @@
   width: 100%;
   padding: 14px;
   margin-top: 12px;
-  border: 1.5px dashed #d1d5db;
+  border: 1.5px dashed #D1D6DB;
   border-radius: 12px;
   background: transparent;
-  color: #888;
+  color: #7B8A97;
   font-family: 'Poppins', sans-serif;
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
 
-  svg { stroke: #888; }
+  svg { stroke: #7B8A97; }
 
   &:hover {
-    border-color: #2d5a27;
-    color: #2d5a27;
-    background: rgba(45, 90, 39, 0.03);
-    svg { stroke: #2d5a27; }
+    border-color: #2B3F51;
+    color: #2B3F51;
+    background: rgba(43, 63, 81, 0.03);
+    svg { stroke: #2B3F51; }
   }
 }

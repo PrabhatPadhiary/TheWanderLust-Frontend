@@ -679,12 +679,12 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
         { featureType: 'poi',                 stylers: [{ visibility: 'off' }] },
         { featureType: 'transit',             stylers: [{ visibility: 'off' }] },
         // Subtle road simplification — keep land/park/water at their natural Google colours
-        { featureType: 'road',         elementType: 'geometry.stroke', stylers: [{ color: '#d6d6d6' }] },
-        { featureType: 'road.highway', elementType: 'geometry',        stylers: [{ color: '#f5c542' }] },
-        { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ color: '#e0a800' }] },
+        { featureType: 'road',         elementType: 'geometry.stroke', stylers: [{ color: '#D3D7D9' }] },
+        { featureType: 'road.highway', elementType: 'geometry',        stylers: [{ color: '#EB714C' }] },
+        { featureType: 'road.highway', elementType: 'geometry.stroke', stylers: [{ color: '#CA4016' }] },
         // Clean up label contrast slightly
         { elementType: 'labels.text.stroke',  stylers: [{ color: '#ffffff' }] },
-        { elementType: 'labels.text.fill',    stylers: [{ color: '#555555' }] }
+        { elementType: 'labels.text.fill',    stylers: [{ color: '#475969' }] }
       ]
     });
 
@@ -747,11 +747,11 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
           display: flex;
           align-items: center;
           justify-content: center;
-          color: #333;
+          color: #2F3B46;
           transition: background 0.15s;
           padding: 0;
         }
-        .dest-zoom-btn:hover { background: #f5f5f5; color: #e85d04; }
+        .dest-zoom-btn:hover { background: #F6F8F9; color: #D9481C; }
         .dest-zoom-divider {
           height: 1px;
           background: rgba(0,0,0,0.08);
@@ -789,9 +789,9 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Color + emoji per tab
     const tabConfig: Record<string, { color: string; darkColor: string; emoji: string }> = {
-      stays:       { color: '#2563eb', darkColor: '#1d4ed8', emoji: '🏨' },
-      food:        { color: '#e85d04', darkColor: '#c0392b', emoji: '🍽' },
-      attractions: { color: '#16a34a', darkColor: '#15803d', emoji: '📍' }
+      stays:       { color: '#6089B0', darkColor: '#517CA4', emoji: '🏨' },
+      food:        { color: '#D9481C', darkColor: '#B53A16', emoji: '🍽' },
+      attractions: { color: '#3E8E63', darkColor: '#2B6A4B', emoji: '📍' }
     };
     const cfg = tabConfig[this.activeSection] || tabConfig['stays'];
 
@@ -834,9 +834,9 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
       const infoWindow = new google.maps.InfoWindow({
         content: `
           <div style="font-family:Poppins,Arial,sans-serif;padding:4px 2px;min-width:140px;max-width:200px">
-            <div style="font-size:12px;font-weight:700;color:#1a1a1a;margin-bottom:2px;line-height:1.3">${place.name}</div>
-            <div style="font-size:11px;color:#888;line-height:1.3">${place.vicinity || ''}</div>
-            ${place.rating ? `<div style="font-size:11px;color:#555;margin-top:4px">⭐ <strong>${place.rating}</strong>${place.userRatingsTotal ? ` · <span style="color:#aaa">${place.userRatingsTotal} reviews</span>` : ''}</div>` : ''}
+            <div style="font-size:12px;font-weight:700;color:#1C2833;margin-bottom:2px;line-height:1.3">${place.name}</div>
+            <div style="font-size:11px;color:#7B8A97;line-height:1.3">${place.vicinity || ''}</div>
+            ${place.rating ? `<div style="font-size:11px;color:#475969;margin-top:4px">⭐ <strong>${place.rating}</strong>${place.userRatingsTotal ? ` · <span style="color:#A3ACB1">${place.userRatingsTotal} reviews</span>` : ''}</div>` : ''}
           </div>`
       });
 

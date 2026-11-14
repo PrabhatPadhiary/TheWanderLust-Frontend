@@ -1,15 +1,15 @@
 // /download: get the Android beta. Same look as the legal pages.
-$navy: #043247;
-$orange: #e85d04;
-$deep: #b3380a;
-$text: #1f2933;
-$muted: #5b6b78;
-$line: #edf0f3;
+$navy: #2B3F51;
+$orange: #D9481C;
+$deep: #AA3613;
+$text: #1F2933;
+$muted: #5B6A78;
+$line: #EDF0F3;
 
 :host {
   display: block;
   min-height: 100vh;
-  background: #fffbf8;
+  background: #EEF2F4;
   font-family: 'Poppins', sans-serif;
   color: $text;
 }
@@ -46,7 +46,7 @@ $line: #edf0f3;
   margin: 0 auto 14px;
   border-radius: 24px;
   background: #fff;
-  box-shadow: 0 10px 30px rgba(4, 50, 71, 0.12);
+  box-shadow: 0 10px 30px rgba(43, 63, 81, 0.12);
   padding: 10px;
 }
 
@@ -54,8 +54,8 @@ $line: #edf0f3;
   display: inline-block;
   padding: 4px 14px;
   border-radius: 999px;
-  background: #fff3eb;
-  border: 1px solid #ffd9c2;
+  background: #FDF1ED;
+  border: 1px solid #F9D3C8;
   color: $deep;
   font-size: 0.8rem;
   font-weight: 700;
@@ -88,7 +88,7 @@ h1 {
   font-size: 1.05rem;
   font-weight: 700;
   text-decoration: none;
-  box-shadow: 0 10px 24px rgba(232, 93, 4, 0.3);
+  box-shadow: 0 10px 24px rgba(217, 72, 28, 0.3);
   transition: transform 0.15s ease, background 0.15s ease;
 
   &:hover {
@@ -108,7 +108,7 @@ h1 {
   max-width: 460px;
   padding: 12px 16px;
   border-radius: 14px;
-  background: #e6f4fb;
+  background: #ECF1F5;
   color: $navy;
   font-size: 0.92rem;
   line-height: 1.5;
@@ -147,8 +147,8 @@ h1 {
 
   &--soft {
     margin-top: 16px;
-    background: #fff3eb;
-    border-color: #ffd9c2;
+    background: #FDF1ED;
+    border-color: #F9D3C8;
   }
 }
 

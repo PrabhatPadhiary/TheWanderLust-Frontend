@@ -20,7 +20,7 @@
     width: 600px;
     max-width: 90vw;
     height: 100vh;
-    background: #f2f4f1;
+    background: #F1F3F4;
     backdrop-filter: blur(24px);
     -webkit-backdrop-filter: blur(24px);
     border-left: 1px solid rgba(255, 255, 255, 0.5);
@@ -122,12 +122,12 @@
 
 .panel-content {
     padding: 28px 30px;
-    background: #f2f4f1;
+    background: #F1F3F4;
 
     h2 {
         font-size: 1.5rem;
         font-weight: 700;
-        color: #1a1a1a;
+        color: #1C2833;
         margin: 0 0 20px;
     }
 }
@@ -135,7 +135,7 @@
 .info-card {
     background: #fff;
     border-radius: 14px;
-    border: 1px solid #e8ebe5;
+    border: 1px solid #E5E8EB;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
     padding: 20px 22px;
     margin-bottom: 24px;
@@ -155,29 +155,29 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #2d5a27;
+            color: #2B3F51;
             font-size: 0.9rem;
         }
 
         .info-card-text {
             font-size: 0.88rem;
-            color: #333;
+            color: #2F3B46;
             line-height: 1.5;
 
             .info-muted {
-                color: #888;
+                color: #7B8A97;
                 font-weight: 400;
             }
 
             .info-price {
-                color: #2d5a27;
+                color: #2B3F51;
                 font-weight: 600;
             }
         }
 
         .info-card-link {
             font-size: 0.88rem;
-            color: #2d5a27;
+            color: #2B3F51;
             text-decoration: none;
             font-weight: 500;
             line-height: 1.5;
@@ -189,14 +189,14 @@
     }
 
     .info-card-hours {
-        border-top: 1px solid #eef0ec;
+        border-top: 1px solid #ECEFF0;
         padding-top: 12px;
 
         .hours-toggle {
             background: none;
             border: none;
             font-size: 0.82rem;
-            color: #2d5a27;
+            color: #2B3F51;
             cursor: pointer;
             font-family: 'Poppins', sans-serif;
             font-weight: 600;
@@ -219,9 +219,9 @@
 
             li {
                 font-size: 0.8rem;
-                color: #444;
+                color: #3F4649;
                 padding: 5px 0;
-                border-bottom: 1px solid rgba(45, 90, 39, 0.08);
+                border-bottom: 1px solid rgba(43, 63, 81, 0.08);
                 display: flex;
                 justify-content: space-between;
 
@@ -251,23 +251,23 @@
         text-decoration: none;
 
         &.primary {
-            background: #2d5a27;
+            background: #2B3F51;
             color: #fff;
             border: none;
 
             &:hover {
-                background: #1e3d1a;
+                background: #1C2833;
             }
         }
 
         &.secondary {
             background: transparent;
-            color: #333;
-            border: 1px solid #ddd;
+            color: #2F3B46;
+            border: 1px solid #DADEE0;
 
             &:hover {
-                border-color: #333;
-                background: #f8f8f8;
+                border-color: #2F3B46;
+                background: #F7F8F9;
             }
         }
     }
@@ -277,7 +277,7 @@
     border-radius: 16px;
     overflow: hidden;
     height: 220px;
-    border: 1px solid #eee;
+    border: 1px solid #EDEEEF;
     margin-bottom: 30px;
 
     iframe {
@@ -296,8 +296,8 @@
     .loading-spinner.small {
         width: 28px;
         height: 28px;
-        border: 3px solid rgba(45, 90, 39, 0.2);
-        border-top-color: #2d5a27;
+        border: 3px solid rgba(43, 63, 81, 0.2);
+        border-top-color: #2B3F51;
         border-radius: 50%;
         animation: spin 0.8s linear infinite;
     }
@@ -315,13 +315,13 @@
         border-radius: 12px;
 
         &.open {
-            color: #2d5a27;
-            background: rgba(45, 90, 39, 0.1);
+            color: #2B3F51;
+            background: rgba(43, 63, 81, 0.1);
         }
 
         &.closed {
-            color: #c62828;
-            background: rgba(198, 40, 40, 0.1);
+            color: #C4392A;
+            background: rgba(196, 57, 42, 0.1);
         }
     }
 }
@@ -332,7 +332,7 @@
     h3 {
         font-size: 1.1rem;
         font-weight: 600;
-        color: #1a1a1a;
+        color: #1C2833;
         margin: 0 0 16px;
     }
 
@@ -341,7 +341,7 @@
         margin-bottom: 10px;
         background: #fff;
         border-radius: 12px;
-        border: 1px solid #eef0f2;
+        border: 1px solid #EEF0F2;
         box-shadow: 0 1px 4px rgba(0,0,0,0.04);
 
         &:last-child { margin-bottom: 0; }
@@ -373,7 +373,7 @@
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    background: #2d5a27;
+                    background: #2B3F51;
                     color: #fff;
                     border-radius: 50%;
                     font-size: 0.8rem;
@@ -390,18 +390,18 @@
                 .review-author {
                     font-size: 0.82rem;
                     font-weight: 600;
-                    color: #1a1a1a;
+                    color: #1C2833;
                 }
 
                 .review-time {
                     font-size: 0.72rem;
-                    color: #999;
+                    color: #7F8D99;
                 }
             }
 
             .review-rating {
                 font-size: 0.8rem;
-                background: #fef9e7;
+                background: #FCEDE8;
                 padding: 2px 8px;
                 border-radius: 8px;
             }
@@ -409,7 +409,7 @@
 
         .review-text {
             font-size: 0.82rem;
-            color: #444;
+            color: #3F4649;
             line-height: 1.6;
             margin: 0;
             display: -webkit-box;

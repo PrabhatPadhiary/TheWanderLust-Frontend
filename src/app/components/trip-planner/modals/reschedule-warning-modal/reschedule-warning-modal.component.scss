@@ -14,17 +14,17 @@
     margin: 0 0 8px;
     font-size: 1rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #1C2833;
   }
 
   .dialog-hint {
     font-size: 0.8rem;
-    color: #666;
+    color: #4F6070;
     margin: 0 0 22px;
     line-height: 1.5;
     text-align: left;
 
-    strong { color: #1a1a1a; }
+    strong { color: #1C2833; }
   }
 }
 
@@ -39,14 +39,14 @@
   font-size: 0.85rem;
   font-weight: 500;
   padding: 9px 20px;
-  background: #f4f4f4;
-  color: #555;
+  background: #F3F4F5;
+  color: #475969;
   border: none;
   border-radius: 20px;
   cursor: pointer;
   transition: background 0.2s;
 
-  &:hover { background: #eee; }
+  &:hover { background: #EDEEEF; }
 }
 
 .dialog-confirm {
@@ -54,18 +54,18 @@
   font-size: 0.85rem;
   font-weight: 600;
   padding: 9px 20px;
-  background: #2d5a27;
+  background: #2B3F51;
   color: #fff;
   border: none;
   border-radius: 20px;
   cursor: pointer;
   transition: background 0.2s;
 
-  &:hover { background: #1e3d1a; }
+  &:hover { background: #1C2833; }
   &:disabled { opacity: 0.4; cursor: default; }
 
   &--warning {
-    background: #f59e0b;
-    &:hover { background: #d97706; }
+    background: #E64A1A;
+    &:hover { background: #C94016; }
   }
 }

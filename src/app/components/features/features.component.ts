@@ -17,8 +17,8 @@ export class FeaturesComponent {
   features = [
     {
       icon: 'search',
-      color: '#2563eb',
-      bg: 'rgba(37,99,235,0.08)',
+      color: '#6089B0',
+      bg: 'rgba(96, 137, 176, 0.08)',
       title: 'Smart Discovery',
       subtitle: 'Find the best places instantly',
       desc: 'Search any city or country and instantly surface top-rated stays, restaurants, and attractions — pulled live from Google Places. No curated lists, just real data.',
@@ -27,8 +27,8 @@ export class FeaturesComponent {
     },
     {
       icon: 'calendar',
-      color: '#e85d04',
-      bg: 'rgba(232,93,4,0.08)',
+      color: '#D9481C',
+      bg: 'rgba(217, 72, 28, 0.08)',
       title: 'Trip Planner',
       subtitle: 'Day-by-day itinerary builder',
       desc: 'Drag and drop places into a day-by-day itinerary. Set dates, add notes, track your budget, and share the plan with your travel crew in real time.',
@@ -37,8 +37,8 @@ export class FeaturesComponent {
     },
     {
       icon: 'users',
-      color: '#7c3aed',
-      bg: 'rgba(124,58,237,0.08)',
+      color: '#6F95B8',
+      bg: 'rgba(111, 149, 184, 0.08)',
       title: 'Collaborate',
       subtitle: 'Plan together, travel together',
       desc: 'Invite friends to co-plan trips. Everyone can add places, vote on options, and see changes in real time — no more endless WhatsApp threads.',
@@ -47,8 +47,8 @@ export class FeaturesComponent {
     },
     {
       icon: 'heart',
-      color: '#db2777',
-      bg: 'rgba(219,39,119,0.08)',
+      color: '#DB5127',
+      bg: 'rgba(219, 81, 39, 0.08)',
       title: 'Favourites',
       subtitle: 'Your personal travel wishlist',
       desc: 'Save places across any destination. Build a wishlist of dream spots — hotels, restaurants, landmarks — and access them from any trip.',
@@ -57,8 +57,8 @@ export class FeaturesComponent {
     },
     {
       icon: 'map',
-      color: '#16a34a',
-      bg: 'rgba(22,163,74,0.08)',
+      color: '#3E8E63',
+      bg: 'rgba(62, 142, 99, 0.08)',
       title: 'Interactive Maps',
       subtitle: 'See your whole trip at a glance',
       desc: 'Every place in your plan is pinned on a live map. Switch between roadmap and terrain views, see your route, and discover nearby gems you might have missed.',
@@ -67,8 +67,8 @@ export class FeaturesComponent {
     },
     {
       icon: 'check',
-      color: '#0891b2',
-      bg: 'rgba(8,145,178,0.08)',
+      color: '#3D5E7D',
+      bg: 'rgba(61, 94, 125, 0.08)',
       title: 'Checklists & Budget',
       subtitle: 'Never forget a thing',
       desc: 'Track packing lists, to-dos, and shared expenses in one place. Split costs with travel mates, see who owes what, and keep totals always up to date.',

@@ -101,7 +101,7 @@ export class BudgetTabComponent implements OnInit, OnChanges {
   };
 
   readonly categoryColors: Record<BudgetExpense['category'], string> = {
-    stay: '#2563eb', food: '#dc2626', activity: '#16a34a', transport: '#d97706', other: '#9333ea'
+    stay: '#6089B0', food: '#C8352B', activity: '#3E8E63', transport: '#C94016', other: '#6890B5'
   };
 
   readonly categoryEmoji: Record<BudgetExpense['category'], string> = {

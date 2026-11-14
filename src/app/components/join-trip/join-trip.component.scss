@@ -3,7 +3,7 @@
   align-items: center;
   justify-content: center;
   min-height: 100vh;
-  background: #f5f6fa;
+  background: #F6F8F9;
   font-family: 'Poppins', sans-serif;
   padding: 20px;
 }
@@ -19,8 +19,8 @@
 }
 
 .join-app-banner {
-  background: #fff3eb;
-  border: 1px solid #ffd9c2;
+  background: #FDF1ED;
+  border: 1px solid #F9D3C8;
   border-radius: 14px;
   padding: 16px;
   margin-bottom: 24px;
@@ -32,7 +32,7 @@
   p {
     margin: 0;
     font-size: 0.85rem;
-    color: #4a5a66;
+    color: #4A5866;
   }
 }
 
@@ -41,7 +41,7 @@
   padding: 12px 20px;
   border: none;
   border-radius: 12px;
-  background: #e85d04;
+  background: #D9481C;
   color: #fff;
   font-family: inherit;
   font-size: 0.95rem;
@@ -49,7 +49,7 @@
   cursor: pointer;
 
   &:active {
-    background: #b3380a;
+    background: #AA3613;
   }
 }
 
@@ -63,13 +63,13 @@
     margin: 0;
     font-size: 1.3rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #1C2833;
   }
 
   p {
     margin: 0;
     font-size: 0.9rem;
-    color: #888;
+    color: #7B8A97;
     max-width: 280px;
   }
 }
@@ -83,8 +83,8 @@
 .join-spinner {
   width: 36px;
   height: 36px;
-  border: 3px solid #eee;
-  border-top-color: #2d5a27;
+  border: 3px solid #EDEEEF;
+  border-top-color: #2B3F51;
   border-radius: 50%;
   animation: join-spin 0.8s linear infinite;
   margin-bottom: 8px;
@@ -101,9 +101,9 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.9rem;
   font-weight: 600;
-  color: #333;
+  color: #2F3B46;
   background: #fff;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid #DCE3E8;
   border-radius: 24px;
   padding: 12px 24px;
   cursor: pointer;
@@ -111,8 +111,8 @@
   transition: border-color 0.2s, box-shadow 0.2s;
 
   &:hover {
-    border-color: #2d5a27;
-    box-shadow: 0 2px 12px rgba(45, 90, 39, 0.1);
+    border-color: #2B3F51;
+    box-shadow: 0 2px 12px rgba(43, 63, 81, 0.1);
   }
 }
 
@@ -121,7 +121,7 @@
   font-size: 0.88rem;
   font-weight: 600;
   color: #fff;
-  background: #2d5a27;
+  background: #2B3F51;
   border: none;
   border-radius: 24px;
   padding: 12px 28px;
@@ -129,7 +129,7 @@
   margin-top: 12px;
   transition: background 0.2s;
 
-  &:hover { background: #1e3d1a; }
+  &:hover { background: #1C2833; }
 }
 
 // ===== PREVIEW STATE =====
@@ -144,19 +144,19 @@
 .join-trip-name {
   font-size: 1.05rem !important;
   font-weight: 700 !important;
-  color: #1a1a1a !important;
+  color: #1C2833 !important;
 }
 
 .join-trip-dest {
   font-size: 0.82rem !important;
-  color: #666 !important;
+  color: #4F6070 !important;
 }
 
 .join-role-badge {
   display: inline-block;
   font-size: 0.75rem;
-  color: #2d5a27;
-  background: #eaf3e8;
+  color: #2B3F51;
+  background: #EEF2F4;
   border-radius: 20px;
   padding: 4px 12px;
   margin-top: 6px;
@@ -171,7 +171,7 @@
   font-size: 0.9rem;
   font-weight: 600;
   color: #fff;
-  background: #2d5a27;
+  background: #2B3F51;
   border: none;
   border-radius: 24px;
   padding: 12px 32px;
@@ -179,5 +179,5 @@
   margin-top: 16px;
   transition: background 0.2s;
 
-  &:hover { background: #1e3d1a; }
+  &:hover { background: #1C2833; }
 }

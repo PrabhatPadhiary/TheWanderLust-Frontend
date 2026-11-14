@@ -1,13 +1,13 @@
 :host {
   display: block;
   font-family: 'Poppins', sans-serif;
-  background: #f5f6f8;
+  background: #F5F7F8;
   min-height: 100vh;
 }
 
 // ── Loader ───────────────────────────────────────────────────────────────────
 .jd-loader {
-  background: #f5f6f8;
+  background: #F5F7F8;
   min-height: 100vh;
 }
 
@@ -21,7 +21,7 @@
 
   p {
     font-size: 0.88rem;
-    color: #aaa;
+    color: #A3ACB1;
     font-weight: 500;
   }
 }
@@ -29,8 +29,8 @@
 .jd-spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid #f0f0f0;
-  border-top-color: #02334a;
+  border: 3px solid #E8EDF0;
+  border-top-color: #2B3F51;
   border-radius: 50%;
   animation: jd-spin 0.7s linear infinite;
 }
@@ -39,7 +39,7 @@
 
 // ── Not found ─────────────────────────────────────────────────────────────────
 .jd-notfound {
-  background: #f5f6f8;
+  background: #F5F7F8;
   min-height: 100vh;
 }
 
@@ -50,15 +50,15 @@
   gap: 12px;
   padding: 120px 20px;
   text-align: center;
-  color: #ccc;
+  color: #C8CDD0;
 
-  h2 { font-size: 1.2rem; color: #333; font-weight: 700; margin: 0; }
-  p  { font-size: 0.88rem; color: #888; margin: 0; }
+  h2 { font-size: 1.2rem; color: #2F3B46; font-weight: 700; margin: 0; }
+  p  { font-size: 0.88rem; color: #7B8A97; margin: 0; }
 }
 
 // ── Page wrapper ──────────────────────────────────────────────────────────────
 .jd-page {
-  background: #f5f6f8;
+  background: #F5F7F8;
   min-height: 100vh;
 }
 
@@ -87,7 +87,7 @@
 
 .jd-sidebar-card {
   background: #fff;
-  border: 1px solid #eee;
+  border: 1px solid #EDEEEF;
   border-radius: 14px;
   padding: 20px;
 }
@@ -95,7 +95,7 @@
 .jd-sidebar-card-title {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #02334a;
+  color: #2B3F51;
   margin: 0 0 14px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -106,20 +106,20 @@
   align-items: center;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px solid #f5f5f5;
+  border-bottom: 1px solid #F6F8F9;
 
   &:last-child { border-bottom: none; }
 }
 
 .jd-stat-label {
   font-size: 0.82rem;
-  color: #888;
+  color: #7B8A97;
 }
 
 .jd-stat-value {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #02334a;
+  color: #2B3F51;
 }
 
 .jd-sidebar-actions {
@@ -134,18 +134,18 @@
   justify-content: center;
   gap: 8px;
   padding: 10px;
-  border: 1.5px solid #e8e8e8;
+  border: 1.5px solid #DCE3E8;
   border-radius: 10px;
   background: #fff;
   font-family: 'Poppins', sans-serif;
   font-size: 0.82rem;
   font-weight: 600;
-  color: #555;
+  color: #475969;
   cursor: pointer;
   transition: all 0.15s;
 
-  &:hover { border-color: #02334a; color: #02334a; }
-  &.liked { color: #02334a; border-color: #02334a; background: rgba(2, 51, 74, 0.04); }
+  &:hover { border-color: #2B3F51; color: #2B3F51; }
+  &.liked { color: #2B3F51; border-color: #2B3F51; background: rgba(43, 63, 81, 0.04); }
 }
 
 .jd-sidebar-save-btn {
@@ -156,7 +156,7 @@
   padding: 12px;
   border: none;
   border-radius: 10px;
-  background: #02334a;
+  background: #2B3F51;
   font-family: 'Poppins', sans-serif;
   font-size: 0.82rem;
   font-weight: 700;
@@ -164,12 +164,12 @@
   cursor: pointer;
   transition: all 0.15s;
 
-  &:hover { background: #034d6e; transform: translateY(-1px); }
+  &:hover { background: #25394C; transform: translateY(-1px); }
 }
 
 .jd-sidebar-placeholder {
   font-size: 0.8rem;
-  color: #bbb;
+  color: #B6BDC0;
   margin: 0;
   font-style: italic;
 }
@@ -183,29 +183,29 @@
   border: none;
   font-family: 'Poppins', sans-serif;
   font-size: 0.8rem;
-  color: #888;
+  color: #7B8A97;
   cursor: pointer;
   padding: 0;
   margin-bottom: 24px;
   transition: color 0.15s;
 
-  &:hover { color: #333; }
+  &:hover { color: #2F3B46; }
 }
 
 .jd-back-btn {
   background: none;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid #DCE3E8;
   border-radius: 50px;
   padding: 10px 24px;
   font-family: 'Poppins', sans-serif;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #555;
+  color: #475969;
   cursor: pointer;
   margin-top: 8px;
   transition: all 0.15s;
 
-  &:hover { border-color: #e85d04; color: #e85d04; }
+  &:hover { border-color: #D9481C; color: #D9481C; }
 }
 
 // ── Author row ────────────────────────────────────────────────────────────────
@@ -239,7 +239,7 @@
 .jd-author-name {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #1C2833;
 }
 
 .jd-author-meta {
@@ -247,7 +247,7 @@
   align-items: center;
   gap: 4px;
   font-size: 0.75rem;
-  color: #888;
+  color: #7B8A97;
 }
 
 // ── Meta chips ────────────────────────────────────────────────────────────────
@@ -266,14 +266,14 @@
   border-radius: 50px;
   font-size: 0.78rem;
   font-weight: 500;
-  background: #f0f0f0;
-  color: #555;
-  border: 1px solid #e8e8e8;
+  background: #E8EDF0;
+  color: #475969;
+  border: 1px solid #DCE3E8;
 
   &--dest {
-    background: rgba(2, 51, 74, 0.08);
-    color: #02334a;
-    border-color: rgba(2, 51, 74, 0.15);
+    background: rgba(43, 63, 81, 0.08);
+    color: #2B3F51;
+    border-color: rgba(43, 63, 81, 0.15);
     font-weight: 600;
   }
 }
@@ -282,7 +282,7 @@
 .jd-title {
   font-size: clamp(1.4rem, 3vw, 2rem);
   font-weight: 800;
-  color: #44413a;
+  color: #3A4144;
   margin: 0 0 16px;
   line-height: 1.3;
   letter-spacing: -0.3px;
@@ -301,10 +301,10 @@
   align-items: center;
   gap: 5px;
   padding: 7px 16px;
-  border: 1px solid #02334a;
+  border: 1px solid #2B3F51;
   border-radius: 50px;
   font-size: 0.78rem;
-  color: #02334a;
+  color: #2B3F51;
   font-weight: 600;
   letter-spacing: 0.2px;
 }
@@ -357,14 +357,14 @@
 
 .jd-body-para {
   font-size: 1rem;
-  color: #333;
+  color: #2F3B46;
   line-height: 1.85;
   margin: 0 0 20px;
 
   &--dropcap::first-letter {
     font-size: 3.6em;
     font-weight: 800;
-    color: #02334a;
+    color: #2B3F51;
     float: left;
     line-height: 0.75;
     margin: 6px 10px 0 0;
@@ -374,8 +374,8 @@
 
 // ── Pro Tips ──────────────────────────────────────────────────────────────────
 .jd-protips {
-  background: #fffbf0;
-  border: 1.5px solid #f5d878;
+  background: #FDF4F2;
+  border: 1.5px solid #F0987D;
   border-radius: 14px;
   padding: 20px 24px;
   margin-bottom: 40px;
@@ -388,14 +388,14 @@
   margin-bottom: 14px;
 
   .jd-protips-icon {
-    color: #f59e0b;
+    color: #E64A1A;
     flex-shrink: 0;
   }
 
   strong {
     font-size: 0.92rem;
     font-weight: 700;
-    color: #b45309;
+    color: #AA3613;
   }
 }
 
@@ -412,13 +412,13 @@
     align-items: flex-start;
     gap: 8px;
     font-size: 0.88rem;
-    color: #78350f;
+    color: #78280F;
     line-height: 1.55;
   }
 }
 
 .jd-protips-arrow {
-  color: #f59e0b;
+  color: #E64A1A;
   font-weight: 700;
   flex-shrink: 0;
   margin-top: 1px;
@@ -431,10 +431,10 @@
   gap: 8px;
   font-size: 1.05rem;
   font-weight: 700;
-  color: #02334a;
+  color: #2B3F51;
   margin: 0 0 20px;
 
-  svg { color: #02334a; flex-shrink: 0; }
+  svg { color: #2B3F51; flex-shrink: 0; }
 }
 
 // ── Places ─────────────────────────────────────────────────────────────────────
@@ -454,12 +454,12 @@
   gap: 8px;
   padding: 10px 16px;
   background: #fff;
-  border: 1.5px solid #e8e8e8;
+  border: 1.5px solid #DCE3E8;
   border-radius: 50px;
   transition: all 0.15s;
 
   &:hover {
-    border-color: #ccc;
+    border-color: #C8CDD0;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   }
 
@@ -470,24 +470,24 @@
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background: #f5f5f5;
-    color: #555;
+    background: #F6F8F9;
+    color: #475969;
     flex-shrink: 0;
   }
 
   .jd-place-chip-name {
     font-size: 0.84rem;
     font-weight: 600;
-    color: #1a1a1a;
+    color: #1C2833;
   }
 
   .jd-place-chip-cat {
     font-size: 0.68rem;
     font-weight: 500;
-    color: #aaa;
+    color: #A3ACB1;
     text-transform: capitalize;
     padding: 2px 8px;
-    background: #f8f8f8;
+    background: #F7F8F9;
     border-radius: 50px;
   }
 }
@@ -496,7 +496,7 @@
 .jd-comments {
   margin-bottom: 60px;
   background: #fff;
-  border: 1px solid #eee;
+  border: 1px solid #EDEEEF;
   border-radius: 18px;
   padding: 28px;
 }
@@ -507,7 +507,7 @@
   gap: 12px;
   margin-bottom: 32px;
   padding-bottom: 28px;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid #E8EDF0;
 }
 
 .jd-comment-avatar {
@@ -525,8 +525,8 @@
 
 .jd-comment-input-wrap {
   flex: 1;
-  background: #f8f9fa;
-  border: 1.5px solid #e8e8e8;
+  background: #F6F8F9;
+  border: 1.5px solid #DCE3E8;
   border-radius: 14px;
   display: flex;
   flex-direction: column;
@@ -534,9 +534,9 @@
   transition: border-color 0.2s, background 0.2s;
 
   &:focus-within {
-    border-color: #02334a;
+    border-color: #2B3F51;
     background: #fff;
-    box-shadow: 0 0 0 3px rgba(2, 51, 74, 0.06);
+    box-shadow: 0 0 0 3px rgba(43, 63, 81, 0.06);
   }
 }
 
@@ -546,19 +546,19 @@
   resize: none;
   font-family: 'Poppins', sans-serif;
   font-size: 0.88rem;
-  color: #1a1a1a;
+  color: #1C2833;
   padding: 14px 16px 10px;
   background: transparent;
   line-height: 1.5;
   min-height: 52px;
 
-  &::placeholder { color: #bbb; }
+  &::placeholder { color: #B6BDC0; }
 }
 
 .jd-comment-post-btn {
   align-self: flex-end;
   margin: 0 12px 12px;
-  background: #02334a;
+  background: #2B3F51;
   color: #fff;
   border: none;
   border-radius: 50px;
@@ -569,8 +569,8 @@
   cursor: pointer;
   transition: all 0.15s;
 
-  &:hover { background: #034d6e; transform: translateY(-1px); }
-  &:disabled { background: #ddd; color: #999; cursor: default; transform: none; }
+  &:hover { background: #25394C; transform: translateY(-1px); }
+  &:disabled { background: #DADEE0; color: #7F8D99; cursor: default; transform: none; }
 }
 
 .jd-comment-list {
@@ -584,20 +584,20 @@
   gap: 12px;
   align-items: flex-start;
   padding: 18px 0;
-  border-bottom: 1px solid #f5f5f5;
+  border-bottom: 1px solid #F6F8F9;
 
   &:last-child { border-bottom: none; }
 }
 
 .jd-comment-body {
   flex: 1;
-  background: #f8f9fa;
+  background: #F6F8F9;
   border-radius: 12px;
   padding: 12px 16px;
 
   p {
     font-size: 0.88rem;
-    color: #333;
+    color: #2F3B46;
     line-height: 1.6;
     margin: 4px 0 0;
   }
@@ -611,18 +611,18 @@
   strong {
     font-size: 0.82rem;
     font-weight: 700;
-    color: #02334a;
+    color: #2B3F51;
   }
 }
 
 .jd-comment-time {
   font-size: 0.7rem;
-  color: #aaa;
+  color: #A3ACB1;
 }
 
 .jd-no-comments {
   font-size: 0.85rem;
-  color: #bbb;
+  color: #B6BDC0;
   padding: 28px 0;
   text-align: center;
 }

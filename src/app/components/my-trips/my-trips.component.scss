@@ -12,9 +12,9 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    background: #f4f4f4;
+    background: #F3F4F5;
     border: none;
-    color: #333;
+    color: #2F3B46;
     font-size: 0.92rem;
     font-weight: 600;
     cursor: pointer;
@@ -23,19 +23,19 @@
     margin-bottom: 20px;
     font-family: 'Poppins', sans-serif;
     transition: background 0.2s, color 0.2s;
-    &:hover { background: #e8f5e9; color: #2d5a27; }
+    &:hover { background: #E9EFF4; color: #2B3F51; }
   }
 
   h1 {
     font-size: 1.8rem;
     font-weight: 700;
-    color: #1a1a1a;
+    color: #1C2833;
     margin: 0 0 6px;
   }
 
   p {
     font-size: 0.9rem;
-    color: #888;
+    color: #7B8A97;
     margin: 0;
   }
 }
@@ -54,14 +54,14 @@
   font-size: 0.85rem;
   font-weight: 600;
   color: #fff;
-  background: #2d5a27;
+  background: #2B3F51;
   border: none;
   border-radius: 10px;
   padding: 10px 18px;
   cursor: pointer;
   transition: background 0.15s;
   white-space: nowrap;
-  &:hover { background: #245020; }
+  &:hover { background: #25394B; }
 }
 
 .loading-state {
@@ -70,13 +70,13 @@
   align-items: center;
   gap: 12px;
   padding: 60px 0;
-  color: #888;
+  color: #7B8A97;
 
   .spinner {
     width: 32px;
     height: 32px;
-    border: 3px solid #eee;
-    border-top-color: #2d5a27;
+    border: 3px solid #EDEEEF;
+    border-top-color: #2B3F51;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
@@ -92,11 +92,11 @@
   align-items: center;
   gap: 12px;
   padding: 80px 0;
-  color: #aaa;
+  color: #A3ACB1;
   text-align: center;
 
   svg { opacity: 0.4; }
-  h3 { font-size: 1.1rem; color: #555; margin: 0; }
+  h3 { font-size: 1.1rem; color: #475969; margin: 0; }
   p { font-size: 0.88rem; margin: 0; }
 }
 
@@ -109,7 +109,7 @@
 .trip-card {
   border-radius: 16px;
   overflow: hidden;
-  border: 1px solid #eee;
+  border: 1px solid #EDEEEF;
   background: #fff;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -124,7 +124,7 @@
   height: 160px;
   background-size: cover;
   background-position: center;
-  background-color: #f0f0f0;
+  background-color: #E8EDF0;
   position: relative;
   display: flex;
   align-items: center;
@@ -146,9 +146,9 @@
   padding: 3px 10px;
 
   &.status-draft       { background: rgba(0,0,0,0.5); color: #fff; }
-  &.status-planning    { background: rgba(45,90,39,0.85); color: #fff; }
-  &.status-in-progress { background: rgba(230,126,34,0.85); color: #fff; }
-  &.status-completed   { background: rgba(39,174,96,0.85); color: #fff; }
+  &.status-planning    { background: rgba(43, 63, 81, 0.85); color: #fff; }
+  &.status-in-progress { background: rgba(230, 80, 34, 0.85); color: #fff; }
+  &.status-completed   { background: rgba(62, 151, 107, 0.85); color: #fff; }
 }
 
 .trip-card-body {
@@ -157,7 +157,7 @@
   h3 {
     font-size: 1rem;
     font-weight: 600;
-    color: #1a1a1a;
+    color: #1C2833;
     margin: 0 0 4px;
     white-space: nowrap;
     overflow: hidden;
@@ -167,21 +167,21 @@
 
 .trip-destination {
   font-size: 0.82rem;
-  color: #2d5a27;
+  color: #2B3F51;
   font-weight: 500;
   margin: 0 0 10px;
 }
 
 .trip-meta {
   font-size: 0.78rem;
-  color: #999;
+  color: #7F8D99;
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
 }
 
 .no-dates { font-style: italic; }
-.travellers { color: #bbb; }
+.travellers { color: #B6BDC0; }
 
 .trip-card-body-header {
   display: flex;
@@ -203,17 +203,17 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #aaa;
+  color: #A3ACB1;
   transition: background 0.15s, color 0.15s;
   flex-shrink: 0;
 
-  &:hover { background: #f0f0f0; color: #333; }
+  &:hover { background: #E8EDF0; color: #2F3B46; }
 }
 
 .trip-menu-dropdown {
   position: fixed;
   background: #fff;
-  border: 1px solid #ebebeb;
+  border: 1px solid #E9ECED;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0,0,0,0.14), 0 2px 8px rgba(0,0,0,0.06);
   z-index: 9999;
@@ -231,14 +231,14 @@
   padding: 10px 14px 6px;
   font-size: 0.68rem;
   font-weight: 700;
-  color: #bbb;
+  color: #B6BDC0;
   text-transform: uppercase;
   letter-spacing: 0.6px;
 }
 
 .trip-menu-divider {
   height: 1px;
-  background: #f0f0f0;
+  background: #E8EDF0;
   margin: 4px 0;
 }
 
@@ -253,16 +253,16 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.85rem;
   font-weight: 500;
-  color: #333;
+  color: #2F3B46;
   cursor: pointer;
   text-align: left;
   transition: background 0.12s;
 
-  &:hover { background: #f7f7f7; }
+  &:hover { background: #F6F7F8; }
 
   &--danger {
-    color: #e53e3e;
-    &:hover { background: #fff5f5; }
+    color: #D9594A;
+    &:hover { background: #FDF7F7; }
   }
 }
 
@@ -270,14 +270,14 @@
   width: 24px;
   height: 24px;
   border-radius: 6px;
-  background: #f5f5f5;
+  background: #F6F8F9;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 
   .trip-menu-item--danger & {
-    background: #fff0f0;
+    background: #FCF4F3;
   }
 }
 
@@ -301,8 +301,8 @@
   box-shadow: 0 20px 60px rgba(0,0,0,0.15);
   font-family: 'Poppins', sans-serif;
 
-  h4 { margin: 0 0 8px; font-size: 1rem; font-weight: 700; color: #1a1a1a; }
-  p  { font-size: 0.85rem; color: #666; margin: 0 0 20px; strong { color: #1a1a1a; } }
+  h4 { margin: 0 0 8px; font-size: 1rem; font-weight: 700; color: #1C2833; }
+  p  { font-size: 0.85rem; color: #4F6070; margin: 0 0 20px; strong { color: #1C2833; } }
 }
 
 .delete-actions {
@@ -317,11 +317,11 @@
   font-weight: 500;
   padding: 9px 20px;
   border-radius: 20px;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid #DCE3E8;
   background: #fff;
-  color: #555;
+  color: #475969;
   cursor: pointer;
-  &:hover { background: #f5f5f5; }
+  &:hover { background: #F6F8F9; }
 }
 
 .btn-danger {
@@ -331,10 +331,10 @@
   padding: 9px 20px;
   border-radius: 20px;
   border: none;
-  background: #e53e3e;
+  background: #D9594A;
   color: #fff;
   cursor: pointer;
   transition: background 0.15s;
-  &:hover { background: #c53030; }
+  &:hover { background: #C53F30; }
   &:disabled { opacity: 0.4; cursor: default; }
 }

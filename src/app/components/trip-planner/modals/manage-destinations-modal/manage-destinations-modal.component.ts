@@ -21,7 +21,7 @@ export interface ManageDestinationsModalData {
 })
 export class ManageDestinationsModalComponent {
   destinations: { id?: string; googlePlaceId?: string; name: string; startDate: string | null; endDate: string | null; latitude?: number; longitude?: number; photoUrl?: string | null }[];
-  colors = ['#4ade80', '#f97316', '#818cf8', '#f472b6', '#facc15', '#22d3ee'];
+  colors = ['#67C194', '#E75528', '#A6BDD3', '#99B4CD', '#E75528', '#6089B0'];
 
   constructor(
     public dialogRef: MatDialogRef<ManageDestinationsModalComponent>,

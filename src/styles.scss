@@ -56,7 +56,7 @@ body.no-scroll {
   font-weight: 500 !important;
   text-align: center !important;
   border: none !important;
-  background: #1a1a1a !important;
+  background: #1C2833 !important;
   background-image: none !important;
   color: #fff !important;
   cursor: default !important;
@@ -91,7 +91,7 @@ body.no-scroll {
 }
 
 .mat-calendar-header {
-  background: #2d5a27 !important;
+  background: #2B3F51 !important;
   border-radius: 16px 16px 0 0 !important;
   padding: 12px 8px 8px !important;
 }
@@ -109,7 +109,7 @@ body.no-scroll {
 }
 
 .mat-calendar-table-header th {
-  color: #888 !important;
+  color: #7B8A97 !important;
   font-size: 0.72rem !important;
   font-weight: 600 !important;
 }
@@ -121,20 +121,20 @@ body.no-scroll {
 }
 
 .mat-calendar-body-selected {
-  background-color: #2d5a27 !important;
+  background-color: #2B3F51 !important;
   color: #fff !important;
 }
 
 .mat-calendar-body-today:not(.mat-calendar-body-selected) {
-  border-color: #2d5a27 !important;
-  color: #2d5a27 !important;
+  border-color: #2B3F51 !important;
+  color: #2B3F51 !important;
   font-weight: 700 !important;
 }
 
 .mat-calendar-body-cell:not(.mat-calendar-body-disabled):hover
   .mat-calendar-body-cell-content:not(.mat-calendar-body-selected) {
-  background-color: #e8f5e9 !important;
-  color: #2d5a27 !important;
+  background-color: #E9EFF4 !important;
+  color: #2B3F51 !important;
 }
 
 // Form field styling for date fields
@@ -149,14 +149,14 @@ body.no-scroll {
   .mdc-notched-outline__leading,
   .mdc-notched-outline__notch,
   .mdc-notched-outline__trailing {
-    border-color: #e8e8e8 !important;
+    border-color: #DCE3E8 !important;
   }
 
   &.mat-focused {
     .mdc-notched-outline__leading,
     .mdc-notched-outline__notch,
     .mdc-notched-outline__trailing {
-      border-color: #2d5a27 !important;
+      border-color: #2B3F51 !important;
     }
   }
 
@@ -168,7 +168,7 @@ body.no-scroll {
   input.mat-mdc-input-element {
     font-family: 'Poppins', sans-serif !important;
     font-size: 0.9rem !important;
-    color: #1a1a1a !important;
+    color: #1C2833 !important;
   }
 
   .mat-mdc-form-field-subscript-wrapper {
@@ -176,7 +176,7 @@ body.no-scroll {
   }
 
   .mat-datepicker-toggle {
-    color: #2d5a27 !important;
+    color: #2B3F51 !important;
   }
 }
 
@@ -210,15 +210,15 @@ body.no-scroll {
   .app-loader-spinner {
     width: 36px;
     height: 36px;
-    border: 3px solid rgba(45, 90, 39, 0.15);
-    border-top-color: #2d5a27;
+    border: 3px solid rgba(43, 63, 81, 0.15);
+    border-top-color: #2B3F51;
     border-radius: 50%;
     animation: app-loader-spin 0.8s linear infinite;
   }
 
   p {
     font-size: 0.9rem;
-    color: #555;
+    color: #475969;
     font-weight: 500;
     font-family: 'Poppins', sans-serif;
     margin: 0;
@@ -304,10 +304,10 @@ body.no-scroll {
   z-index: 9999 !important;
   box-shadow: 0 10px 32px rgba(0, 0, 0, 0.25);
   border-radius: 10px;
-  background: #1e293b !important;
+  background: #1E2D3B !important;
   color: #fff !important;
   padding: 12px 16px;
-  border-left: 4px solid #4ade80;
+  border-left: 4px solid #67C194;
   font-family: 'Poppins', sans-serif;
   min-width: 180px;
 
@@ -331,9 +331,9 @@ body.no-scroll {
 
 .cdk-drag-placeholder {
   opacity: 0.3;
-  border: 1.5px dashed #4ade80;
+  border: 1.5px dashed #67C194;
   border-radius: 8px;
-  background: rgba(74, 222, 128, 0.08);
+  background: rgba(103, 193, 148, 0.08);
   min-height: 42px;
 }
 
@@ -359,22 +359,22 @@ body.no-scroll {
 
 // Color variants — applied as background on the cell content
 .mat-calendar-body-cell.dest-range-0 .mat-calendar-body-cell-content {
-  background: rgba(74, 222, 128, 0.3) !important;
-  color: #1a1a1a !important;
+  background: rgba(103, 193, 148, 0.3) !important;
+  color: #1C2833 !important;
 }
 .mat-calendar-body-cell.dest-range-1 .mat-calendar-body-cell-content {
-  background: rgba(139, 92, 246, 0.3) !important;
-  color: #1a1a1a !important;
+  background: rgba(140, 170, 198, 0.3) !important;
+  color: #1C2833 !important;
 }
 .mat-calendar-body-cell.dest-range-2 .mat-calendar-body-cell-content {
-  background: rgba(59, 130, 246, 0.3) !important;
-  color: #1a1a1a !important;
+  background: rgba(118, 154, 187, 0.3) !important;
+  color: #1C2833 !important;
 }
 .mat-calendar-body-cell.dest-range-3 .mat-calendar-body-cell-content {
-  background: rgba(245, 158, 11, 0.3) !important;
-  color: #1a1a1a !important;
+  background: rgba(230, 74, 26, 0.3) !important;
+  color: #1C2833 !important;
 }
 .mat-calendar-body-cell.dest-range-4 .mat-calendar-body-cell-content {
-  background: rgba(236, 72, 153, 0.3) !important;
-  color: #1a1a1a !important;
+  background: rgba(235, 111, 73, 0.3) !important;
+  color: #1C2833 !important;
 }

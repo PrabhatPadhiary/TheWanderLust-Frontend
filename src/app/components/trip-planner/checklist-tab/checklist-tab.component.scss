@@ -9,10 +9,10 @@
   justify-content: space-between;
   margin-bottom: 20px;
 
-  h2 { font-size: 1.1rem; font-weight: 700; color: #1a1a1a; margin: 0 0 4px; }
+  h2 { font-size: 1.1rem; font-weight: 700; color: #1C2833; margin: 0 0 4px; }
 }
 
-.cl-meta { font-size: 0.78rem; color: #888; margin: 0; }
+.cl-meta { font-size: 0.78rem; color: #7B8A97; margin: 0; }
 
 .cl-add-btn {
   display: inline-flex;
@@ -22,13 +22,13 @@
   font-size: 0.82rem;
   font-weight: 600;
   color: #fff;
-  background: #2d5a27;
+  background: #2B3F51;
   border: none;
   border-radius: 10px;
   padding: 10px 16px;
   cursor: pointer;
   transition: background 0.15s;
-  &:hover { background: #245020; }
+  &:hover { background: #25394B; }
 }
 
 // ===== PROGRESS CARD =====
@@ -37,7 +37,7 @@
   align-items: center;
   gap: 18px;
   background: #fff;
-  border: 1.5px solid #f0f0f0;
+  border: 1.5px solid #E8EDF0;
   border-radius: 14px;
   padding: 18px 22px;
   margin-bottom: 20px;
@@ -54,7 +54,7 @@
   transform: translate(-50%, -50%);
   font-size: 0.72rem;
   font-weight: 700;
-  color: #2d5a27;
+  color: #2B3F51;
 }
 
 .cl-ring-fill {
@@ -67,20 +67,20 @@
   flex-direction: column;
   gap: 3px;
 
-  strong { font-size: 0.9rem; color: #1a1a1a; }
+  strong { font-size: 0.9rem; color: #1C2833; }
 }
 
 .cl-progress-sub {
   font-size: 0.75rem;
-  color: #888;
+  color: #7B8A97;
 }
 
 .cl-progress-stats {
   font-size: 0.72rem;
-  color: #aaa;
+  color: #A3ACB1;
 }
 
-.cl-stat-overdue { color: #dc2626; font-weight: 600; }
+.cl-stat-overdue { color: #C8352B; font-weight: 600; }
 
 // ===== FILTERS =====
 .cl-filters {
@@ -100,19 +100,19 @@
   font-weight: 600;
   padding: 6px 12px;
   border-radius: 20px;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid #DCE3E8;
   background: #fff;
-  color: #666;
+  color: #4F6070;
   cursor: pointer;
   transition: all 0.15s;
 
-  &:hover { border-color: #2d5a27; color: #2d5a27; }
-  &.active { background: #2d5a27; color: #fff; border-color: #2d5a27; }
+  &:hover { border-color: #2B3F51; color: #2B3F51; }
+  &.active { background: #2B3F51; color: #fff; border-color: #2B3F51; }
 
   &--overdue {
-    border-color: #fecaca;
-    color: #dc2626;
-    &.active { background: #dc2626; color: #fff; border-color: #dc2626; }
+    border-color: #F6D6D2;
+    color: #C8352B;
+    &.active { background: #C8352B; color: #fff; border-color: #C8352B; }
   }
 
   &--cat {
@@ -127,7 +127,7 @@
 .cl-filter-divider {
   width: 1px;
   height: 18px;
-  background: #e0e0e0;
+  background: #DCE3E8;
   margin: 0 4px;
 }
 
@@ -143,26 +143,26 @@
   margin-bottom: 10px;
   font-size: 0.72rem;
   font-weight: 700;
-  color: #888;
+  color: #7B8A97;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 
-  &--overdue { color: #dc2626; }
-  &--done { color: #16a34a; }
+  &--overdue { color: #C8352B; }
+  &--done { color: #3E8E63; }
 }
 
 .cl-section-dot {
   width: 8px; height: 8px;
   border-radius: 50%;
-  background: #ccc;
-  &--overdue { background: #dc2626; }
-  &--done { background: #16a34a; }
+  background: #C8CDD0;
+  &--overdue { background: #C8352B; }
+  &--done { background: #3E8E63; }
 }
 
 .cl-section-count {
   font-size: 0.68rem;
-  background: #f0f0f0;
-  color: #888;
+  background: #E8EDF0;
+  color: #7B8A97;
   padding: 2px 7px;
   border-radius: 10px;
 }
@@ -174,19 +174,19 @@
   gap: 12px;
   padding: 14px 16px;
   background: #fff;
-  border: 1.5px solid #f0f0f0;
+  border: 1.5px solid #E8EDF0;
   border-radius: 12px;
   margin-bottom: 8px;
   transition: border-color 0.15s;
 
-  &--overdue { border-color: #fecaca; background: #fef7f7; }
+  &--overdue { border-color: #F6D6D2; background: #FDF8F8; }
   &--done { opacity: 0.7; }
 }
 
 .cl-checkbox {
   width: 22px; height: 22px;
   border-radius: 6px;
-  border: 2px solid #d0d0d0;
+  border: 2px solid #CCD1D4;
   background: #fff;
   display: flex;
   align-items: center;
@@ -195,8 +195,8 @@
   flex-shrink: 0;
   transition: all 0.15s;
 
-  &:hover { border-color: #2d5a27; }
-  &.checked { background: #2d5a27; border-color: #2d5a27; }
+  &:hover { border-color: #2B3F51; }
+  &.checked { background: #2B3F51; border-color: #2B3F51; }
   &:disabled { cursor: default; opacity: 0.6; }
 }
 
@@ -208,11 +208,11 @@
 .cl-item-title {
   font-size: 0.88rem;
   font-weight: 500;
-  color: #1a1a1a;
+  color: #1C2833;
   display: block;
   margin-bottom: 4px;
 
-  &.done { text-decoration: line-through; color: #aaa; }
+  &.done { text-decoration: line-through; color: #A3ACB1; }
 }
 
 .cl-item-meta {
@@ -231,8 +231,8 @@
 
 .cl-due {
   font-size: 0.7rem;
-  color: #888;
-  &--overdue { color: #dc2626; font-weight: 600; }
+  color: #7B8A97;
+  &--overdue { color: #C8352B; font-weight: 600; }
 }
 
 .cl-assignee {
@@ -244,7 +244,7 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: #2d5a27;
+  background: #2B3F51;
   color: #fff;
   font-size: 0.55rem;
   font-weight: 700;
@@ -264,15 +264,15 @@
   width: 26px; height: 26px;
   border-radius: 50%;
   border: none;
-  background: #f5f5f5;
-  color: #888;
+  background: #F6F8F9;
+  color: #7B8A97;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: background 0.15s;
-  &:hover { background: #eee; }
-  &--del:hover { background: #fee2e2; color: #dc2626; }
+  &:hover { background: #EDEEEF; }
+  &--del:hover { background: #FAE8E6; color: #C8352B; }
 }
 
 // ===== ADD INLINE =====
@@ -286,19 +286,19 @@
   gap: 8px;
   padding: 12px 16px;
   background: #fff;
-  border: 1.5px solid #e8e8e8;
+  border: 1.5px solid #DCE3E8;
   border-radius: 12px;
   cursor: pointer;
   font-family: 'Poppins', sans-serif;
   font-size: 0.85rem;
   font-weight: 500;
-  color: #888;
+  color: #7B8A97;
   transition: all 0.2s;
 
-  &:hover { border-color: #2d5a27; color: #2d5a27; }
+  &:hover { border-color: #2B3F51; color: #2B3F51; }
   &--open {
-    border-color: #2d5a27;
-    color: #2d5a27;
+    border-color: #2B3F51;
+    color: #2B3F51;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
     border-bottom-color: transparent;
@@ -324,7 +324,7 @@
 .cl-add-panel-inner {
   padding: 16px;
   background: #fff;
-  border: 1.5px solid #2d5a27;
+  border: 1.5px solid #2B3F51;
   border-top: none;
   border-bottom-left-radius: 12px;
   border-bottom-right-radius: 12px;
@@ -347,7 +347,7 @@
 .cl-add-label {
   font-size: 0.68rem;
   font-weight: 600;
-  color: #aaa;
+  color: #A3ACB1;
   text-transform: uppercase;
   letter-spacing: 0.4px;
 }
@@ -356,13 +356,13 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.9rem;
   padding: 10px 12px;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid #DCE3E8;
   border-radius: 10px;
   outline: none;
-  color: #1a1a1a;
+  color: #1C2833;
   transition: border-color 0.2s;
-  &:focus { border-color: #2d5a27; }
-  &::placeholder { color: #bbb; }
+  &:focus { border-color: #2B3F51; }
+  &::placeholder { color: #B6BDC0; }
 }
 
 .cl-add-cats {
@@ -377,9 +377,9 @@
   font-weight: 600;
   padding: 5px 10px;
   border-radius: 14px;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid #DCE3E8;
   background: #fff;
-  color: #666;
+  color: #4F6070;
   cursor: pointer;
   transition: all 0.12s;
 
@@ -416,7 +416,7 @@
   }
   ::ng-deep .mdc-notched-outline__leading,
   ::ng-deep .mdc-notched-outline__trailing,
-  ::ng-deep .mdc-notched-outline__notch { border-color: #e0e0e0 !important; }
+  ::ng-deep .mdc-notched-outline__notch { border-color: #DCE3E8 !important; }
   ::ng-deep input {
     font-family: 'Poppins', sans-serif;
     font-size: 0.78rem !important;
@@ -427,14 +427,14 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.78rem;
   padding: 8px 10px;
-  border: 1.5px solid #e0e0e0;
+  border: 1.5px solid #DCE3E8;
   border-radius: 8px;
   background: #fff;
-  color: #555;
+  color: #475969;
   cursor: pointer;
   outline: none;
   width: 100%;
-  &:focus { border-color: #2d5a27; }
+  &:focus { border-color: #2B3F51; }
 }
 
 // Assign pills
@@ -457,8 +457,8 @@
   gap: 5px;
   padding: 5px 10px;
   border-radius: 18px;
-  background: #f0f0f0;
-  color: #555;
+  background: #E8EDF0;
+  color: #475969;
   font-size: 0.7rem;
   font-weight: 600;
   font-family: 'Poppins', sans-serif;
@@ -466,17 +466,17 @@
   cursor: pointer;
   transition: all 0.15s;
 
-  &:hover { border-color: #2d5a27; }
+  &:hover { border-color: #2B3F51; }
   &--selected {
-    background: #eaf3e8;
-    color: #2d5a27;
-    border-color: #2d5a27;
+    background: #EEF2F4;
+    color: #2B3F51;
+    border-color: #2B3F51;
   }
   &--more {
-    background: #f8f8f8;
-    color: #888;
+    background: #F7F8F9;
+    color: #7B8A97;
     font-size: 0.65rem;
-    &:hover { background: #eee; }
+    &:hover { background: #EDEEEF; }
   }
 }
 
@@ -484,7 +484,7 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #2d5a27;
+  background: #2B3F51;
   color: #fff;
   font-size: 0.5rem;
   font-weight: 700;
@@ -499,7 +499,7 @@
   top: calc(100% + 4px);
   left: 0;
   background: #fff;
-  border: 1px solid #eee;
+  border: 1px solid #EDEEEF;
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   z-index: 50;
@@ -515,22 +515,22 @@
   padding: 9px 14px;
   font-family: 'Poppins', sans-serif;
   font-size: 0.78rem;
-  color: #555;
+  color: #475969;
   background: #fff;
   border: none;
   cursor: pointer;
   transition: background 0.12s;
 
-  &:hover { background: #f8f9fa; }
-  &.active { color: #2d5a27; font-weight: 600; background: #f3f9f2; }
-  &:not(:last-child) { border-bottom: 1px solid #f5f5f5; }
+  &:hover { background: #F6F8F9; }
+  &.active { color: #2B3F51; font-weight: 600; background: #F4F6F7; }
+  &:not(:last-child) { border-bottom: 1px solid #F6F8F9; }
 }
 
 .cl-assign-opt-avatar {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: #2d5a27;
+  background: #2B3F51;
   color: #fff;
   font-size: 0.6rem;
   font-weight: 700;
@@ -552,12 +552,12 @@
   font-size: 0.78rem;
   font-weight: 500;
   padding: 8px 16px;
-  background: #f4f4f4;
-  color: #555;
+  background: #F3F4F5;
+  color: #475969;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  &:hover { background: #eee; }
+  &:hover { background: #EDEEEF; }
 }
 
 .cl-add-submit {
@@ -565,13 +565,13 @@
   font-size: 0.78rem;
   font-weight: 600;
   padding: 8px 16px;
-  background: #2d5a27;
+  background: #2B3F51;
   color: #fff;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   &:disabled { opacity: 0.4; cursor: default; }
-  &:hover:not(:disabled) { background: #245020; }
+  &:hover:not(:disabled) { background: #25394B; }
 }
 
 // ===== SHOW MORE =====
@@ -579,7 +579,7 @@
   font-family: 'Poppins', sans-serif;
   font-size: 0.78rem;
   font-weight: 500;
-  color: #2d5a27;
+  color: #2B3F51;
   background: none;
   border: none;
   cursor: pointer;
@@ -596,10 +596,10 @@
   padding: 48px 20px;
   text-align: center;
 
-  p { margin: 0; font-size: 0.9rem; color: #888; }
+  p { margin: 0; font-size: 0.9rem; color: #7B8A97; }
 }
 
-.cl-empty-sub { font-size: 0.78rem !important; color: #bbb !important; }
+.cl-empty-sub { font-size: 0.78rem !important; color: #B6BDC0 !important; }
 
 // ===== SKELETON =====
 @keyframes cl-shimmer {
@@ -608,7 +608,7 @@
 }
 
 .sk-line {
-  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, #E8EDF0 25%, #DCE3E8 50%, #E8EDF0 75%);
   background-size: 400px 100%;
   animation: cl-shimmer 1.4s ease infinite;
   border-radius: 6px;
@@ -630,7 +630,7 @@
 .sk-circle {
   width: 56px; height: 56px;
   border-radius: 50%;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, #E8EDF0 25%, #DCE3E8 50%, #E8EDF0 75%);
   background-size: 400px 100%;
   animation: cl-shimmer 1.4s ease infinite;
   flex-shrink: 0;
@@ -652,7 +652,7 @@
   gap: 12px;
   padding: 14px 16px;
   background: #fff;
-  border: 1.5px solid #f0f0f0;
+  border: 1.5px solid #E8EDF0;
   border-radius: 12px;
   margin-bottom: 8px;
 }
@@ -660,7 +660,7 @@
 .sk-checkbox {
   width: 22px; height: 22px;
   border-radius: 6px;
-  background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
+  background: linear-gradient(90deg, #E8EDF0 25%, #DCE3E8 50%, #E8EDF0 75%);
   background-size: 400px 100%;
   animation: cl-shimmer 1.4s ease infinite;
   flex-shrink: 0;

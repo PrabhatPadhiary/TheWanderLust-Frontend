@@ -84,11 +84,11 @@ export class ItineraryItemDetailComponent {
   }
 
   getCategoryColor(cat: string): string {
-    if (cat === 'activity') return '#60a5fa';
-    if (cat === 'food') return '#fbbf24';
-    if (cat === 'stay') return '#4ade80';
-    if (cat === 'transport') return '#a78bfa';
-    return '#94a3b8';
+    if (cat === 'activity') return '#91AEC9';
+    if (cat === 'food') return '#E96036';
+    if (cat === 'stay') return '#67C194';
+    if (cat === 'transport') return '#AEC3D7';
+    return '#94A7B8';
   }
 
   save(): void {

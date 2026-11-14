@@ -14,6 +14,8 @@ import { PricingComponent } from './components/pricing/pricing.component';
 import { MyJournalsComponent } from './components/my-journals/my-journals.component';
 import { LegalComponent } from './components/legal/legal.component';
 import { DownloadComponent } from './components/download/download.component';
+import { ProfileComponent } from './components/profile/profile.component';
+import { SettingsComponent } from './components/settings/settings.component';
 
 const routes: Routes = [
   { path: '', component: LandingPageV2Component },
@@ -35,6 +37,8 @@ const routes: Routes = [
   { path: 'privacy', component: LegalComponent, data: { doc: 'privacy' }, title: 'Privacy Policy · Wayraa' },
   { path: 'terms', component: LegalComponent, data: { doc: 'terms' }, title: 'Terms of Use · Wayraa' },
   { path: 'download', component: DownloadComponent, title: 'Get Wayraa for Android (Beta)' },
+  { path: 'profile', component: ProfileComponent, title: 'Your profile · Wayraa' },
+  { path: 'settings', component: SettingsComponent, title: 'Settings · Wayraa' },
 ];
 
 @NgModule({
