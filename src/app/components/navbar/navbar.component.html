@@ -1,6 +1,8 @@
 <nav class="app-navbar"
      [class.app-navbar--landing]="isLanding"
      [class.app-navbar--scrolled]="isLanding && scrolled"
+     [class.app-navbar--dark]="dark"
+     [class.app-navbar--onlight]="dark && onLight"
      [class.app-navbar--destination]="isDestination"
      [class.app-navbar--tripplanner]="isTripPlanner">
 

@@ -1,6 +1,6 @@
 <!-- Loading -->
 <div class="jd-loader" *ngIf="loading">
-  <app-navbar [isLanding]="true"></app-navbar>
+  <app-navbar [isLanding]="true" [dark]="true" [onLight]="true"></app-navbar>
   <div class="jd-loader-inner">
     <div class="jd-spinner"></div>
     <p>Loading journal...</p>
@@ -9,7 +9,7 @@
 
 <!-- Not found -->
 <div class="jd-notfound" *ngIf="!loading && notFound">
-  <app-navbar [isLanding]="true"></app-navbar>
+  <app-navbar [isLanding]="true" [dark]="true" [onLight]="true"></app-navbar>
   <div class="jd-notfound-inner">
     <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5">
       <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
@@ -24,7 +24,7 @@
 <!-- Main content -->
 <div class="jd-page" *ngIf="!loading && !notFound && journal">
 
-  <app-navbar [isLanding]="true"></app-navbar>
+  <app-navbar [isLanding]="true" [dark]="true" [onLight]="true"></app-navbar>
 
   <div class="jd-layout">
 

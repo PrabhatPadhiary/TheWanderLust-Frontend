@@ -1,276 +1,340 @@
-<!-- ===== NAVBAR ===== -->
-<app-navbar [isLanding]="true"></app-navbar>
+<app-navbar [isLanding]="true" [dark]="true" [onLight]="navOnLight"></app-navbar>
 
-<!-- ===== HERO SECTION ===== -->
-<section class="hero-section" id="explore">
+<main class="landing">
 
-  <!-- Large watermark logo in background -->
-  <div class="hero-bg">
-    <div class="hero-gradient"></div>
-    <img src="assets/images/logo/wayraa_logo_notext.svg" alt="" class="hero-bg-logo" aria-hidden="true">
-  </div>
+  <!-- ===== HERO: the destination film ===== -->
+  <section class="hero" #hero id="explore" aria-labelledby="hero-title">
+    <!-- Opening: the brand word, split around the photo card (behind it). -->
+    <div class="brand-word" aria-hidden="true">
+      <span class="bw-top">WAY</span>
+      <span class="bw-bottom">RAA</span>
+    </div>
 
-  <div class="hero-content">
-    <h1 class="hero-title">
-      Your next adventure<br>
-      <span class="hero-highlight">starts here.</span>
-    </h1>
-    <p class="hero-subtitle">
-      Discover destinations, plan trips with friends, and create unforgettable journeys — all in one place.
-    </p>
+    <div class="hero-media" #heroMedia aria-hidden="true">
+      <picture>
+        <source media="(max-width: 720px)" [srcset]="intro.srcSmall">
+        <img class="hero-photo" [src]="intro.src" alt="" fetchpriority="high">
+      </picture>
+    </div>
+    <div class="hero-shade" aria-hidden="true"></div>
 
-    <!-- Search Bar -->
-    <div class="hero-search">
-      <div class="search-bar">
-        <svg class="search-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5">
-          <circle cx="11" cy="11" r="8"></circle>
-          <path d="M21 21l-4.35-4.35"></path>
-        </svg>
-        <input type="text"
-               placeholder="Where do you want to go?"
-               (input)="onSearchInput($event)"
-               (focus)="showDropdown = predictions.length > 0"
-               (blur)="onBlur()">
-        <button class="search-btn" (click)="onExplore()">Explore</button>
-      </div>
-      <!-- Dropdown -->
-      <div class="search-dropdown" *ngIf="showDropdown && predictions.length > 0">
-        <div class="dropdown-item"
-             *ngFor="let prediction of predictions"
-             (mousedown)="selectPlace(prediction)">
-          <div class="dropdown-text">
-            <span class="dropdown-main">{{ prediction.structured_formatting.main_text }}</span>
-            <span class="dropdown-secondary" *ngIf="prediction.structured_formatting.secondary_text">{{ prediction.structured_formatting.secondary_text }}</span>
+    <div class="hero-content" #heroCopy>
+      <span class="glass-pill">Free while in beta · Web and Android</span>
+      <h1 class="hero-title" id="hero-title">
+        <!-- Letter by letter, so the one nearest the centre can be highlighted (the dive's target). -->
+        <span><span *ngFor="let c of titleChars; let i = index" class="ch" [class.target]="i === diveIndex">{{ c }}</span></span>
+        <em><span *ngFor="let c of emChars; let i = index" class="ch" [class.target]="titleChars.length + i === diveIndex">{{ c }}</span></em>
+      </h1>
+      <p class="hero-sub">{{ intro.sub }}</p>
+
+      <div class="hero-search" role="search">
+        <div class="search-glass">
+          <svg class="search-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path>
+          </svg>
+          <input #searchInput type="text"
+                 placeholder="Where do you want to go?"
+                 aria-label="Search a city or country"
+                 (input)="onSearchInput($event)"
+                 (focus)="showDropdown = predictions.length > 0"
+                 (blur)="onBlur()">
+          <button class="search-btn" (click)="onExplore()">Explore</button>
+        </div>
+        <div class="search-dropdown" *ngIf="showDropdown && predictions.length > 0" role="listbox">
+          <div class="dropdown-item" role="option"
+               *ngFor="let prediction of predictions"
+               (mousedown)="selectPlace(prediction)">
+            <div class="dropdown-text">
+              <span class="dropdown-main">{{ prediction.structured_formatting.main_text }}</span>
+              <span class="dropdown-secondary" *ngIf="prediction.structured_formatting.secondary_text">{{ prediction.structured_formatting.secondary_text }}</span>
+            </div>
+            <span class="dropdown-label">{{ getPlaceLabel(prediction) }}</span>
           </div>
-          <span class="dropdown-label">{{ getPlaceLabel(prediction) }}</span>
+          <div class="dropdown-attribution">Powered by Google</div>
         </div>
-        <div class="dropdown-attribution">Powered by Google</div>
       </div>
+
+      <ul class="hero-facts">
+        <li>Plan together, live</li>
+        <li>Real Google ratings and photos</li>
+        <li>No download needed</li>
+      </ul>
     </div>
 
-    <!-- What you get (facts, no made-up numbers). -->
-    <div class="hero-trust">
-      <div class="trust-stats">
-        <span class="trust-stat">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 12v10H4V12"/><path d="M2 7h20v5H2z"/><path d="M12 22V7"/></svg>
-          Free while in beta
-        </span>
-        <span class="trust-stat">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          Plan together with friends
-        </span>
-        <span class="trust-stat">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-          Real Google ratings and photos
-        </span>
+    <div class="scroll-cue" aria-hidden="true"><span></span></div>
+
+    <!-- The dive: a vector copy of the headline, zoomed (by viewBox, so it stays
+         sharp) into the highlighted letter until it fills the screen. -->
+    <svg class="dive" #dive aria-hidden="true" preserveAspectRatio="none"></svg>
+  </section>
+
+  <!-- ===== CHOOSE YOUR NEXT DESTINATION: a slider in a rounded panel; it moves
+       to the next place as you scroll (the content sticks while you do) ===== -->
+  <section class="story" #story aria-labelledby="dest-title" [style.--steps]="dests.length">
+    <div class="story-sticky">
+      <div class="dest-head">
+        <span class="label">Destinations</span>
+        <h2 id="dest-title" data-split>Choose your next <em>destination</em></h2>
+      </div>
+
+      <div class="dest-panel">
+        <!-- Background: the current place -->
+        <div class="dest-bg" aria-hidden="true">
+          <picture *ngFor="let d of dests; let i = index">
+            <source media="(max-width: 720px)" [srcset]="d.srcSmall">
+            <img [src]="d.src" alt="" loading="lazy" [class.on]="i === activeStep" [class.prev]="i === prevStep">
+          </picture>
+        </div>
+        <div class="dest-shade" aria-hidden="true"></div>
+
+        <!-- Left: progress line -->
+        <div class="dest-progress" aria-hidden="true">
+          <i *ngFor="let d of dests; let i = index" [class.on]="i === activeStep" [class.done]="i < activeStep"></i>
+        </div>
+
+        <!-- The place: name (slides up as it changes), words, Explore -->
+        <div class="dest-copy">
+          <span class="dest-country">
+            <span *ngFor="let d of dests; let i = index" [class.on]="i === activeStep" [class.past]="i < activeStep">{{ d.country }}</span>
+          </span>
+          <h3 class="dest-name">
+            <span *ngFor="let d of dests; let i = index" [class.on]="i === activeStep" [class.past]="i < activeStep"
+                  [attr.aria-hidden]="i !== activeStep">{{ d.name }}</span>
+          </h3>
+          <div class="dest-text">
+            <p *ngFor="let d of dests; let i = index" [class.on]="i === activeStep" [attr.aria-hidden]="i !== activeStep">{{ d.text }}</p>
+          </div>
+          <a class="dest-explore" [routerLink]="['/destination', dests[activeStep].placeId]"
+             [state]="{ destinationName: dests[activeStep].name }">
+            Explore {{ dests[activeStep].name }}
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+        </div>
+
+        <!-- Right: the next places, as cards -->
+        <div class="dest-cards">
+          <div class="dest-track" [style.--at]="activeStep">
+            <button type="button" class="dest-card" *ngFor="let d of dests; let i = index"
+                    [class.gone]="i <= activeStep" (click)="showStep(i)" [attr.aria-label]="'Show ' + d.name"
+                    [attr.tabindex]="i <= activeStep ? -1 : 0">
+              <img [src]="d.srcSmall" alt="" loading="lazy">
+              <span class="dest-card-text"><small>{{ d.country }}</small>{{ d.name }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Bottom right: arrows and count -->
+        <div class="dest-nav">
+          <button type="button" (click)="showStep(activeStep - 1)" [disabled]="activeStep === 0" aria-label="Previous destination">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
+          </button>
+          <button type="button" (click)="showStep(activeStep + 1)" [disabled]="activeStep === dests.length - 1" aria-label="Next destination">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 6l6 6-6 6"/></svg>
+          </button>
+          <span class="dest-count">{{ (activeStep + 1).toString().padStart(2, '0') }} <i>/ {{ dests.length.toString().padStart(2, '0') }}</i></span>
+        </div>
       </div>
     </div>
-  </div>
+  </section>
 
-</section>
-
-<!-- ===== HOW IT WORKS SECTION ===== -->
-<section class="how-it-works-section">
-  <div class="section-container">
-    <span class="section-label">How it works</span>
-    <h2 class="section-title">From idea to itinerary in minutes</h2>
-
-    <div class="steps-grid">
-      <div class="step-card step-1">
-        <div class="step-number">1</div>
-        <div class="step-icon">
-          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
-          </svg>
-        </div>
-        <h3>Pick a destination</h3>
-        <p>Search any city or country and discover top-rated stays, food, and attractions instantly.</p>
+  <!-- ===== YOUR TRIP, MAPPED: a camera follows the trip across a real map as you scroll ===== -->
+  <section class="tripmap" #tripMap aria-labelledby="tripmap-title">
+    <div class="tripmap-sticky">
+      <div class="dest-head">
+        <span class="label">Plan the trip</span>
+        <h2 id="tripmap-title" data-split>Your trip, <em>mapped</em></h2>
       </div>
 
-      <div class="step-connector"></div>
+      <div class="map-panel">
+        <!-- The map (MapLibre, loaded when the section comes near). -->
+        <div class="map-gl" aria-hidden="true"></div>
 
-      <div class="step-card step-2">
-        <div class="step-number">2</div>
-        <div class="step-icon">
-          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-          </svg>
+        <!-- The plane and the car, moved along the route. -->
+        <div class="plane" aria-hidden="true">
+          <svg viewBox="-14 -14 28 28" width="30" height="30"><path d="M13 0 L4 -2.2 L-2 -12 L-5.5 -12 L-1.5 -2.2 L-7.5 -2.2 L-10.5 -6.5 L-13 -6.5 L-11 0 L-13 6.5 L-10.5 6.5 L-7.5 2.2 L-1.5 2.2 L-5.5 12 L-2 12 L4 2.2 Z"></path></svg>
         </div>
-        <h3>Invite your crew</h3>
-        <p>Share the trip with friends and plan together in real time — everyone on the same page.</p>
-      </div>
+        <div class="car" aria-hidden="true"></div>
 
-      <div class="step-connector"></div>
-
-      <div class="step-card step-3">
-        <div class="step-number">3</div>
-        <div class="step-icon">
-          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-          </svg>
-        </div>
-        <h3>Save places</h3>
-        <p>Favourite the spots you love — restaurants, hotels, landmarks — and keep them all in one place.</p>
-      </div>
-
-      <div class="step-connector"></div>
-
-      <div class="step-card step-4">
-        <div class="step-number">4</div>
-        <div class="step-icon">
-          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
-          </svg>
-        </div>
-        <h3>Plan your trip</h3>
-        <p>Build a day-by-day itinerary, set budgets, create checklists, and hit the road.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== PRODUCT SHOWCASE SECTION ===== -->
-<section class="showcase-section">
-  <div class="section-container">
-    <h2 class="section-title">See it in action</h2>
-    <p class="section-subtitle">Explore destinations, build itineraries, and collaborate — all from one dashboard.</p>
-
-    <div class="browser-mockup">
-      <div class="browser-chrome">
-        <div class="browser-dots">
-          <span></span><span></span><span></span>
-        </div>
-        <div class="browser-address-bar">
-          <span>wayraa.com</span>
-        </div>
-      </div>
-      <div class="browser-content">
-        <!-- Replace this with a video or screenshot later -->
-        <video #demoVideo autoplay muted loop playsinline>
-          <source src="assets/video/demo-landing.mp4" type="video/mp4">
-        </video>
-        <!-- Alternative: use an image instead
-        <img src="assets/images/app-screenshot.png" alt="WanderLust app preview"> -->
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== WHAT YOU CAN DO SECTION ===== -->
-<section class="capabilities-section">
-  <div class="section-container">
-    <h2 class="section-title">Everything you need to plan the perfect trip</h2>
-    <p class="section-subtitle">From discovery to itinerary — we've got you covered.</p>
-
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon icon-blue">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8">
-            <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
-          </svg>
-        </div>
-        <h3>Smart Discovery</h3>
-        <p>Search any destination and instantly see top stays, food spots, and attractions curated for you.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon icon-orange">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-          </svg>
-        </div>
-        <h3>Trip Planner</h3>
-        <p>Organize your days with a drag-and-drop itinerary. Add places, set budgets, and track everything.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon icon-purple">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-          </svg>
-        </div>
-        <h3>Collaborate</h3>
-        <p>Invite friends to co-plan trips in real time. Everyone stays on the same page.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon icon-red">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-          </svg>
-        </div>
-        <h3>Favourites</h3>
-        <p>Save places you love across any destination. Build your personal travel wishlist.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon icon-teal">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8">
-            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/>
-          </svg>
-        </div>
-        <h3>Interactive Maps</h3>
-        <p>See all your planned places on a map. Visualize your route and discover nearby gems.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon icon-green">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8">
-            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>
-          </svg>
-        </div>
-        <h3>Checklists & Budget</h3>
-        <p>Never forget a thing. Track packing lists, to-dos, and shared expenses in one place.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== FROM THE COMMUNITY SECTION ===== -->
-<section class="community-section" *ngIf="stories.length">
-  <div class="section-container">
-    <span class="section-label">From the community</span>
-    <h2 class="section-title">Stories from fellow travellers</h2>
-    <p class="section-subtitle">The latest trips shared on Wayraa.</p>
-
-    <div class="blog-grid">
-      <a class="blog-card" *ngFor="let j of stories" [routerLink]="['/community/journal', j.id]">
-        <div class="blog-card-image">
-          <img [src]="j.photos![0].url" [alt]="j.destination" loading="lazy">
-        </div>
-        <div class="blog-card-body">
-          <span class="blog-card-tag">{{ j.destination }}</span>
-          <h3>{{ j.title }}</h3>
-          <p>{{ storyExcerpt(j.body) }}</p>
-          <div class="blog-card-author">
-            <span class="author-avatar" [style.background]="storyColor(j.author.name)">{{ (j.author.name || 'T').charAt(0).toUpperCase() }}</span>
-            <div class="author-info">
-              <span class="author-name">{{ j.author.name || 'Traveller' }}</span>
-              <span class="author-date">{{ storyDate(j) }}</span>
+        <!-- Cards and tags, kept on their pins as the camera moves. -->
+        <div class="map-anchor" *ngFor="let s of tripStops" [attr.data-anchor]="s.id">
+          <div class="pin" [attr.data-for]="s.id" [class.home]="s.id === 'blr'">
+            <span class="ripple"></span>
+            <svg class="pin-body" viewBox="-11 -30 22 31" width="30" height="42"><path d="M0 0 C-3 -6 -10 -11 -10 -18 A10 10 0 1 1 10 -18 C10 -11 3 -6 0 0 Z"></path><circle cy="-18" r="4"></circle></svg>
+          </div>
+          <div class="map-side" [ngClass]="'side-' + s.tagSide">
+            <span class="stop-tag" [attr.data-for]="s.id" [class.home]="s.id === 'blr'">{{ s.id === 'blr' ? 'Bengaluru · home' : s.name }}</span>
+          </div>
+          <div *ngIf="s.num" class="map-side card-side" [ngClass]="'side-' + s.cardSide">
+            <div class="stop-card glass" [attr.data-for]="s.id">
+              <span class="stop-num">{{ s.num }} · {{ s.days }}</span>
+              <strong>{{ s.name }}</strong>
+              <span class="stop-spots">{{ s.spots }}</span>
             </div>
           </div>
         </div>
-      </a>
-    </div>
 
-    <div class="community-cta-row">
-      <a class="community-cta-btn" routerLink="/community">
-        Explore all stories
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
-          <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-        </svg>
-      </a>
-    </div>
-  </div>
-</section>
+        <!-- The plan, day by day. -->
+        <ol class="itin glass">
+          <li><span>Days 1–3</span><b>Dubai</b></li>
+          <li><span>Day 4</span><b>Abu Dhabi</b></li>
+          <li><span>Days 5–6</span><b>Doha</b></li>
+          <li><span>Days 7–8</span><b>Muscat</b></li>
+          <li><span>Day 9</span><b>Home</b></li>
+        </ol>
 
-<!-- ===== FOOTER ===== -->
-<footer class="landing-footer">
-  <div class="footer-container">
-    <div class="footer-brand">
-      <div class="footer-brand-row">
-        <img src="assets/images/logo/wayraa_logo_notext.svg" alt="Wayraa" class="footer-logo-img">
-        <span class="footer-logo-text">wayraa</span>
       </div>
-      <p>Plan your journeys, together.</p>
+      <!-- The trip, counting up (text under the map) -->
+      <p class="trip-summary">
+        <span><b data-num="days">0</b> days</span>
+        <span><b data-num="stops">0</b> stops</span>
+        <span><b data-num="spots">0</b> spots</span>
+        <span><b>4</b> travellers</span>
+      </p>
     </div>
-    <div class="footer-copy">
-      <span>© 2025 Wayraa. Made with ❤️ for travelers.</span>
+  </section>
+
+  <!-- ===== PLAN IT TOGETHER: a live trip board fills up as you scroll ===== -->
+  <section class="together" #together aria-labelledby="together-title">
+    <div class="together-sticky">
+      <div class="together-copy">
+        <span class="label">Plan together</span>
+        <h2 id="together-title" data-split>Plan it <em>together</em></h2>
+        <p>Invite your friends to the trip. Everyone adds places, votes and comments on the same plan, live.</p>
+        <ol class="together-steps">
+          <li><b>Invite your crew</b><span>Share a link; they're in.</span></li>
+          <li><b>Add places together</b><span>Anyone can add to any day.</span></li>
+          <li><b>Vote on what to do</b><span>Settle dinner in seconds.</span></li>
+          <li><b>Talk it through</b><span>Comments right on the plan.</span></li>
+        </ol>
+      </div>
+
+      <div class="board glass" aria-hidden="true">
+        <header class="board-head">
+          <div class="board-title">
+            <span>Trip · 9 days · 25 Nov</span>
+            <strong>Dubai &amp; the Gulf</strong>
+          </div>
+          <div class="board-people">
+            <i *ngFor="let p of crew" class="person" [attr.data-id]="p.id" [style.background]="p.color">{{ p.name.charAt(0) }}</i>
+            <button class="invite" type="button" tabindex="-1">+ Invite</button>
+          </div>
+        </header>
+        <div class="board-days"><span class="on">Day 2 · Dubai</span><span>Day 3</span><span>Day 4</span></div>
+        <ul class="board-list">
+          <li class="slot"><time>09:00</time><div><b>Burj Khalifa</b><span>At the Top · 124th floor</span></div></li>
+          <li class="slot"><time>13:00</time><div><b>Al Fahidi</b><span>Old Dubai walk and an abra ride</span></div></li>
+          <li class="slot new">
+            <time>16:00</time><div><b>Desert safari</b><span>Added by Riya</span></div>
+            <span class="bubble ask"><i style="background:#3F5A73">M</i>Book the 5pm slot?</span>
+            <span class="bubble reply"><i style="background:#A53412">S</i>Done, 5 seats ✓</span>
+          </li>
+          <li class="slot poll">
+            <time>20:00</time>
+            <div>
+              <b>Dinner: where? <em class="won">Al Fanar wins ✓</em></b>
+              <div class="opt a"><span>Al Fanar</span><span class="bar"><i></i></span><em data-votes="3">0</em></div>
+              <div class="opt b"><span>Arabian Tea House</span><span class="bar"><i></i></span><em data-votes="1">0</em></div>
+            </div>
+          </li>
+        </ul>
+        <button class="add-place" type="button" tabindex="-1">+ Add a place</button>
+
+        <div class="cursor riya"><svg viewBox="0 0 16 20" width="18" height="22"><path d="M1 1 L1 16 L5 12 L8 19 L11 18 L8 11 L14 11 Z"/></svg><span>Riya</span><i class="tap"></i></div>
+        <div class="cursor meera"><svg viewBox="0 0 16 20" width="18" height="22"><path d="M1 1 L1 16 L5 12 L8 19 L11 18 L8 11 L14 11 Z"/></svg><span>Meera</span><i class="tap"></i></div>
+
+        <div class="board-toast joined">Riya, Meera and Sam joined the trip</div>
+        <div class="board-toast invited">Invite link copied · Kabir joined</div>
+        <div class="board-done">Everyone's on the same plan ✓</div>
+      </div>
     </div>
-  </div>
-</footer>
+  </section>
+
+  <!-- ===== FROM THE COMMUNITY: a collage of real stories that slides sideways as you scroll ===== -->
+  <section class="collage" #collage *ngIf="stories.length" aria-labelledby="stories-title" [style.--count]="stories.length">
+    <div class="collage-sticky">
+      <div class="collage-head">
+        <div>
+          <span class="label">From the community</span>
+          <h2 id="stories-title">Stories from <em>fellow travellers</em></h2>
+        </div>
+        <a class="btn glass-btn" routerLink="/community">Explore all stories</a>
+      </div>
+      <div class="collage-track">
+        <a class="cluster" *ngFor="let j of stories; let i = index" [class.alt]="i % 2 === 1"
+           [routerLink]="['/community/journal', j.id]" [attr.aria-label]="j.title">
+          <img class="ph main" [src]="j.photos![0].url" [alt]="j.destination" loading="lazy">
+          <img class="ph second" *ngIf="j.photos![1]" [src]="j.photos![1].url" alt="" loading="lazy">
+          <img class="ph third" *ngIf="j.photos![2]" [src]="j.photos![2].url" alt="" loading="lazy">
+          <div class="cluster-card glass">
+            <span class="story-tag">{{ j.destination }}</span>
+            <h3>{{ j.title }}</h3>
+            <span class="story-by">
+              <i [style.background]="storyColor(j.author.name)">{{ (j.author.name || 'T').charAt(0).toUpperCase() }}</i>
+              {{ j.author.name || 'Traveller' }} · {{ storyDate(j) }}
+            </span>
+          </div>
+        </a>
+        <a class="cluster more" routerLink="/community">
+          <span>See every story</span>
+          <strong>Explore the community →</strong>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== WHAT YOU CAN DO ===== -->
+  <section class="features" aria-labelledby="features-title">
+    <div class="glow glow-c" aria-hidden="true"></div>
+    <div class="section-head" data-reveal>
+      <span class="label">Everything in one place</span>
+      <h2 id="features-title" data-split>Everything you need <em>to travel well</em></h2>
+    </div>
+    <div class="feature-grid">
+      <article class="feature glass" *ngFor="let f of features; let i = index" [class.wide]="i === 0 || i === 5">
+        <span class="feature-icon" [ngSwitch]="f.icon" aria-hidden="true">
+          <svg *ngSwitchCase="'search'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <svg *ngSwitchCase="'calendar'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+          <svg *ngSwitchCase="'users'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg>
+          <svg *ngSwitchCase="'heart'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+          <svg *ngSwitchCase="'map'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 6v16l7-4 8 4 7-4V2l-7 4-8-4z"/><path d="M8 2v16M16 6v16"/></svg>
+          <svg *ngSwitchCase="'check'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </span>
+        <h3>{{ f.title }}</h3>
+        <p>{{ f.text }}</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===== PLAN ON THE WEB, OR GET THE APP ===== -->
+  <section class="cta" aria-labelledby="cta-title">
+    <div class="cta-panel" data-reveal>
+      <span class="cta-glow" aria-hidden="true"></span>
+      <h2 id="cta-title" data-split>Plan on the web.<br><em>Take it on the road.</em></h2>
+      <p>Everything works right here in your browser, on any phone or computer. The Android app is in beta too.</p>
+      <div class="cta-buttons">
+        <button class="btn primary" (click)="focusSearch()">Start planning</button>
+        <a class="btn glass-btn" routerLink="/download">Get the Android app</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <img src="assets/images/logo/wayraa_logo_notext.svg" alt="" width="34" height="34">
+        <div>
+          <strong>wayraa</strong>
+          <span>Plan your journeys, together.</span>
+        </div>
+      </div>
+      <nav class="footer-links" aria-label="Footer">
+        <a routerLink="/community">Community</a>
+        <a routerLink="/features">Features</a>
+        <a routerLink="/download">Android app</a>
+        <a routerLink="/privacy">Privacy</a>
+        <a routerLink="/terms">Terms</a>
+      </nav>
+      <span class="footer-copy">© {{ year }} Wayraa · Photos from Pexels</span>
+    </div>
+  </footer>
+</main>

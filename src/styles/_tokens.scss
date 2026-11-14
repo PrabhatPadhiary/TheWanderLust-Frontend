@@ -1,0 +1,53 @@
+// Wayraa design tokens: the same system as the app.
+//   60% alpine frost · 30% slate blue · 10% blood orange
+// Use these (var(--…)) in new and redesigned pages.
+
+:root {
+  // Colour
+  --frost: #EEF2F4;
+  --frost-deep: #E3E9ED;
+  --frost-light: #F6F8F9;
+  --white: #FFFFFF;
+
+  --ink: #1C2833;          // text
+  --slate-dark: #2B3F51;
+  --slate: #3F5A73;
+  --slate-light: #5E7A93;
+  --slate-pale: #DCE3E8;   // borders
+  --muted: #4F6070;        // secondary text
+  --faint: #7F8D99;
+
+  --orange: #D9481C;
+  --orange-dark: #B53A16;
+  --orange-deep: #A8360F;  // small orange text
+  --orange-tint: #FDEFEA;
+
+  --success: #3E8E63;
+  --error: #C8352B;
+
+  // Type
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Poppins', system-ui, sans-serif;
+
+  // Shape
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 2px 8px rgba(43, 63, 81, 0.06);
+  --shadow-md: 0 10px 30px rgba(43, 63, 81, 0.10);
+  --shadow-lg: 0 24px 60px rgba(28, 40, 51, 0.16);
+
+  // Motion
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 0.18s;
+  --dur-base: 0.32s;
+  --dur-slow: 0.6s;
+
+  // Layout
+  --page-max: 1200px;
+  --gutter: clamp(16px, 4vw, 32px);
+}

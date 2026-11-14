@@ -24,6 +24,10 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() primaryDestinationPlaceId: string = '';
   /** Landing mode: transparent navbar that frosts on scroll, shows section links */
   @Input() isLanding: boolean = false;
+  /** Dark glass look, for pages over dark/cinematic heroes (the landing page). */
+  @Input() dark: boolean = false;
+  /** With `dark`: the page under the bar is light now (dark text and icons). */
+  @Input() onLight: boolean = false;
   /** Destination mode: logo-only brand, single search bar, left-aligned to match content */
   @Input() isDestination: boolean = false;
   @Output() localSearchInput = new EventEmitter<string>();
@@ -47,8 +51,11 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
 
   private readonly navRoutes = ['explore', 'features', 'community', 'pricing'];
 
+  /** Width of each section link (bigger on the dark landing bar; must match the SCSS). */
+  get linkWidth(): number { return this.dark ? 132 : 110; }
+
   get pillTransform(): string {
-    return `translateX(${this.navIndex * 110}px)`;
+    return `translateX(${this.navIndex * this.linkWidth}px)`;
   }
 
   constructor(
