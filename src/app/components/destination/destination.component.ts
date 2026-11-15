@@ -63,6 +63,13 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
   private destMarkers: any[] = [];
   private destMapReady = false;
 
+  /** The Stay / Eat / Do tabs, shown in the navbar. */
+  readonly navTabs = [
+    { id: 'stays', label: 'Where to Stay', short: 'Stay' },
+    { id: 'food', label: 'Where to Eat', short: 'Eat' },
+    { id: 'attractions', label: 'Things to Do', short: 'Do' },
+  ];
+
   get tabInkTransform(): string {
     const index = { stays: 0, food: 1, attractions: 2 }[this.activeSection];
     return `translateX(${index * 100}%)`;

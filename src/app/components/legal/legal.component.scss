@@ -63,7 +63,7 @@ $line: #EDF0F3;
 .legal {
   max-width: 760px;
   margin: 0 auto;
-  padding: 48px 24px 64px;
+  padding: 130px 24px 64px;   // below the floating navbar
   line-height: 1.7;
   font-size: 1rem;
 
@@ -150,3 +150,6 @@ $line: #EDF0F3;
     padding: 12px 16px;
   }
 }
+
+// The switch now sits at the top of the page, under the navbar.
+.legal > .legal-switch { display: inline-flex; margin-bottom: 24px; }

@@ -1,15 +1,10 @@
-<header class="legal-top">
-  <a routerLink="/" class="legal-brand" aria-label="Wayraa home">
-    <img src="assets/images/logo/wayraa_logo_notext.svg" alt="" width="32" height="32" />
-    <span>Wayraa</span>
-  </a>
+<app-navbar [isLanding]="true" [dark]="true" [onLight]="true"></app-navbar>
+
+<main class="legal">
   <nav class="legal-switch" aria-label="Legal documents">
     <a routerLink="/privacy" routerLinkActive="active">Privacy</a>
     <a routerLink="/terms" routerLinkActive="active">Terms</a>
   </nav>
-</header>
-
-<main class="legal">
   <!-- ─────────────────────────── PRIVACY POLICY ─────────────────────────── -->
   <article *ngIf="doc === 'privacy'">
     <h1>Privacy Policy</h1>

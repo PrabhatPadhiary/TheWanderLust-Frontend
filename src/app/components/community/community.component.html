@@ -5,13 +5,14 @@
 <!-- ===== HERO HEADER ===== -->
 <div class="community-hero">
   <div class="community-hero-inner">
-    <h1>Travel Stories from Real People</h1>
-    <p>Journals, tips, and itineraries shared by the Wayraa community — not algorithms, not ads.</p>
+    <span class="community-label">Community</span>
+    <h1>Stories from <em>fellow travellers</em></h1>
+    <p>Trips, tips and itineraries shared by real people on Wayraa.</p>
     <button class="write-journal-btn" (click)="onWriteJournal()">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
       </svg>
-      Write a Journal
+      Write a story
     </button>
   </div>
 </div>
@@ -94,81 +95,60 @@
         <p>No journals yet. Be the first to share your travel story!</p>
       </div>
 
-      <div class="journal-card" *ngFor="let j of journals">
-        <!-- Author row -->
-        <div class="jcard-author">
-          <span class="jcard-avatar" [style.background]="j.authorColor">{{ j.authorInitial }}</span>
-          <div class="jcard-meta">
-            <div class="jcard-meta-top">
-              <strong>{{ j.authorName }}</strong>
-              <span *ngFor="let tag of j.tags" class="jtag">{{ tag }}</span>
-            </div>
-            <div class="jcard-meta-bottom">
-              <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              {{ j.destinationName }}
-              <span class="jcard-meta-dot">·</span>
-              {{ j.month }}
-            </div>
-          </div>
+      <div class="journal-grid">
+      <article class="journal-card" *ngFor="let j of journals">
+        <!-- Photo (or a soft placeholder with the place's name), with the trip length on it -->
+        <div class="jcard-photo" (click)="openJournal(j.id)">
+          <img *ngIf="j.imageUrl" [src]="j.imageUrl" [alt]="j.title" loading="lazy">
+          <div *ngIf="!j.imageUrl" class="jcard-photo-empty"><span>{{ j.destinationName }}</span></div>
           <span class="jcard-trip-badge" *ngIf="j.tripBadge">{{ j.tripBadge }}</span>
+          <span class="jcard-place">
+            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            {{ j.destinationName }}
+          </span>
         </div>
 
-        <!-- Content -->
-        <div class="jcard-content">
-          <div class="jcard-text">
-            <h3 (click)="openJournal(j.id)" style="cursor:pointer">{{ j.title }}</h3>
-            <p (click)="openJournal(j.id)" style="cursor:pointer">{{ j.excerpt }}</p>
-            <!-- Places mentioned -->
-            <div class="jcard-places" *ngIf="j.placesMentioned.length > 0">
-              <span class="place-chip" *ngFor="let place of j.placesMentioned.slice(0, 3)">
-                <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-                {{ place }}
-              </span>
-              <span class="place-chip place-chip--more" *ngIf="j.placesMentioned.length > 3">+{{ j.placesMentioned.length - 3 }} more places</span>
-            </div>
+        <div class="jcard-body">
+          <div class="jcard-author">
+            <span class="jcard-avatar" [style.background]="j.authorColor">{{ j.authorInitial }}</span>
+            <strong>{{ j.authorName }}</strong>
+            <span class="jcard-meta-dot">·</span>
+            <span class="jcard-month">{{ j.month }}</span>
+            <span *ngFor="let tag of j.tags" class="jtag">{{ tag }}</span>
           </div>
-          <div class="jcard-image" *ngIf="j.imageUrl">
-            <img [src]="j.imageUrl" [alt]="j.destinationName" loading="lazy">
-          </div>
-        </div>
 
-        <!-- Actions -->
-        <div class="jcard-actions">
-          <button class="jaction" [class.jaction--liked]="j.isLiked" (click)="likeJournal(j)">
-            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2"
-                 [attr.fill]="j.isLiked ? 'currentColor' : 'none'">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-            </svg>
-            {{ j.likes }}
-          </button>
-          <button class="jaction" (click)="openJournal(j.id, 'comments')">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-            {{ j.comments }} comments
-          </button>
-          <button class="jaction">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-              <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-            </svg>
-            Share
-          </button>
-          <button class="jaction jaction--more" *ngIf="isOwnJournal(j)" (click)="toggleJournalMenu(j, $event)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16">
-              <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/>
-            </svg>
-          </button>
-          <button class="jaction jaction--read" (click)="openJournal(j.id)">
-            Read more →
-          </button>
-          <button class="jaction jaction--cta" (click)="saveJournal(j)">
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
-            </svg>
-            + Save Itinerary
-          </button>
+          <h3 (click)="openJournal(j.id)">{{ j.title }}</h3>
+          <p (click)="openJournal(j.id)">{{ j.excerpt }}</p>
+
+          <div class="jcard-places" *ngIf="j.placesMentioned.length > 0">
+            <span class="place-chip" *ngFor="let place of j.placesMentioned.slice(0, 2)">{{ place }}</span>
+            <span class="place-chip place-chip--more" *ngIf="j.placesMentioned.length > 2">+{{ j.placesMentioned.length - 2 }}</span>
+          </div>
+
+          <div class="jcard-actions">
+            <button class="jaction" [class.jaction--liked]="j.isLiked" (click)="likeJournal(j)" [attr.aria-label]="'Like · ' + j.likes">
+              <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="2" [attr.fill]="j.isLiked ? 'currentColor' : 'none'">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              </svg>
+              {{ j.likes }}
+            </button>
+            <button class="jaction" (click)="openJournal(j.id, 'comments')" [attr.aria-label]="j.comments + ' comments'">
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              {{ j.comments }}
+            </button>
+            <button class="jaction" aria-label="Share">
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+            </button>
+            <button class="jaction jaction--more" *ngIf="isOwnJournal(j)" (click)="toggleJournalMenu(j, $event)" aria-label="Story options">
+              <svg width="15" height="15" fill="currentColor" viewBox="0 0 16 16"><path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/></svg>
+            </button>
+            <button class="jaction jaction--cta" (click)="saveJournal(j)" title="Save this itinerary as a trip">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+              Save
+            </button>
+          </div>
         </div>
+      </article>
       </div>
     </div>
 

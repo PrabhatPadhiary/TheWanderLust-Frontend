@@ -15,60 +15,12 @@
   position: sticky;
   top: 64px;     // clears the fixed navbar
   z-index: 100;
-  background: rgba(255, 255, 255, 0.88);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
-}
-
-// ===== COMPACT PAGE HEADER =====
-.dest-header {
-  background: transparent;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  padding: 12px 0 10px;
-  max-height: 80px;
-  overflow: hidden;
-  transition: max-height 0.3s ease, padding 0.3s ease, opacity 0.3s ease, border-color 0.3s ease;
-
-  &--collapsed {
-    max-height: 0;
-    padding: 0;
-    opacity: 0;
-    border-bottom-color: transparent;
-  }
-}
-
-.dest-header-inner {
-  width: 100%;
-  padding: 0 32px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  box-sizing: border-box;
-}
-
-.dest-header-text {
-  flex: 1 1 auto; // takes all available space, pushes actions to the far right
-
-  .dest-title {
-    font-size: clamp(1.3rem, 2vw, 1.7rem); // compact — always sticky
-    font-weight: 800;
-    color: #1C2833;
-    margin: 0 0 2px;
-    letter-spacing: -0.4px;
-  }
-
-  .dest-tagline {
-    font-size: 0.78rem;
-    color: #A3ACB1;
-    margin: 0;
-  }
 }
 
 .dest-header-actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 10px;
 }
 
@@ -76,13 +28,13 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 8px 18px;   // smaller to match compact header
+  padding: 12px 22px;
   background: #D9481C;
   color: #fff;
   border: none;
   border-radius: 50px;
-  font-size: 0.82rem;
-  font-weight: 700;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
   font-family: 'Poppins', sans-serif;
   transition: all 0.2s ease;
@@ -119,63 +71,6 @@
 .content-sections {
   background: #F6F8F9;
   padding-bottom: 80px;
-}
-
-// ===== TAB BAR =====
-.section-tabs-bar {
-  background: transparent;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-}
-
-.section-tabs {
-  position: relative;
-  display: flex;
-  width: 100%;
-  padding: 0;
-}
-
-.section-tab {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 18px 20px;
-  background: none;
-  border: none;
-  border-bottom: 3px solid transparent;
-  font-family: 'Poppins', sans-serif;
-  font-size: 0.88rem;
-  font-weight: 500;
-  color: #A3ACB1;
-  cursor: pointer;
-  transition: color 0.2s ease, background 0.15s ease;
-  white-space: nowrap;
-
-  svg { flex-shrink: 0; }
-
-  &:hover {
-    color: #475969;
-    background: #F8FAFB;
-  }
-
-  &.active {
-    color: #D9481C;
-    font-weight: 700;
-  }
-}
-
-// Sliding ink bar — tracks the active tab
-.tab-ink-bar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: calc(100% / 3);
-  height: 3px;
-  background: #D9481C;
-  border-radius: 3px 3px 0 0;
-  transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
 }
 
 // ===== INDIVIDUAL SECTION =====
@@ -638,12 +533,20 @@
   position: relative;
   top: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  margin-top: 64px; // push below fixed navbar
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+  background: none;
+}
+
+// The page starts just below the floating navbar (its only bar: top 10px + 56px),
+// with the places and the map starting on the same line.
+.dest-split-layout { margin-top: 78px; }
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  margin: -1px; padding: 0; border: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
 // Split area fills the remaining viewport height exactly
@@ -660,6 +563,9 @@
   min-width: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
+  // Cards fade out softly as they scroll up under the bar, instead of a hard cut.
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18px);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 18px);
   // Subtle scrollbar styling
   scrollbar-width: thin;
   scrollbar-color: rgba(0,0,0,0.12) transparent;
@@ -682,7 +588,7 @@
   flex: 1 1 50%;
   min-width: 0;
   position: relative; // not sticky — just a normal flex child that fills height
-  padding: 16px 16px 16px 0;
+  padding: 0 16px 16px 0;   // no top padding: the map's top lines up with the places'
   box-sizing: border-box;
 }
 
@@ -698,6 +604,10 @@
 
 // ===== RESPONSIVE =====
 @media (max-width: 900px) {
+  // Below the frosted navbar; room at the bottom for the floating tabs.
+  .dest-split-layout { margin-top: 76px; }
+  .content-sections { padding-bottom: 110px; }
+
   // Restore normal page scroll on smaller screens
   :host {
     height: auto;
@@ -711,12 +621,15 @@
 
   .dest-split-layout {
     flex-direction: column;
+    flex: none;          // its own height (not the leftover, which is 0 here), so the header can stay pinned
     overflow: visible;
   }
 
   .dest-cards-col {
     overflow-y: visible;
     flex: none;
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 
   .dest-map-col {
@@ -736,9 +649,6 @@
 }
 
 @media (max-width: 600px) {
-  .dest-sticky-band {
-    margin-top: 56px;
-  }
 
   .places-grid {
     grid-template-columns: 1fr;
@@ -748,11 +658,6 @@
     padding: 0 4%;
   }
 
-  .dest-header-inner {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
 
   .dest-map-col {
     height: 240px;

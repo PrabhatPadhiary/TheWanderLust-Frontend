@@ -1,95 +1,196 @@
 <app-navbar [isLanding]="true" [dark]="true" [onLight]="true"></app-navbar>
 
-<!-- HERO -->
-<div class="features-hero">
-  <div class="features-hero-inner">
-    <div class="fhero-label">✦ Features</div>
-    <h1>Everything you need to plan the <span class="fhero-accent">perfect trip</span></h1>
-    <p>Six powerful tools. One seamless experience. Built for real travelers.</p>
-    <button class="fhero-cta" (click)="goToExplore()">
-      Start Exploring Free
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5">
-        <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
-      </svg>
-    </button>
-  </div>
-</div>
+<main class="features">
 
-<!-- FEATURE ROWS -->
-<div class="features-body">
-  <div class="feature-row" *ngFor="let f of features; let i = index" [class.feature-row--flip]="i % 2 !== 0">
+  <!-- ===== HERO: the whole route at a glance ===== -->
+  <header class="f-hero">
+    <span class="f-label">Features</span>
+    <h1>From first idea <em>to the last photo</em></h1>
+    <p>One trip, start to finish. Follow the line to see how Wayraa helps at every step.</p>
+    <nav class="mini-route" aria-label="Jump to a feature">
+      <button *ngFor="let c of chapters; let i = index" type="button" (click)="jumpTo(c.id)" [style.--i]="i">
+        <span class="mini-num">{{ c.num }}</span>
+        <span class="mini-name">{{ c.kicker }}</span>
+      </button>
+    </nav>
+  </header>
 
-    <!-- Text side -->
-    <div class="frow-text">
-      <div class="frow-icon" [style.background]="f.bg" [style.color]="f.color">
-        <!-- Search icon -->
-        <ng-container *ngIf="f.icon === 'search'">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-        </ng-container>
-        <!-- Calendar icon -->
-        <ng-container *ngIf="f.icon === 'calendar'">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        </ng-container>
-        <!-- Users icon -->
-        <ng-container *ngIf="f.icon === 'users'">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        </ng-container>
-        <!-- Heart icon -->
-        <ng-container *ngIf="f.icon === 'heart'">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
-        </ng-container>
-        <!-- Map icon -->
-        <ng-container *ngIf="f.icon === 'map'">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
-        </ng-container>
-        <!-- Check icon -->
-        <ng-container *ngIf="f.icon === 'check'">
-          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-        </ng-container>
-      </div>
-      <span class="frow-subtitle">{{ f.subtitle }}</span>
-      <h2>{{ f.title }}</h2>
-      <p>{{ f.desc }}</p>
-      <ul class="frow-bullets">
-        <li *ngFor="let b of f.bullets">
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-          {{ b }}
-        </li>
-      </ul>
+  <!-- ===== THE LAUNCH FILM ===== -->
+  <section class="film" #film aria-labelledby="film-title">
+    <div class="film-copy left">
+      <span class="f-label">The launch film</span>
+      <h2 id="film-title">Wayraa in <em>35 seconds</em></h2>
     </div>
+    <div class="film-card">
+      <video #filmVideo muted playsinline loop preload="none" poster="assets/video/wayraa-launch-poster.jpg"
+             aria-label="The Wayraa launch film: search a city, start a trip, plan each day on the map">
+        <source src="assets/video/wayraa-launch.mp4" type="video/mp4">
+      </video>
+      <button class="film-sound" type="button" (click)="toggleSound()" [attr.aria-pressed]="!filmMuted">
+        <svg *ngIf="filmMuted" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M23 9l-6 6M17 9l6 6"/></svg>
+        <svg *ngIf="!filmMuted" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>
+        {{ filmMuted ? 'Sound on' : 'Sound off' }}
+      </button>
+    </div>
+    <div class="film-copy right">
+      <p>Search a city, start a trip, invite your friends, drag places into each day and watch the whole plan come alive on the map.</p>
+    </div>
+  </section>
 
-    <!-- Mockup side -->
-    <div class="frow-mockup">
-      <div class="fmock-card" [style.borderColor]="f.color + '33'">
-        <div class="fmock-header" [style.background]="f.bg">
-          <div class="fmock-dot" [style.background]="f.color"></div>
-          <div class="fmock-dot" [style.background]="f.color" style="opacity:0.5"></div>
-          <div class="fmock-dot" [style.background]="f.color" style="opacity:0.25"></div>
-        </div>
-        <div class="fmock-body">
-          <!-- Skeleton UI lines that visually represent each feature -->
-          <div class="fmock-row fmock-row--tall" [style.background]="f.bg"></div>
-          <div class="fmock-grid">
-            <div class="fmock-block" [style.background]="f.color + '15'"></div>
-            <div class="fmock-block" [style.background]="f.color + '15'"></div>
+  <!-- ===== THE JOURNEY: one route through every feature ===== -->
+  <section class="journey" #journey aria-label="Features, one after another">
+    <svg class="route" aria-hidden="true" preserveAspectRatio="none">
+      <path class="route-base"></path>
+      <path class="route-live"></path>
+    </svg>
+    <span class="route-head" aria-hidden="true"></span>
+
+    <!-- Captions on the line between stops (placed by the script). -->
+    <ng-container *ngFor="let c of chapters">
+      <span class="bridge" *ngIf="c.next" data-bridge aria-hidden="true">{{ c.next }}</span>
+    </ng-container>
+
+    <article class="chapter" *ngFor="let c of chapters; let i = index" [id]="'ch-' + c.id"
+             [class.flip]="i % 2 === 1" [attr.aria-labelledby]="'ch-title-' + c.id">
+      <div class="ch-text">
+        <span class="ch-kicker">{{ c.kicker }}</span>
+        <h2 [id]="'ch-title-' + c.id">{{ c.title }} <em>{{ c.em }}</em></h2>
+        <p>{{ c.text }}</p>
+        <ul class="ch-points">
+          <li *ngFor="let p of c.points; let j = index" [style.--i]="j">{{ p }}</li>
+        </ul>
+      </div>
+
+      <div class="ch-pin"><span data-pin>{{ c.num }}</span></div>
+
+      <div class="ch-stage" [class.has-phone]="c.shot">
+        <div class="phone" *ngIf="c.shot"><img [src]="'assets/images/app/' + c.shot + '.jpg'" [alt]="c.shotAlt" loading="lazy"></div>
+        <span class="float-chip f1" aria-hidden="true">{{ c.chips[0] }}</span>
+        <span class="float-chip f2" aria-hidden="true">{{ c.chips[1] }}</span>
+      <div class="ch-mock" [ngSwitch]="c.id" aria-hidden="true">
+
+        <!-- 01 Discover -->
+        <div class="mock glass" *ngSwitchCase="'discover'">
+          <div class="m-search">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+            <span class="typed">Dubai, UAE</span>
           </div>
-          <div class="fmock-row" [style.background]="f.bg"></div>
-          <div class="fmock-row fmock-row--short" [style.background]="f.bg"></div>
-          <div class="fmock-cta-bar" [style.background]="f.color">
-            <span style="color:#fff;font-size:0.72rem;font-weight:700;font-family:Poppins,sans-serif">
-              {{ f.title }} →
-            </span>
+          <div class="m-chips"><span class="on">Stays</span><span>Food</span><span>Activities</span></div>
+          <div class="m-place" style="--i:0">
+            <span class="thumb sea"></span>
+            <div><b>Sofitel Dubai The Palm</b><span><i class="star">★</i> 4.8 · Stay</span></div>
+            <i class="m-heart"></i>
+          </div>
+          <div class="m-place" style="--i:1">
+            <span class="thumb orange"></span>
+            <div><b>Arabian Fish House</b><span><i class="star">★</i> 4.6 · Food</span></div>
+          </div>
+          <div class="m-place" style="--i:2">
+            <span class="thumb green"></span>
+            <div><b>Dubai Frame</b><span><i class="star">★</i> 4.5 · Activity</span></div>
           </div>
         </div>
+
+        <!-- 02 Favourites -->
+        <div class="mock glass" *ngSwitchCase="'favourites'">
+          <div class="m-head"><b>Favourites</b><span>4 saved</span></div>
+          <div class="m-favs">
+            <div class="fav" style="--i:0"><img src="assets/images/hero/kyoto-sm.jpg" alt=""><span>Fushimi Inari</span><i class="m-heart on pop"></i></div>
+            <div class="fav" style="--i:1"><img src="assets/images/hero/santorini-sm.jpg" alt=""><span>Oia, Santorini</span><i class="m-heart on"></i></div>
+            <div class="fav" style="--i:2"><img src="assets/images/hero/bali-sm.jpg" alt=""><span>Uluwatu, Bali</span><i class="m-heart on"></i></div>
+            <div class="fav" style="--i:3"><img src="assets/images/hero/machu-picchu-sm.jpg" alt=""><span>Machu Picchu</span><i class="m-heart on"></i></div>
+          </div>
+        </div>
+
+        <!-- 03 Trip -->
+        <div class="mock glass" *ngSwitchCase="'trip'">
+          <span class="m-over">New trip</span>
+          <strong class="m-trip">Trip to Dubai</strong>
+          <span class="m-dates">25 – 30 Nov · 6 days</span>
+          <div class="m-stops">
+            <span class="stops-line"><i></i></span>
+            <div class="stop" style="--i:0"><span class="dot"></span><b>Dubai</b><small>Stop 1</small></div>
+            <div class="stop" style="--i:1"><span class="dot"></span><b>Sharjah</b><small>Stop 2</small></div>
+            <div class="stop add" style="--i:2"><span class="dot"></span><b>+ Add stop</b><small>&nbsp;</small></div>
+          </div>
+        </div>
+
+        <!-- 04 Day by day, with its map -->
+        <div class="mock glass m-days" *ngSwitchCase="'days'">
+          <div class="m-tabs"><span>Day 2</span><span class="on">Day 3 · Dubai</span><span>Day 4</span></div>
+          <div class="m-daygrid">
+            <ol class="m-slots">
+              <li style="--i:0"><time>Stay</time><b>Sofitel The Palm</b><span class="n">1</span></li>
+              <li style="--i:1"><time>15:00</time><b>Dubai Frame</b><span class="n">2</span></li>
+              <li style="--i:2"><time>19:00</time><b>Burj Khalifa</b><span class="n">3</span></li>
+            </ol>
+            <div class="m-map">
+              <svg viewBox="0 0 160 180">
+                <path class="river" d="M20 0 C40 50 10 90 40 130 C60 160 50 180 55 180"></path>
+                <path class="street" d="M0 60 H160 M0 120 H160 M90 0 V180 M130 0 V180"></path>
+                <path class="day-route" pathLength="1" d="M118 150 C100 120 70 110 74 84 C78 60 110 52 120 30"></path>
+                <g class="mpin" style="--i:0"><circle cx="118" cy="150" r="9"></circle><text x="118" y="154">1</text></g>
+                <g class="mpin" style="--i:1"><circle cx="74" cy="84" r="9"></circle><text x="74" y="88">2</text></g>
+                <g class="mpin" style="--i:2"><circle cx="120" cy="30" r="9"></circle><text x="120" y="34">3</text></g>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- 05 Together -->
+        <div class="mock glass" *ngSwitchCase="'together'">
+          <div class="m-head">
+            <b>Trip to Dubai</b>
+            <span class="here"><i class="face" style="background:#1C2833">Y</i><i class="face" style="background:#D9481C">R</i><i class="face" style="background:#3F5A73">S</i><em>3 here now</em></span>
+          </div>
+          <div class="m-invite"><span>wayraa.app/join/dubai-trip</span><b>Copied ✓</b></div>
+          <div class="m-toasts">
+            <div class="toast" style="--i:0"><i class="face" style="background:#D9481C">R</i>Riya joined the trip</div>
+            <div class="toast" style="--i:1"><i class="face" style="background:#D9481C">R</i>Riya added Dubai Frame to the itinerary</div>
+            <div class="toast" style="--i:2"><i class="face" style="background:#3F5A73">S</i>Sam saved Arabian Fish House</div>
+          </div>
+        </div>
+
+        <!-- 06 Budget and checklists -->
+        <div class="mock glass" *ngSwitchCase="'budget'">
+          <div class="m-head"><b>Budget</b><span class="total">₹37,064 spent</span></div>
+          <div class="m-expense" style="--i:0"><div><b>Visa for everyone</b><span>Paid by you</span></div><em>₹25,318</em></div>
+          <div class="m-expense" style="--i:1"><div><b>Airport transfers</b><span>Paid by Riya</span></div><em>₹8,246</em></div>
+          <div class="m-expense" style="--i:2"><div><b>Dinner at the airport</b><span>Paid by you</span></div><em>₹3,500</em></div>
+          <div class="m-head small"><b>Checklist</b></div>
+          <ul class="m-check">
+            <li style="--i:0"><span class="box"><svg viewBox="0 0 16 16"><path pathLength="1" d="M3 8.5l3 3 7-7"/></svg></span>Passports</li>
+            <li style="--i:1"><span class="box"><svg viewBox="0 0 16 16"><path pathLength="1" d="M3 8.5l3 3 7-7"/></svg></span>Safari booked</li>
+            <li style="--i:2" class="todo"><span class="box"></span>Plug adapters</li>
+          </ul>
+        </div>
+
+        <!-- 07 Stories -->
+        <div class="mock glass m-story" *ngSwitchCase="'stories'">
+          <img src="assets/images/hero/dubai.jpg" alt="">
+          <div class="m-story-body">
+            <span class="m-over">Dubai, UAE</span>
+            <strong>Old Dubai, new heights</strong>
+            <div class="m-tags"><span>Burj Khalifa</span><span>Al Fahidi</span><span>Dubai Frame</span></div>
+            <div class="m-story-foot"><span><i class="face" style="background:#D9481C">R</i>Riya · Dec 2026</span><span class="likes"><i class="m-heart on"></i>128 · 24 comments</span></div>
+          </div>
+        </div>
+
+      </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="f-cta">
+    <div class="f-cta-panel">
+      <span class="f-cta-glow" aria-hidden="true"></span>
+      <h2>Your next trip <em>starts here</em></h2>
+      <p>Everything works in your browser, on any phone or computer. The Android app is in beta too.</p>
+      <div class="f-cta-buttons">
+        <button class="btn primary" type="button" (click)="goToExplore()">Start planning</button>
+        <button class="btn ghost" type="button" (click)="goToDownload()">Get the Android app</button>
       </div>
     </div>
-
-  </div>
-</div>
-
-<!-- BOTTOM CTA -->
-<div class="features-cta-section">
-  <h2>Ready to plan smarter?</h2>
-  <p>Wayraa is in beta and free to use. Plan your next trip with us.</p>
-  <button class="fhero-cta" (click)="goToExplore()">Get Started — It's Free</button>
-</div>
+  </section>
+</main>

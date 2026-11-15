@@ -80,6 +80,16 @@ export class TripPlannerComponent implements OnInit {
   currentUserRole: 'owner' | 'member' | 'viewer' = 'viewer';
 
   get isOwner(): boolean { return this.currentUserRole === 'owner'; }
+
+  /** The trip's sections, shown in the navbar (like the app's tab bar). */
+  get tripTabs(): { id: string; label: string; short: string; badge?: number }[] {
+    return [
+      { id: 'overview', label: 'Overview', short: 'Overview' },
+      { id: 'itinerary', label: 'Itinerary', short: 'Itinerary', badge: this.itinerary.length || undefined },
+      { id: 'budget', label: 'Budget', short: 'Budget' },
+      { id: 'checklist', label: 'Checklist', short: 'Checklist' },
+    ];
+  }
   get canEdit(): boolean { return this.currentUserRole === 'owner' || this.currentUserRole === 'member'; }
   get canInvite(): boolean { return this.currentUserRole === 'owner' || this.currentUserRole === 'member'; }  expandedFavId: string | null = null;
 

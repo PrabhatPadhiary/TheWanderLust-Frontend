@@ -3,63 +3,38 @@
      [class.app-navbar--scrolled]="isLanding && scrolled"
      [class.app-navbar--dark]="dark"
      [class.app-navbar--onlight]="dark && onLight"
-     [class.app-navbar--destination]="isDestination"
-     [class.app-navbar--tripplanner]="isTripPlanner">
+     [class.app-navbar--destination]="isDestination || isTripPlanner"
+     [class.app-navbar--mobile-search]="mobileSearchOpen"
+     [class.app-navbar--tripplanner]="isTripPlanner"
+     [class.app-navbar--app]="isAppPage">
 
-  <!-- ===== LOGO ===== -->
+  <!-- ===== LOGO (and, on a destination, the place beside it) ===== -->
+  <div class="nav-left">
   <div class="navbar-brand" (click)="goHome()">
     <img src="assets/images/logo/wayraa_logo_notext.svg" alt="Wayraa" class="brand-logo-img">
     <span class="brand-name">wayraa</span>
   </div>
 
-  <!-- ===== TRIP PLANNER: trip name in place of search ===== -->
-  <div class="navbar-search navbar-search--single" *ngIf="isTripPlanner">
-    <div class="single-search-bar trip-name-display">
-      <span class="trip-name-text">{{ tripName || destinationName || 'Trip Planner' }}</span>
-    </div>
-  </div>
-
-  <!-- ===== LANDING: section links with sliding pill ===== -->
-  <div class="nav-links" *ngIf="isLanding && !isTripPlanner">
-    <div class="nav-pill-track">
-      <div class="nav-pill-bg"
-           [style.transform]="pillTransform"
-           [style.transition]="pillReady ? 'transform 0.28s cubic-bezier(0.4,0,0.2,1)' : 'none'"></div>
-      <button class="nav-link" [class.active]="navIndex === 0" (click)="scrollToSection('explore')">Explore</button>
-      <a      class="nav-link" [class.active]="navIndex === 1" routerLink="/features">Features</a>
-      <a      class="nav-link" [class.active]="navIndex === 2" routerLink="/community">Community</a>
-      <a      class="nav-link" [class.active]="navIndex === 3" routerLink="/pricing">Pricing</a>
-    </div>
-  </div>
-
-  <!-- ===== DESTINATION: single destination search ===== -->
-  <div class="navbar-search navbar-search--single" *ngIf="isDestination && !isTripPlanner">
+  <!-- Destination: the place, as plain text; click it to search somewhere else -->
+  <ng-container *ngIf="isDestination && !isTripPlanner">
+    <div class="navbar-search navbar-search--single">
     <div class="single-search-bar">
-      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" class="search-icon">
-        <circle cx="11" cy="11" r="8"></circle>
-        <path d="M21 21l-4.35-4.35"></path>
+      <svg *ngIf="!searchActive" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" class="search-icon pin-icon">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+      </svg>
+      <svg *ngIf="searchActive" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" class="search-icon">
+        <circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path>
       </svg>
       <input type="text"
              [value]="!searchActive ? destinationName : ''"
-             [placeholder]="destinationName || 'Search destination...'"
+             [placeholder]="searchActive ? 'Search another destination' : (destinationName || 'Search destination...')"
+             [attr.aria-label]="'Destination: ' + destinationName + '. Type to search another'"
              (input)="onSearchInput($event)"
-             (focus)="searchActive = true; showDropdown = predictions.length > 0"
+             (focus)="searchActive = true; mobileSearchOpen = true; showDropdown = predictions.length > 0"
              (blur)="onBlur(); searchActive = false">
-    </div>
-    <!-- Active trip indicator — Dynamic Island style, hugs the search bar -->
-    <div class="trip-indicator" *ngIf="existingTrip && !isTripPlanner && !isLanding"
-         (click)="navigateToTrip()"
-         (mouseenter)="showTripTooltip = true"
-         (mouseleave)="showTripTooltip = false">
-      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
-        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
-      </svg>
-      <span class="trip-indicator-badge"></span>
-      <div class="trip-tooltip" *ngIf="showTripTooltip">
-        <span class="trip-tooltip-label">Active trip</span>
-        <strong>{{ getTripCapsuleLabel() }}</strong>
-        <span class="trip-tooltip-cta">Continue Planning →</span>
-      </div>
+      <button class="search-close" type="button" (mousedown)="mobileSearchOpen = false" aria-label="Close search">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>
     </div>
     <div class="search-dropdown" *ngIf="showDropdown && predictions.length > 0">
       <div class="dropdown-item" *ngFor="let prediction of predictions" (mousedown)="selectPlace(prediction)">
@@ -69,12 +44,101 @@
     </div>
   </div>
 
+  </ng-container>
+
+  <!-- Trip planner: back to the destination, and the trip's name -->
+  <div class="trip-title" *ngIf="isTripPlanner">
+    <button class="trip-back" type="button" (click)="backToDestination()" [attr.aria-label]="'Back to ' + (destinationName || 'the destination')" [title]="'Back to ' + (destinationName || 'the destination')">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="trip-title-text">
+      <strong>{{ tripName || 'Your trip' }}</strong>
+      <span *ngIf="destinationName">{{ destinationName }}</span>
+    </div>
+  </div>
+  </div>
+
+
+  <!-- ===== LANDING: section links with sliding pill ===== -->
+  <div class="nav-links" *ngIf="isLanding && !isTripPlanner">
+    <div class="nav-pill-track">
+      <div class="nav-pill-bg" *ngIf="landingPill >= 0"
+           [style.transform]="pillTransform"
+           [style.transition]="pillReady ? 'transform 0.45s cubic-bezier(0.22,1,0.36,1)' : 'none'"></div>
+      <button class="nav-link" [class.active]="navIndex === 0" (click)="scrollToSection('explore')">Explore</button>
+      <a      class="nav-link" [class.active]="navIndex === 1" routerLink="/features">Features</a>
+      <a      class="nav-link" [class.active]="navIndex === 2" routerLink="/community">Community</a>
+      <a      class="nav-link" [class.active]="navIndex === 3" routerLink="/pricing">Pricing</a>
+    </div>
+  </div>
+
+  <!-- ===== DESTINATION: the Stay / Eat / Do tabs (the same glass pill as the landing pages' links) ===== -->
+  <div class="dest-center" *ngIf="(isDestination || isTripPlanner) && sectionTabs.length">
+    <div class="dest-tabs" role="tablist" [attr.aria-label]="isTripPlanner ? 'Trip sections' : 'What to explore'">
+      <div class="nav-pill-bg"
+           [style.width.px]="sectionTabWidth"
+           [style.transform]="sectionPillTransform"
+           [style.transition]="pillReady ? 'transform 0.45s cubic-bezier(0.22,1,0.36,1)' : 'none'"></div>
+      <button class="nav-link" type="button" role="tab" *ngFor="let t of sectionTabs"
+              [style.width.px]="sectionTabWidth" [class.active]="t.id === activeSection"
+              [attr.aria-selected]="t.id === activeSection"
+              (click)="sectionChange.emit(t.id)">{{ t.label }}<span class="tab-badge" *ngIf="t.badge">{{ t.badge }}</span></button>
+    </div>
+  </div>
+
+  <!-- ===== ACCOUNT PAGES: Favourites / My Trips / My Journals (the same glass pill as the landing pages') ===== -->
+  <div class="nav-links app-tabs" *ngIf="isAppPage && authService.isLoggedIn">
+    <div class="nav-pill-track">
+      <div class="nav-pill-bg" *ngIf="appPill >= 0"
+           [style.transform]="'translateX(' + appPill * appTabWidth + 'px)'"
+           [style.transition]="pillReady ? 'transform 0.45s cubic-bezier(0.22,1,0.36,1)' : 'none'"></div>
+      <button class="nav-link" type="button" [class.active]="appIndex === 0" (click)="onFavouritesClick()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        Favourites
+      </button>
+      <button class="nav-link" type="button" [class.active]="appIndex === 1" (click)="onTripsClick()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="3"/><path d="M8 7V5.5A2.5 2.5 0 0 1 10.5 3h3A2.5 2.5 0 0 1 16 5.5V7"/><path d="M3 13h18"/></svg>
+        My Trips
+      </button>
+      <button class="nav-link" type="button" [class.active]="appIndex === 2" (click)="onJournalsClick()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        My Journals
+      </button>
+    </div>
+  </div>
+
   <!-- ===== RIGHT ACTIONS ===== -->
   <div class="navbar-actions">
 
+    <!-- Trip planner: edit and delete (owner), and start a new trip -->
+    <ng-container *ngIf="isTripPlanner">
+      <button class="nav-action-btn trip-icon-btn" type="button" *ngIf="tripOwner" (click)="editTrip.emit()" title="Edit trip" aria-label="Edit trip">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+      <button class="nav-action-btn trip-icon-btn danger" type="button" *ngIf="tripOwner" (click)="deleteTrip.emit()" title="Delete trip" aria-label="Delete trip">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      </button>
+      <button class="plan-btn ghost" type="button" (click)="newTrip.emit()"><span>+ New trip</span></button>
+    </ng-container>
+
+    <!-- Destination: plan a trip here (or carry on with the one you have) -->
+    <ng-container *ngIf="isDestination && !isTripPlanner && planActions">
+      <button class="plan-btn" type="button" *ngIf="!existingTrip" (click)="planTrip.emit()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        <span>Plan trip</span>
+      </button>
+      <ng-container *ngIf="existingTrip">
+        <button class="plan-btn" type="button" (click)="planTrip.emit()" [title]="getTripCapsuleLabel()">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          <span>Continue planning</span>
+        </button>
+        <button class="plan-btn ghost" type="button" (click)="newTrip.emit()" title="Plan a new trip here"><span>+ New trip</span></button>
+      </ng-container>
+    </ng-container>
+
     <!-- Favourites (app mode only) -->
     <button class="nav-action-btn" [class.with-label]="!isLanding"
-            *ngIf="!isLanding"
+            *ngIf="!isLanding && !isTripPlanner"
             (click)="onFavouritesClick()" title="Favourites">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
@@ -84,19 +148,19 @@
 
     <!-- My Trips (app mode, logged in only) -->
     <button class="nav-action-btn" [class.with-label]="!isLanding"
-            *ngIf="!isLanding && authService.isLoggedIn"
+            *ngIf="!isLanding && !isTripPlanner && authService.isLoggedIn"
             (click)="onTripsClick()" title="My Trips">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-        <line x1="16" y1="2" x2="16" y2="6"></line>
-        <line x1="8" y1="2" x2="8" y2="6"></line>
-        <line x1="3" y1="10" x2="21" y2="10"></line>
+      <!-- A suitcase -->
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="7" width="18" height="13" rx="3"></rect>
+        <path d="M8 7V5.5A2.5 2.5 0 0 1 10.5 3h3A2.5 2.5 0 0 1 16 5.5V7"></path>
+        <path d="M3 13h18"></path>
       </svg>
       <span>My Trips</span>
     </button>
 
     <!-- My Journals (app mode, logged in only) -->
-    <button class="nav-action-btn" [class.with-label]="!isLanding"
+    <button class="nav-action-btn btn-journals" [class.with-label]="!isLanding"
             *ngIf="!isLanding && authService.isLoggedIn"
             (click)="onJournalsClick()" title="My Journals">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
@@ -153,5 +217,17 @@
       </div>
     </div>
 
+  </div>
+
+  <!-- ===== DESTINATION, phones: the Stay / Eat / Do tabs and Plan trip float at the bottom ===== -->
+  <div class="dest-bottom" *ngIf="(isDestination || isTripPlanner) && sectionTabs.length">
+    <div class="dest-bottom-tabs" role="tablist" aria-label="What to explore">
+      <button type="button" role="tab" *ngFor="let t of sectionTabs" [class.active]="t.id === activeSection"
+              [attr.aria-selected]="t.id === activeSection" (click)="sectionChange.emit(t.id)">{{ t.short || t.label }}</button>
+    </div>
+    <button class="dest-bottom-plan" type="button" *ngIf="planActions" (click)="planTrip.emit()"
+            [attr.aria-label]="existingTrip ? 'Continue planning' : 'Plan trip'">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+    </button>
   </div>
 </nav>

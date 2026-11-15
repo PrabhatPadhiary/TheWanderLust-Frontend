@@ -45,3 +45,8 @@
   border-radius: 0 0 16px 16px;
   overflow: hidden;
 }
+
+// Fills whatever height its parent gives it (the Overview's full-height map column).
+:host { display: block; height: 100%; }
+.trip-map-card { height: 100%; display: flex; flex-direction: column; border: 0; border-radius: 24px; }
+.trip-map-container { flex: 1; height: auto; min-height: 320px; border-radius: 0 0 24px 24px; }

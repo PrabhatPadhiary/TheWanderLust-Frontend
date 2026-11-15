@@ -31,6 +31,26 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   /** Destination mode: logo-only brand, single search bar, left-aligned to match content */
   @Input() isDestination: boolean = false;
   @Output() localSearchInput = new EventEmitter<string>();
+  /** Destination mode: the page's section tabs (Stay / Eat / Do). */
+  @Input() sectionTabs: { id: string; label: string; short?: string; badge?: number | string }[] = [];
+  @Input() activeSection = '';
+  @Output() sectionChange = new EventEmitter<string>();
+  /** Destination mode: show Plan trip (or Continue planning + New trip) in the bar. */
+  @Input() planActions = false;
+  @Output() planTrip = new EventEmitter<void>();
+  @Output() newTrip = new EventEmitter<void>();
+  /** Trip planner: you own this trip (edit and delete show in the bar). */
+  @Input() tripOwner = false;
+  @Output() editTrip = new EventEmitter<void>();
+  @Output() deleteTrip = new EventEmitter<void>();
+  /** Phones: the destination search opens over the bar from a search button. */
+  mobileSearchOpen = false;
+  /** Width of each section tab in the bar (must match the SCSS). */
+  readonly sectionTabWidth = 128;
+  get sectionPillTransform(): string {
+    const i = Math.max(0, this.sectionTabs.findIndex(t => t.id === this.activeSection));
+    return `translateX(${i * this.sectionTabWidth}px)`;
+  }
 
   predictions: any[] = [];
   showDropdown = false;
@@ -54,8 +74,17 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   /** Width of each section link (bigger on the dark landing bar; must match the SCSS). */
   get linkWidth(): number { return this.dark ? 132 : 110; }
 
+  /**
+   * Where each pill sits on screen. Every page has its own navbar, so on arrival the
+   * pill starts where it was on the previous page (remembered below) and slides to
+   * this page's tab, instead of just appearing there.
+   */
+  private static lastPill: Record<'landing' | 'app', number> = { landing: -1, app: -1 };
+  landingPill = -1;
+  appPill = -1;
+
   get pillTransform(): string {
-    return `translateX(${this.navIndex * this.linkWidth}px)`;
+    return `translateX(${this.landingPill * this.linkWidth}px)`;
   }
 
   constructor(
@@ -70,23 +99,44 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
       filter(e => e instanceof NavigationEnd)
     ).subscribe((e: any) => {
       this.updateIndex(e.urlAfterRedirects || e.url);
+      if (this.pillReady) this.syncPills();
     });
     this.updateIndex(this.router.url);
+    // Start each pill where it was on the last page (or right on this page's tab if it wasn't shown).
+    const last = NavbarComponent.lastPill;
+    this.landingPill = last.landing >= 0 && this.navIndex >= 0 ? last.landing : this.navIndex;
+    this.appPill = last.app >= 0 && this.appIndex >= 0 ? last.app : this.appIndex;
   }
 
   ngAfterViewInit(): void {
-    // Enable transition only after first paint so the pill
-    // doesn't animate from Explore on every page load
+    // After the first paint, turn the transition on and slide each pill to this page's tab.
     requestAnimationFrame(() => {
       this.pillReady = true;
+      requestAnimationFrame(() => this.syncPills());
     });
   }
 
+  /** Move the pills to the current tabs and remember where they are for the next page. */
+  private syncPills(): void {
+    this.landingPill = this.navIndex;
+    this.appPill = this.appIndex;
+    if (this.isLanding) NavbarComponent.lastPill.landing = this.navIndex;
+    if (this.isAppPage) NavbarComponent.lastPill.app = this.appIndex;
+  }
+
+  /** Account pages (My Trips, Favourites, My Journals, Profile, Settings): the floating bar with their own switch. */
+  get isAppPage(): boolean { return !this.isLanding && !this.isDestination && !this.isTripPlanner; }
+  /** Which of Favourites / My Trips / My Journals is open (-1: none, e.g. Profile). */
+  appIndex = -1;
+  get appTabWidth(): number { return typeof window !== 'undefined' && window.innerWidth <= 760 ? 52 : 132; }
+
   private updateIndex(url: string): void {
+    this.appIndex = url.startsWith('/favourites') ? 0 : url.startsWith('/my-trips') ? 1 : url.startsWith('/my-journals') ? 2 : -1;
     if (url.startsWith('/features'))       this.navIndex = 1;
     else if (url.startsWith('/community')) this.navIndex = 2;
     else if (url.startsWith('/pricing'))   this.navIndex = 3;
-    else                                   this.navIndex = 0;
+    else if (url === '/' || url.startsWith('/home') || url.startsWith('/v2') || url.startsWith('/#')) this.navIndex = 0;
+    else                                   this.navIndex = -1;   // e.g. Download, Privacy: nothing highlighted
 
     this.hideSearchBar = url.startsWith('/my-trips') || url.startsWith('/favourites') || url.startsWith('/my-journals');
     this.isCommunityPage = url.startsWith('/community');
@@ -168,8 +218,11 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   onBlur(): void {
     this.blurTimeout = setTimeout(() => {
       this.showDropdown = false;
+      this.mobileSearchOpen = false;
     }, 200);
   }
+
+
 
   onFavouritesClick(): void {
     this.router.navigate(['/favourites']);
@@ -260,6 +313,7 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
 
   scrollToSection(section: string): void {
     this.navIndex = 0; // Explore
+    if (this.pillReady) this.syncPills();
     const el = document.getElementById(section);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });

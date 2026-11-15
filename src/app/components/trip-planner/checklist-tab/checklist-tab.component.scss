@@ -667,3 +667,34 @@
 }
 
 .sk-item-info { flex: 1; }
+// ===== The app's look: soft white cards, no borders, bigger radii; empty states fill the space =====
+.cl-header h2, .cl-header h1 { font-family: var(--font-display, 'Playfair Display', Georgia, serif); font-size: 1.9rem; font-weight: 700; line-height: 1.15; margin-bottom: 4px; }
+.cl-add-inline { border: 0 !important; border-radius: 18px; background: #fff; box-shadow: 0 4px 14px rgba(43, 63, 81, 0.06); }
+.cl-add-btn { border-radius: 999px; background: #1C2833; }
+.cl-progress-card {
+  border: 0 !important;
+  border-radius: 24px;
+  padding: 22px 26px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(43, 63, 81, 0.07);
+}
+.cl-filter-pill { border-radius: 999px; }
+.cl-item {
+  border: 0;
+  border-radius: 18px;
+  padding: 16px 18px;
+  box-shadow: 0 4px 14px rgba(43, 63, 81, 0.06);
+  &--overdue { box-shadow: 0 0 0 1.5px #F6D6D2, 0 4px 14px rgba(43, 63, 81, 0.06); }
+}
+.cl-checkbox { border-radius: 8px; }
+
+.cl-empty {
+  min-height: calc(100vh - 78px - 380px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  margin-top: 6px;
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(43, 63, 81, 0.07);
+}
+@media (max-width: 900px) { .cl-empty { min-height: 280px; } }
+.cl-add-trigger { border: 0 !important; border-radius: 18px; background: #fff; box-shadow: 0 4px 14px rgba(43, 63, 81, 0.06); }
