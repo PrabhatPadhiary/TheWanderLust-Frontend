@@ -1,0 +1,107 @@
+<app-navbar [isLanding]="true" [dark]="true" [onLight]="true"></app-navbar>
+
+<main class="about">
+
+  <!-- ===== HERO ===== -->
+  <header class="a-hero">
+    <span class="a-label">About Wayraa</span>
+    <h1>Built by a traveller, <em>for every traveller</em></h1>
+    <p>Wayraa is a trip planner you can use together: find great places, plan every day, share the plan with your friends and the story when you're back.</p>
+  </header>
+
+  <!-- ===== THE STORY, WITH THE FOUNDER ===== -->
+  <section class="a-story" aria-labelledby="story-title">
+    <div class="founder" data-reveal>
+      <div class="founder-photo">
+        <img *ngIf="photoOk" src="assets/images/about/prabhat.jpg" alt="Prabhat Padhiary" (error)="photoOk = false">
+        <span *ngIf="!photoOk" class="founder-initials" aria-hidden="true">PP</span>
+      </div>
+      <div class="founder-card glass">
+        <strong>Prabhat Padhiary</strong>
+        <span>Founder, builds Wayraa</span>
+        <a [href]="'mailto:' + email">{{ email }}</a>
+      </div>
+    </div>
+
+    <div class="story-text" data-reveal>
+      <span class="a-label">The story</span>
+      <h2 id="story-title">Years of trying, <em>finally real</em></h2>
+      <p>I've always loved to travel, and since my college days I kept trying to build travel websites. There were several attempts before this one, and some of them failed. Wayraa is the one that finally came to life.</p>
+      <p>The reason was simple. Every time I planned a trip, it turned into Excel sheets, long discussions and plans that kept changing, and not everyone in the group knew what was decided. I faced those problems myself, and I always wanted to solve them.</p>
+      <p>So I built Wayraa, to help anyone plan a trip: find the places, put them into days, plan it together with friends, and keep the budget and checklist in one place.</p>
+      <p class="sign">Prabhat Padhiary</p>
+    </div>
+  </section>
+
+  <!-- ===== THE ROAD HERE ===== -->
+  <section class="a-road" aria-label="How Wayraa came about" data-reveal>
+    <div class="road-line" aria-hidden="true"></div>
+    <article class="mile" *ngFor="let m of milestones; let i = index" [style.--i]="i">
+      <span class="mile-dot" aria-hidden="true"></span>
+      <span class="mile-when">{{ m.when }}</span>
+      <h3>{{ m.title }}</h3>
+      <p>{{ m.text }}</p>
+    </article>
+  </section>
+
+  <!-- ===== WHAT WE STAND FOR ===== -->
+  <section class="a-values" aria-labelledby="values-title">
+    <div class="section-head" data-reveal>
+      <span class="a-label">What we stand for</span>
+      <h2 id="values-title">Four things <em>we won't compromise on</em></h2>
+    </div>
+    <div class="values-grid">
+      <article class="value glass" *ngFor="let v of values; let i = index" data-reveal [style.--i]="i">
+        <span class="value-icon" [ngSwitch]="v.icon" aria-hidden="true">
+          <svg *ngSwitchCase="'users'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></svg>
+          <svg *ngSwitchCase="'pin'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <svg *ngSwitchCase="'book'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          <svg *ngSwitchCase="'lock'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </span>
+        <h3>{{ v.title }}</h3>
+        <p>{{ v.text }}</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ===== WHERE WE ARE ===== -->
+  <section class="a-now" data-reveal aria-labelledby="now-title">
+    <div>
+      <span class="a-label">Where we are</span>
+      <h2 id="now-title">Free, and <em>in beta</em></h2>
+      <p>Wayraa works in your browser on any phone or computer, the Android app is in beta, and the iPhone app is in testing. It's built by one person, so your feedback really shapes what comes next.</p>
+    </div>
+    <ul class="now-list">
+      <li><b>Web</b><span>Live</span></li>
+      <li><b>Android</b><span>Beta</span></li>
+      <li><b>iPhone</b><span>Testing</span></li>
+    </ul>
+  </section>
+
+  <!-- ===== CONTACT ===== -->
+  <section class="a-contact" data-reveal aria-labelledby="contact-title">
+    <div class="contact-panel">
+      <span class="contact-glow" aria-hidden="true"></span>
+      <h2 id="contact-title">Let's <em>talk</em></h2>
+      <p>Feedback, ideas, a bug, or a partnership with a travel company: write to me directly, I read every email.</p>
+      <a class="btn primary" [href]="'mailto:' + email + '?subject=Hello%20from%20the%20website'">{{ email }}</a>
+      <div class="contact-alt">
+        <a [href]="'mailto:' + email + '?subject=Partnership%20with%20Wayraa'">Partnerships</a>
+        <span>·</span>
+        <a [href]="'mailto:' + email + '?subject=Feedback%20on%20Wayraa'">Feedback</a>
+        <span>·</span>
+        <a routerLink="/download">Get the Android app</a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="a-footer">
+    <span>© {{ year }} Wayraa</span>
+    <nav aria-label="Footer">
+      <a routerLink="/features">Features</a>
+      <a routerLink="/community">Community</a>
+      <a routerLink="/privacy">Privacy</a>
+      <a routerLink="/terms">Terms</a>
+    </nav>
+  </footer>
+</main>
