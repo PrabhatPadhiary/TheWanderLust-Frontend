@@ -17,9 +17,9 @@ import { Component } from '@angular/core';
 })
 export class DownloadComponent {
   readonly APK_URL = 'https://github.com/PrabhatPadhiary/Wayraa-Mobile/releases/latest/download/wayraa-beta.apk';
-  readonly VERSION = '1.1.0';
-  readonly UPDATED = '13 November 2026';
-  readonly SIZE = '111 MB';
+  readonly VERSION = '1.2.0';
+  readonly UPDATED = '15 November 2026';
+  readonly SIZE = '116 MB';
 
   readonly isAndroid = /Android/i.test(navigator.userAgent);
   readonly isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
