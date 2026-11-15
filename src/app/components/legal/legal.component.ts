@@ -16,7 +16,7 @@ import { ActivatedRoute } from '@angular/router';
   standalone: false
 })
 export class LegalComponent {
-  readonly LAST_UPDATED = '13 November 2026';
+  readonly LAST_UPDATED = '15 November 2026';
   readonly SUPPORT_EMAIL = 'support@wayraa.com';
 
   doc: 'privacy' | 'terms';

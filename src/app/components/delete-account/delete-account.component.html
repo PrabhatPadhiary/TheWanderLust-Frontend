@@ -1,0 +1,67 @@
+<app-navbar [isLanding]="true" [dark]="true" [onLight]="true"></app-navbar>
+
+<main class="del">
+  <header class="del-head">
+    <span class="del-label">Your account</span>
+    <h1>Delete your Wayraa account</h1>
+    <p>You can delete your account and its data at any time, in any of these three ways. You don't need the app for the last two.</p>
+  </header>
+
+  <section class="ways" aria-label="Ways to delete your account">
+    <article class="way">
+      <span class="way-num">1</span>
+      <h2>In the app</h2>
+      <ol>
+        <li>Open Wayraa and sign in.</li>
+        <li>Open <strong>Settings</strong>: the menu (☰) at the top right of Home, or <strong>Profile → Settings</strong>.</li>
+        <li>Tap <strong>Delete account</strong> at the bottom and confirm.</li>
+      </ol>
+      <p class="when">Deleted straight away.</p>
+    </article>
+
+    <article class="way">
+      <span class="way-num">2</span>
+      <h2>On the website</h2>
+      <ol>
+        <li>Sign in on wayraa.com.</li>
+        <li>Open your account menu (your picture, top right) → <strong>Settings</strong>.</li>
+        <li>Click <strong>Delete account</strong> and confirm.</li>
+      </ol>
+      <a class="way-btn" routerLink="/settings">Go to Settings</a>
+      <p class="when">Deleted straight away.</p>
+    </article>
+
+    <article class="way">
+      <span class="way-num">3</span>
+      <h2>By email</h2>
+      <p>Write to <a [href]="mailto">{{ SUPPORT_EMAIL }}</a>&#32;<strong>from the email address on your account</strong>, asking us to delete it. If you can't, tell us that email address and we'll check it's yours first.</p>
+      <a class="way-btn" [href]="mailto">Email us</a>
+      <p class="when">We'll confirm, and delete it within 30 days.</p>
+    </article>
+  </section>
+
+  <section class="what" aria-labelledby="what-title">
+    <h2 id="what-title">What gets deleted</h2>
+    <ul>
+      <li>Your profile, photo and sign-in.</li>
+      <li>Your stories and journals, and their photos.</li>
+      <li>Your favourites, and trips only you are on.</li>
+      <li>You're removed from other people's trips.</li>
+    </ul>
+
+    <h2>What happens to shared trips</h2>
+    <p>Trips you own that other people are on aren't deleted: they're passed to another person on the trip, so their plans aren't lost. Things you added there (places, expenses, checklist items) stay part of that trip.</p>
+
+    <h2>Backups</h2>
+    <p>Copies in backups and server logs are removed over a short period afterwards. Deleting your account can't be undone.</p>
+
+    <p class="more">More in our <a routerLink="/privacy">Privacy Policy</a>, or ask us at <a [href]="'mailto:' + SUPPORT_EMAIL">{{ SUPPORT_EMAIL }}</a>.</p>
+  </section>
+
+  <footer class="del-foot">
+    <span>© {{ year }} Wayraa</span>
+    <a routerLink="/about">About</a>
+    <a routerLink="/privacy">Privacy</a>
+    <a routerLink="/terms">Terms</a>
+  </footer>
+</main>

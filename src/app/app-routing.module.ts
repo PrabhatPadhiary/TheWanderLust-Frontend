@@ -12,6 +12,7 @@ import { JournalDetailComponent } from './components/community/journal-detail/jo
 import { FeaturesComponent } from './components/features/features.component';
 import { PricingComponent } from './components/pricing/pricing.component';
 import { AboutComponent } from './components/about/about.component';
+import { DeleteAccountComponent } from './components/delete-account/delete-account.component';
 import { MyJournalsComponent } from './components/my-journals/my-journals.component';
 import { LegalComponent } from './components/legal/legal.component';
 import { DownloadComponent } from './components/download/download.component';
@@ -35,6 +36,7 @@ const routes: Routes = [
   { path: 'features', component: FeaturesComponent },
   { path: 'pricing', component: PricingComponent },
   { path: 'about', component: AboutComponent, title: 'About · Wayraa' },
+  { path: 'delete-account', component: DeleteAccountComponent, title: 'Delete your account · Wayraa' },
   // Linked from the mobile app and from Google's sign-in consent screen.
   { path: 'privacy', component: LegalComponent, data: { doc: 'privacy' }, title: 'Privacy Policy · Wayraa' },
   { path: 'terms', component: LegalComponent, data: { doc: 'terms' }, title: 'Terms of Use · Wayraa' },

@@ -102,7 +102,9 @@
     <h2>6. Keeping and deleting your information</h2>
     <p>
       We keep your information while your account exists. You can delete your account at any time in
-      the app under <strong>Profile → Delete account</strong>, or by emailing us. When you do:
+      the app under <strong>Settings → Delete account</strong>, on the website under
+      <strong>Settings → Delete account</strong>, or by emailing us. All the ways are on our
+      <a routerLink="/delete-account">delete your account</a> page. When you do:
     </p>
     <ul>
       <li>your profile, your stories and journals, and their photos are deleted;</li>
@@ -168,7 +170,7 @@
     <ul>
       <li>You need to be at least 13 (or the minimum age for online services where you live).</li>
       <li>Give accurate information and keep your sign-in secure. You're responsible for what happens in your account.</li>
-      <li>You can delete your account at any time in the app (Profile → Delete account).</li>
+      <li>You can delete your account at any time in the app or on the website (Settings → Delete account), or see <a routerLink="/delete-account">all the ways to delete it</a>.</li>
     </ul>
 
     <h2>3. Your content</h2>
@@ -250,5 +252,6 @@
   <a routerLink="/about">About</a>
   <a routerLink="/privacy">Privacy</a>
   <a routerLink="/terms">Terms</a>
+  <a routerLink="/delete-account">Delete account</a>
   <a [href]="'mailto:' + SUPPORT_EMAIL">{{ SUPPORT_EMAIL }}</a>
 </footer>

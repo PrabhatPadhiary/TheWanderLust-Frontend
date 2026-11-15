@@ -57,6 +57,7 @@ import { JournalDetailComponent } from './components/community/journal-detail/jo
 import { FeaturesComponent } from './components/features/features.component';
 import { PricingComponent } from './components/pricing/pricing.component';
 import { AboutComponent } from './components/about/about.component';
+import { DeleteAccountComponent } from './components/delete-account/delete-account.component';
 import { MyJournalsComponent } from './components/my-journals/my-journals.component';
 
 import { ProfileComponent } from './components/profile/profile.component';
@@ -108,6 +109,7 @@ import { SettingsComponent } from './components/settings/settings.component';
     FeaturesComponent,
     PricingComponent,
     AboutComponent,
+    DeleteAccountComponent,
     MyJournalsComponent,
   ],
   imports: [
