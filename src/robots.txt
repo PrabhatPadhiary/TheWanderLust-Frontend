@@ -6,5 +6,7 @@ Disallow: /my-trips
 Disallow: /my-journals
 Disallow: /join/
 Disallow: /community/write
+Disallow: /profile
+Disallow: /settings
 
 Sitemap: https://wayraa.com/sitemap.xml

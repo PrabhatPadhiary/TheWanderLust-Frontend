@@ -1,4 +1,5 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, HostListener, ViewChild, ElementRef } from '@angular/core';
+import { SeoService } from '../../services/seo.service';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { DestinationService } from '../../services/destination.service';
@@ -109,8 +110,18 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
     private authService: AuthService,
     public favouritesService: FavouritesService,
     private tripService: TripService,
-    private loaderService: LoaderService
+    private loaderService: LoaderService,
+    private seo: SeoService
   ) {}
+
+  /** Title and description for search, once the place's name is known. */
+  private applySeo(name: string): void {
+    if (!name) return;
+    this.seo.set({
+      title: `${name}: where to stay, eat and things to do · Wayraa`,
+      description: `Plan a trip to ${name}: the best stays, places to eat and things to do, with real ratings and photos on one map. Save places and plan it with friends on Wayraa.`,
+    });
+  }
 
   ngOnInit(): void {
     this.route.paramMap.subscribe(params => {
@@ -139,6 +150,7 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
     // Name comes from router state when navigating via autocomplete — free, no API call
     const nav = window.history.state;
     const nameFromState: string = nav?.destinationName || '';
+    this.applySeo(nameFromState);
 
     // Build a minimal destination object immediately so the header renders without waiting
     this.destination = {
@@ -201,6 +213,7 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
           if (status === google.maps.places.PlacesServiceStatus.OK && result?.name) {
             if (this.destination) {
               this.destination = { ...this.destination, name: result.name };
+              this.applySeo(result.name);
             }
           }
         }

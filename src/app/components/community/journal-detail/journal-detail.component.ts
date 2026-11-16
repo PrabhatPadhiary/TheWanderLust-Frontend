@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { JournalService, JournalDetail, JournalComment } from '../../../services/journal.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastrService } from 'ngx-toastr';
+import { SeoService } from '../../../services/seo.service';
 
 @Component({
   selector: 'app-journal-detail',
@@ -34,8 +35,36 @@ export class JournalDetailComponent implements OnInit {
     private router: Router,
     private journalService: JournalService,
     public authService: AuthService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private seo: SeoService
   ) {}
+
+  /** The story's own title, summary and photo for search and link previews (private stories stay out). */
+  private applySeo(j: JournalDetail): void {
+    const text = (j.body || '').replace(/\s+/g, ' ').trim();
+    const description = text.length > 155 ? text.slice(0, 152).replace(/\s+\S*$/, '') + '…' : text;
+    const photo = [...(j.photos || [])].sort((a, b) => a.order - b.order)[0]?.url;
+    const isPublic = (j.visibility || '').toLowerCase() === 'public';
+    this.seo.set({
+      title: `${j.title} · ${j.destination} travel story · Wayraa`,
+      description: description || `A trip to ${j.destination}, shared on Wayraa.`,
+      image: photo,
+      type: 'article',
+      noindex: !isPublic,
+    });
+    this.seo.setJsonLd(isPublic ? {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: j.title,
+      description,
+      image: photo ? [photo] : undefined,
+      datePublished: j.publishedAt || j.createdAt,
+      author: { '@type': 'Person', name: j.author?.name || 'Wayraa traveller' },
+      publisher: { '@type': 'Organization', name: 'Wayraa', logo: { '@type': 'ImageObject', url: 'https://wayraa.com/assets/images/logo/wayraa_logo_notext.png' } },
+      mainEntityOfPage: `https://wayraa.com/community/journal/${j.id}`,
+      contentLocation: { '@type': 'Place', name: j.destination },
+    } : null);
+  }
 
   ngOnInit(): void {
     const id = this.route.snapshot.paramMap.get('id');
@@ -45,6 +74,7 @@ export class JournalDetailComponent implements OnInit {
       this.journalService.getById(id).subscribe({
         next: (j) => {
           this.journal = j;
+          this.applySeo(j);
           this.isLiked = j.isLikedByMe;
           this.likesCount = j.likesCount;
           this.loading = false;
