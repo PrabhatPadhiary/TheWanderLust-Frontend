@@ -16,7 +16,7 @@
         <img *ngIf="photoOk" src="assets/images/about/prabhat.jpg" alt="Prabhat Padhiary" (error)="photoOk = false">
         <span *ngIf="!photoOk" class="founder-initials" aria-hidden="true">PP</span>
       </div>
-      <div class="founder-card glass">
+      <div class="founder-card">
         <strong>Prabhat Padhiary</strong>
         <span>Founder, builds Wayraa</span>
         <a [href]="'mailto:' + email">{{ email }}</a>

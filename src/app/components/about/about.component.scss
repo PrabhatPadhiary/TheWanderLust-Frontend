@@ -48,21 +48,28 @@ h1, h2 {
 // ── Story with the founder ──
 .a-story {
   display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
   gap: clamp(32px, 6vw, 90px);
   align-items: center;
   max-width: 1160px;
   margin: 0 auto;
   padding: 40px var(--gutter) 90px;
 }
-.founder { position: relative; }
+.founder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 18px;
+}
 .founder-photo {
-  aspect-ratio: 4 / 5;
-  border-radius: 36px;
+  width: clamp(180px, 22vw, 240px);
+  aspect-ratio: 1;
+  border-radius: 50%;
   overflow: hidden;
   background: linear-gradient(150deg, #F6D9CC 0%, #DCE6EE 100%);
-  box-shadow: 0 40px 90px rgba(28, 40, 51, 0.2);
-  rotate: -2deg;
+  border: 6px solid #fff;
+  box-shadow: 0 0 0 2px rgba(217, 72, 28, 0.35), 0 24px 50px rgba(28, 40, 51, 0.16);
   img { width: 100%; height: 100%; object-fit: cover; display: block; }
 }
 .founder-initials {
@@ -70,20 +77,15 @@ h1, h2 {
   width: 100%; height: 100%;
   align-items: center; justify-content: center;
   font-family: var(--font-display);
-  font-size: clamp(5rem, 12vw, 8rem);
+  font-size: clamp(3.4rem, 7vw, 4.6rem);
   font-weight: 700;
   color: rgba(28, 40, 51, 0.45);
 }
 .founder-card {
-  position: absolute;
-  left: -18px; bottom: 28px;
-  display: flex; flex-direction: column; gap: 2px;
-  padding: 16px 20px;
-  border-radius: 22px;
-  box-shadow: 0 18px 40px rgba(28, 40, 51, 0.16);
-  strong { font-size: 1.05rem; }
-  span { font-size: 0.82rem; color: $ink-3; }
-  a { margin-top: 4px; font-size: 0.85rem; font-weight: 600; color: var(--orange); text-decoration: none; &:hover { text-decoration: underline; } }
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  strong { font-size: 1.1rem; }
+  span { font-size: 0.85rem; color: $ink-3; }
+  a { margin-top: 4px; font-size: 0.88rem; font-weight: 600; color: var(--orange); text-decoration: none; &:hover { text-decoration: underline; } }
 }
 .story-text {
   h2 { margin: 12px 0 22px; font-size: clamp(2.2rem, 4.4vw, 3.4rem); }
@@ -236,7 +238,6 @@ h1, h2 {
 // ── Phones and tablets ──
 @media (max-width: 900px) {
   .a-story { grid-template-columns: 1fr; }
-  .founder { max-width: 360px; margin: 0 auto; width: 100%; }
   .values-grid { grid-template-columns: repeat(2, 1fr); }
   .a-now { grid-template-columns: 1fr; }
 }
@@ -246,7 +247,6 @@ h1, h2 {
   .road-line { top: 10px; bottom: 10px; left: calc(var(--gutter) + 9px); right: auto; border-top: 0; border-left: 2px dashed rgba(28, 40, 51, 0.2); }
   .mile { padding: 0 0 0 38px; }
   .values-grid { grid-template-columns: 1fr; }
-  .founder-card { left: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
   [data-reveal] { opacity: 1; transform: none; transition: none; }
