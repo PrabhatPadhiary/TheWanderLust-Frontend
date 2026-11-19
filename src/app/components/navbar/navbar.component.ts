@@ -1,4 +1,5 @@
-import { Component, EventEmitter, HostListener, Input, OnInit, OnDestroy, Output, ElementRef, ViewChild, AfterViewInit, QueryList, ViewChildren } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnInit, OnDestroy, Output, ElementRef, ViewChild, AfterViewInit, QueryList, ViewChildren, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../services/auth.service';
@@ -87,6 +88,9 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
     return `translateX(${this.landingPill * this.linkWidth}px)`;
   }
 
+  /** False while pages are pre-rendered at build time (no window, animations or observers then). */
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
   constructor(
     public authService: AuthService,
     private router: Router,
@@ -109,6 +113,7 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
+    if (!this.isBrowser) return;
     // After the first paint, turn the transition on and slide each pill to this page's tab.
     requestAnimationFrame(() => {
       this.pillReady = true;

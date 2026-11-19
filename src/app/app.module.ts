@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule, provideClientHydration, withEventReplay } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -148,6 +148,9 @@ import { SettingsComponent } from './components/settings/settings.component';
   ],
   providers: [
     provideAnimationsAsync(),
+    // Public pages arrive pre-rendered (see app.routes.server.ts); reuse that HTML
+    // instead of redrawing it, and replay clicks made before the app has loaded.
+    provideClientHydration(withEventReplay()),
   ],
   bootstrap: [AppComponent]
 })

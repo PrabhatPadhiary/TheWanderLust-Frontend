@@ -27,6 +27,8 @@
             "outputPath": "dist/the-wander-lust-ui",
             "index": "src/index.html",
             "browser": "src/main.ts",
+            "server": "src/main.server.ts",
+            "outputMode": "static",
             "polyfills": [
               "zone.js"
             ],

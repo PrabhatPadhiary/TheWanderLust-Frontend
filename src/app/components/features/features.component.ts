@@ -1,4 +1,5 @@
-import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, ViewChild, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -106,6 +107,9 @@ export class FeaturesComponent implements AfterViewInit, OnDestroy {
   private triggers: ScrollTrigger[] = [];
   private cleanups: (() => void)[] = [];
 
+  /** False while pages are pre-rendered at build time (no window, animations or observers then). */
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
   constructor(private router: Router, private zone: NgZone) {}
 
   goToExplore(): void { this.router.navigate(['/']); }
@@ -128,6 +132,7 @@ export class FeaturesComponent implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
+    if (!this.isBrowser) return;
     this.zone.runOutsideAngular(() => {
       gsap.registerPlugin(ScrollTrigger);
       this.film();

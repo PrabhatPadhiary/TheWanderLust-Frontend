@@ -1,4 +1,5 @@
-import { Component, ElementRef, OnInit, AfterViewInit, OnDestroy, ViewChild, NgZone } from '@angular/core';
+import { Component, ElementRef, OnInit, AfterViewInit, OnDestroy, ViewChild, NgZone, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { animate, inView, stagger } from 'motion';
@@ -130,6 +131,9 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
   /** The latest real stories from the community, for the landing section. */
   stories: JournalFeedItem[] = [];
 
+  /** False while pages are pre-rendered at build time (no window, animations or observers then). */
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
   constructor(
     public authService: AuthService,
     private router: Router,
@@ -140,6 +144,7 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
   ngOnInit(): void {
     // The page starts light (the frost opening); with reduced motion it starts on the photo.
     this.navOnLight = typeof window !== 'undefined' && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!this.isBrowser) return;   // places search and stories load in the browser
     this.initPlacesAutocomplete();
     // Real stories only: the newest six with a photo (the section hides if none load).
     this.journalService.getFeed().subscribe({
@@ -168,6 +173,7 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
   }
 
   ngAfterViewInit(): void {
+    if (!this.isBrowser) return;
     this.reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     this.small = window.matchMedia('(max-width: 720px)').matches;
 

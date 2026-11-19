@@ -21,6 +21,8 @@ export class DownloadComponent {
   readonly UPDATED = '17 November 2026';
   readonly SIZE = '116 MB';
 
-  readonly isAndroid = /Android/i.test(navigator.userAgent);
-  readonly isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  // No navigator while the page is pre-rendered at build time: show the general version.
+  private readonly ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+  readonly isAndroid = /Android/i.test(this.ua);
+  readonly isIOS = /iPhone|iPad|iPod/i.test(this.ua);
 }

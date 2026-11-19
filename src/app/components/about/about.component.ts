@@ -1,4 +1,5 @@
-import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, NgZone, OnDestroy, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
 
 /**
@@ -35,12 +36,16 @@ export class AboutComponent implements AfterViewInit, OnDestroy {
 
   private observer?: IntersectionObserver;
 
+  /** False while pages are pre-rendered at build time (no window, animations or observers then). */
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
   constructor(private router: Router, private host: ElementRef<HTMLElement>, private zone: NgZone) {}
 
   startPlanning(): void { this.router.navigate(['/']); }
 
   /** Sections fade up as they come into view (skipped with reduced motion). */
   ngAfterViewInit(): void {
+    if (!this.isBrowser) return;
     const items = Array.from(this.host.nativeElement.querySelectorAll<HTMLElement>('[data-reveal]'));
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || !('IntersectionObserver' in window)) {
       items.forEach(el => el.classList.add('in'));

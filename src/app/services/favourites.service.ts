@@ -30,6 +30,8 @@ export class FavouritesService {
   private favouritesLoaded = false;
 
   constructor() {
+    // Nothing to load while pages are pre-rendered at build time (no browser storage).
+    if (typeof localStorage === 'undefined') return;
     this.loadFromStorage();
     this.authService.registerLogoutCallback(() => this.clearAll());
   }

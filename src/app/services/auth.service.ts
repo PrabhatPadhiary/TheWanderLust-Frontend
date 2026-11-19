@@ -1,4 +1,5 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, PLATFORM_ID, inject } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { initializeApp, FirebaseApp } from 'firebase/app';
 import {
@@ -41,9 +42,9 @@ export interface LoginResult {
   providedIn: 'root'
 })
 export class AuthService {
-  private app: FirebaseApp;
-  private firebaseAuth: Auth;
-  private provider: GoogleAuthProvider;
+  private app!: FirebaseApp;
+  private firebaseAuth!: Auth;
+  private provider!: GoogleAuthProvider;
   private http = inject(HttpClient);
 
   private currentUserSubject = new BehaviorSubject<UserResponse | null>(null);
@@ -57,11 +58,18 @@ export class AuthService {
   private onLogoutCallback: (() => void) | null = null;
 
   constructor() {
+    this.authReady = new Promise(resolve => { this.resolveAuthReady = resolve; });
+
+    // While pages are pre-rendered at build time there is no browser: nobody is
+    // signed in, and Firebase and localStorage aren't available.
+    if (!isPlatformBrowser(inject(PLATFORM_ID))) {
+      this.resolveAuthReady();
+      return;
+    }
+
     this.app = initializeApp(environment.firebase);
     this.firebaseAuth = getAuth(this.app);
     this.provider = new GoogleAuthProvider();
-
-    this.authReady = new Promise(resolve => { this.resolveAuthReady = resolve; });
 
     const stored = localStorage.getItem('wanderlust_user');
     if (stored) {
@@ -94,7 +102,7 @@ export class AuthService {
   }
 
   async getFirebaseToken(): Promise<string | null> {
-    const user = this.firebaseAuth.currentUser;
+    const user = this.firebaseAuth?.currentUser;
     if (!user) return null;
     return user.getIdToken();
   }
@@ -154,7 +162,7 @@ export class AuthService {
 
   /** Email a password-reset link. */
   async sendPasswordReset(email?: string): Promise<string> {
-    const to = (email || this.firebaseAuth.currentUser?.email || '').trim();
+    const to = (email || this.firebaseAuth?.currentUser?.email || '').trim();
     if (!to) throw new Error('Enter your email address first.');
     try {
       await sendPasswordResetEmail(this.firebaseAuth, to);
@@ -166,7 +174,7 @@ export class AuthService {
 
   /** How the signed-in user signs in: Google, email and password, or both. */
   signInMethods(): { google: boolean; password: boolean } {
-    const providers = (this.firebaseAuth.currentUser?.providerData || []).map(p => p.providerId);
+    const providers = (this.firebaseAuth?.currentUser?.providerData || []).map(p => p.providerId);
     return { google: providers.includes('google.com'), password: providers.includes('password') };
   }
 
