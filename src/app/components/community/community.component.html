@@ -24,21 +24,37 @@
   <div class="community-head">
       <div class="feed-header">
         <h2 class="feed-title">Latest stories</h2>
-        <div class="sort-toggle">
-          <button [class.active]="journalSort === 'recent'"  (click)="setSort('recent')">Most Recent</button>
-          <button [class.active]="journalSort === 'popular'" (click)="setSort('popular')">Most Popular</button>
-        </div>
       </div>
 
-      <!-- Search and vibes -->
-      <div class="feed-filters" *ngIf="journals.length">
+      <!-- One toolbar: search on the left; the vibe and the order on the right -->
+      <div class="feed-toolbar" *ngIf="journals.length">
         <label class="feed-search">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="search" [(ngModel)]="searchQuery" placeholder="Search destinations, stories, travellers" aria-label="Search stories">
+          <input type="search" [(ngModel)]="searchQuery" placeholder="Search places, stories, travellers" aria-label="Search stories">
         </label>
-        <div class="vibe-chips" *ngIf="vibeChips.length">
-          <button class="vibe-chip" [class.active]="activeVibe === 'all'" (click)="activeVibe = 'all'">All</button>
-          <button class="vibe-chip" *ngFor="let v of vibeChips" [class.active]="activeVibe === v" (click)="activeVibe = v">{{ vibeLabel(v) }}</button>
+        <div class="toolbar-right">
+          <!-- Vibe: a small menu (closes on a pick, outside click or Esc) -->
+          <div class="vibe-dd" *ngIf="vibeOptions.length" (click)="$event.stopPropagation()">
+            <button type="button" class="vibe-dd-btn" (click)="vibeOpen = !vibeOpen"
+                    aria-haspopup="listbox" [attr.aria-expanded]="vibeOpen">
+              <span>Vibe</span>
+              <strong>{{ activeVibe === 'all' ? 'All' : vibeLabel(activeVibe) }}</strong>
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="vibe-dd-menu" *ngIf="vibeOpen" role="listbox" aria-label="Vibe">
+              <button type="button" role="option" [class.on]="activeVibe === 'all'" [attr.aria-selected]="activeVibe === 'all'" (click)="pickVibe('all')">
+                All <span>{{ journals.length }}</span>
+              </button>
+              <button type="button" role="option" *ngFor="let o of vibeOptions" [class.on]="activeVibe === o.vibe"
+                      [attr.aria-selected]="activeVibe === o.vibe" (click)="pickVibe(o.vibe)">
+                {{ vibeLabel(o.vibe) }} <span>{{ o.count }}</span>
+              </button>
+            </div>
+          </div>
+          <div class="sort-toggle" role="group" aria-label="Order">
+            <button [class.active]="journalSort === 'recent'"  (click)="setSort('recent')">Recent</button>
+            <button [class.active]="journalSort === 'popular'" (click)="setSort('popular')">Popular</button>
+          </div>
         </div>
       </div>
   </div>
@@ -96,55 +112,40 @@
         <p>No matching stories. Try another search or vibe.</p>
       </div>
 
-      <div class="journal-grid">
-      <article class="journal-card" *ngFor="let j of shownJournals; trackBy: trackById">
-        <!-- Photo (or a soft placeholder with the place's name), with the trip length on it -->
-        <div class="jcard-photo" (click)="openJournal(j.id)">
-          <img *ngIf="j.imageUrl" [src]="j.imageUrl | sized:'cover'" [alt]="j.title" loading="lazy">
-          <div *ngIf="!j.imageUrl" class="jcard-photo-empty"><span>{{ j.destinationName }}</span></div>
-          <span class="jcard-trip-badge" *ngIf="j.tripBadge">{{ j.tripBadge }}</span>
-          <span class="jcard-place">
-            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-            {{ j.destinationName }}
-          </span>
-        </div>
+      <div class="journal-grid cluster-grid">
+      <!-- A story as a small collage (as on the home page): the main photo, up to two more, and a glass card -->
+      <article class="cluster" *ngFor="let j of shownJournals; trackBy: trackById"
+               [class.solo]="j.photos.length < 2" (click)="openJournal(j.id)">
+       <div class="cluster-stage">
+        <img class="ph main" *ngIf="j.photos[0]" [src]="j.photos[0] | sized:'cover'" [alt]="j.title" loading="lazy">
+        <div class="ph main ph-empty" *ngIf="!j.photos[0]"><span>{{ j.destinationName }}</span></div>
+        <img class="ph second" *ngIf="j.photos[1]" [src]="j.photos[1] | sized:'thumb'" alt="" loading="lazy">
+        <img class="ph third" *ngIf="j.photos[2]" [src]="j.photos[2] | sized:'thumb'" alt="" loading="lazy">
+        <span class="cluster-badge" *ngIf="j.tripBadge">{{ j.tripBadge }}</span>
 
-        <div class="jcard-body">
-          <div class="jcard-author">
-            <span class="jcard-avatar" [style.background]="j.authorColor">{{ j.authorInitial }}</span>
-            <strong>{{ j.authorName }}</strong>
-            <span class="jcard-meta-dot">·</span>
-            <span class="jcard-month">{{ j.month }}</span>
-            <span *ngFor="let tag of j.tags" class="jtag">{{ tag }}</span>
-          </div>
-
-          <h3 (click)="openJournal(j.id)">{{ j.title }}</h3>
-          <p (click)="openJournal(j.id)">{{ j.excerpt }}</p>
-
-          <div class="jcard-places" *ngIf="j.placesMentioned.length > 0">
-            <span class="place-chip" *ngFor="let place of j.placesMentioned.slice(0, 2)">{{ place }}</span>
-            <span class="place-chip place-chip--more" *ngIf="j.placesMentioned.length > 2">+{{ j.placesMentioned.length - 2 }}</span>
-          </div>
-
-          <div class="jcard-actions">
-            <button class="jaction" [class.jaction--liked]="j.isLiked" (click)="likeJournal(j)" [attr.aria-label]="'Like · ' + j.likes">
-              <svg viewBox="0 0 24 24" width="17" height="17" stroke="currentColor" stroke-width="2" [attr.fill]="j.isLiked ? 'currentColor' : 'none'">
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-              </svg>
+        <div class="cluster-card">
+          <span class="story-tag">{{ j.destinationName }} · {{ j.month }}</span>
+          <h3>{{ j.title }}</h3>
+          <div class="cluster-foot">
+            <span class="story-by">
+              <i [style.background]="j.authorColor">{{ j.authorInitial }}</i>
+              <span>{{ j.authorName }}</span>
+            </span>
+            <button class="cluster-act" [class.cluster-act--liked]="j.isLiked"
+                    (click)="$event.stopPropagation(); likeJournal(j)" [attr.aria-label]="'Like · ' + j.likes">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" [attr.fill]="j.isLiked ? 'currentColor' : 'none'"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
               {{ j.likes }}
             </button>
-            <button class="jaction" (click)="openJournal(j.id, 'comments')" [attr.aria-label]="j.comments + ' comments'">
-              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            <button class="cluster-act" (click)="$event.stopPropagation(); openJournal(j.id, 'comments')" [attr.aria-label]="j.comments + ' comments'">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
               {{ j.comments }}
             </button>
-            <button class="jaction" aria-label="Share" title="Share" (click)="shareJournal(j)">
-              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-            </button>
-            <button class="jaction jaction--more" (click)="openStoryMenu(j, $event)" aria-label="More options for this story" title="More options">
-              <svg width="15" height="15" fill="currentColor" viewBox="0 0 16 16"><path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0m0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"/></svg>
+            <button class="cluster-act" (click)="$event.stopPropagation(); openStoryMenu(j, $event)" aria-label="More options for this story" title="Share and more">
+              <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/></svg>
             </button>
           </div>
         </div>
+       </div>
       </article>
       </div>
     </div>

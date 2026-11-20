@@ -6,7 +6,10 @@
      [class.app-navbar--destination]="isDestination || isTripPlanner"
      [class.app-navbar--mobile-search]="mobileSearchOpen"
      [class.app-navbar--tripplanner]="isTripPlanner"
-     [class.app-navbar--app]="isAppPage">
+     [class.app-navbar--app]="isAppPage"
+     [class.app-navbar--hides]="hidesOnScroll"
+     [class.app-navbar--hidden]="hidesOnScroll && barHidden"
+     [class.app-navbar--backed]="hidesOnScroll && scrolled">
 
   <!-- ===== LOGO (and, on a destination, the place beside it) ===== -->
   <div class="nav-left">

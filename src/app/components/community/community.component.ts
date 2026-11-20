@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
@@ -30,6 +30,8 @@ export interface TripJournal {
   saves: number;
   tripBadge: string | null;
   imageUrl: string | null;
+  /** Up to three photos, in order (the card's collage). */
+  photos: string[];
   vibes: string[];
   publishedAt: string;
 }
@@ -112,7 +114,7 @@ export class CommunityComponent implements OnInit, OnDestroy {
 
     // Format month
     const publishedDate = item.publishedAt ? new Date(item.publishedAt) : new Date(item.createdAt);
-    const month = publishedDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    const month = publishedDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
     return {
       id: item.id,
@@ -135,6 +137,7 @@ export class CommunityComponent implements OnInit, OnDestroy {
       saves: 0,
       tripBadge: tripBadge,
       imageUrl: item.photos && item.photos.length > 0 ? item.photos[0].url : null,
+      photos: [...(item.photos || [])].sort((a, b) => a.order - b.order).slice(0, 3).map(p => p.url),
       vibes: vibesOf(item.vibes),
       publishedAt: item.publishedAt || item.createdAt,
     };
@@ -213,11 +216,24 @@ export class CommunityComponent implements OnInit, OnDestroy {
 
   // ── Search, vibes and sort ─────────────────────────────────────────────
 
-  /** Vibes that actually appear in the feed, most used first. */
-  get vibeChips(): string[] {
+  /** Vibes that actually appear in the feed, most used first, with how many stories have each. */
+  get vibeOptions(): { vibe: string; count: number }[] {
     const counts = new Map<string, number>();
     for (const j of this.journals) for (const v of j.vibes) counts.set(v, (counts.get(v) || 0) + 1);
-    return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([v]) => v);
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([vibe, count]) => ({ vibe, count }));
+  }
+
+  vibeOpen = false;
+
+  pickVibe(v: string): void {
+    this.activeVibe = v;
+    this.vibeOpen = false;
+  }
+
+  @HostListener('document:click')
+  @HostListener('document:keydown.escape')
+  closeVibeMenu(): void {
+    this.vibeOpen = false;
   }
 
   /** The feed after the search, the vibe and the sort. */

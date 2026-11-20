@@ -1141,3 +1141,31 @@
 @keyframes home-search-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
 // Narrower screens: the home page's floating search takes over.
 @media (max-width: 1100px) { .home-search { display: none; } }
+
+// ===== SCROLLING PAGES: out of the way going down, back (frosted) coming up =====
+// At the top the bar is transparent. Scrolling down it glides away, its frosted
+// strip with it (so nothing pops); scrolling up it glides back.
+.app-navbar.app-navbar--hides {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.4s ease;
+  will-change: transform;
+}
+.app-navbar.app-navbar--hidden { transform: translateY(-160%); }
+@media (min-width: 901px) {
+  .app-navbar.app-navbar--hides::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -10px;
+    height: 220px;   // reaches the top of the screen above the bar
+    z-index: -1;
+    background: rgba(238, 242, 244, 0.86);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border-bottom: 1px solid rgba(28, 40, 51, 0.07);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+  }
+  .app-navbar.app-navbar--hides.app-navbar--backed::before { opacity: 1; }
+}

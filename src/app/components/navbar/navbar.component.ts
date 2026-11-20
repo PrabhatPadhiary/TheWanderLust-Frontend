@@ -173,9 +173,27 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
     this.routerSub?.unsubscribe();
   }
 
+  /** Scrolling down: the bar slides away (pages other than home, destination and trip planner). */
+  barHidden = false;
+  private lastScrollY = 0;
+
+  /** Pages where the bar hides on scroll down and comes back, frosted, on scroll up. */
+  get hidesOnScroll(): boolean {
+    return !this.isHomePage && !this.isDestination && !this.isTripPlanner;
+  }
+
   @HostListener('window:scroll')
   onWindowScroll(): void {
-    this.scrolled = window.scrollY > 50;
+    const y = window.scrollY;
+    this.scrolled = y > 50;
+    if (!this.hidesOnScroll || y < 80 || this.showUserMenu || this.homeSearchOpen) {
+      this.barHidden = false;
+    } else if (y > this.lastScrollY + 6) {
+      this.barHidden = true;
+    } else if (y < this.lastScrollY - 6) {
+      this.barHidden = false;
+    }
+    if (Math.abs(y - this.lastScrollY) > 6 || y < 80) this.lastScrollY = y;
   }
 
   private initAutocomplete(): void {
