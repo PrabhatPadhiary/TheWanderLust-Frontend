@@ -13,9 +13,17 @@ import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 
 declare var google: any;
 
+/** The dive's zoom target: the letter (in the SVG), a point deep inside it, and how far to zoom. */
+interface DiveTarget { el: SVGTextElement; px: number; py: number; kMax: number; }
+
 /** Community stories: the one that leads the collage, and any left out of it. */
 const LEAD_STORY = '29242fa1-9f03-4a53-87a8-adebf6ca50a4';   // Sun, Sand, and Squad Goals (Goa)
 const HIDDEN_STORIES = ['e709adcf-7570-4196-9328-39931e4c065f']; // Official Trip to Mysore
+
+/** The letter of the headline's first line that the dive zooms into. */
+const DIVE_LETTER = 'o';
+
+
 
 @Component({
   selector: 'app-landing-page-v2',
@@ -24,9 +32,9 @@ const HIDDEN_STORIES = ['e709adcf-7570-4196-9328-39931e4c065f']; // Official Tri
   standalone: false
 })
 /**
- * Landing page: an editorial hero (a cream panel on warm sand with the
- * headline, the search and a tilted Santorini photo), then a "step into the
- * photo" as it straightens and fills the screen, into the next section; a
+ * Landing page: an Apple-style opening (the photo grows from a rounded card,
+ * between the big WAY / RAA, to the full screen), the headline and search over
+ * it, then a dive into the "o" of WORLD that lands in the next section; a
  * destination slider; the trip on a map (trip-map.ts); planning together on a
  * live board (plan-together.ts); a collage slider of real community stories;
  * what you can do; and a call to plan on the web or get the app.
@@ -36,6 +44,7 @@ const HIDDEN_STORIES = ['e709adcf-7570-4196-9328-39931e4c065f']; // Official Tri
  */
 export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('hero') heroRef!: ElementRef<HTMLElement>;
+  @ViewChild('heroMedia') heroMedia!: ElementRef<HTMLElement>;
   @ViewChild('heroCopy') heroCopy!: ElementRef<HTMLElement>;
   @ViewChild('story') storyRef!: ElementRef<HTMLElement>;
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
@@ -46,6 +55,7 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
     if (this.collageEl && this.animating) setTimeout(() => this.zone.runOutsideAngular(() => this.collageStory()));
   }
   private collageEl?: HTMLElement;
+  @ViewChild('dive') diveRef!: ElementRef<SVGSVGElement>;
   @ViewChild('tripMap') tripMapRef!: ElementRef<HTMLElement>;
 
   /** The trip on the map. */
@@ -55,13 +65,13 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
   readonly crew = CREW;
 
   readonly year = new Date().getFullYear();
-  /** The page under the navbar is light, so it uses dark text. */
+  /** The page under the navbar is light (after the dive), so it uses dark text. */
   navOnLight = false;
-  /** The hero's search is out of view: the navbar shows its own (wide screens). */
+  /** The hero's search isn't showing: the navbar shows its own (wide screens). */
   showNavSearch = false;
   /** …and on narrow screens a floating one, unless the closing section's search is on screen. */
   showFloatSearch = false;
-  /** The hero: its headline and line of text. */
+  /** The hero: one photo and its headline (the full stop is the dive's target). */
   readonly intro = {
     src: 'assets/images/hero/santorini.jpg',
     srcSmall: 'assets/images/hero/santorini-sm.jpg',
@@ -69,6 +79,11 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
     em: 'planned beautifully', // shown with a full stop
     sub: 'Find places, plan trips with friends and keep every day of the journey in one place, right in your browser.',
   };
+  /** The headline, letter by letter (spaces kept), and which letter the dive goes into. */
+  readonly titleChars = this.intro.title.split('');
+  readonly emChars = (this.intro.em + '.').split('');
+  diveIndex = -1;
+
   /** The destination being shown in the slider, and the one before (it stays under the next as that grows in). */
   activeStep = 0;
   prevStep = -1;
@@ -172,7 +187,6 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
         gsap.registerPlugin(ScrollTrigger);
         this.animating = true;
         this.scrollEffects();
-        this.stepIntoPhoto();   // after the destinations' own triggers, so it reads the card where it ends up
         this.reveals();
         if (this.collageEl) this.zone.runOutsideAngular(() => this.collageStory());
       } else {
@@ -189,88 +203,32 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
   }
 
   /**
-   * Step into the photo: as the destinations section scrolls up, a copy of the
-   * hero's tilted Santorini flies from the tilted one into the destinations
-   * card (straightening, growing, matching its corners), following both live
-   * as they move, then fades into the card's own Santorini.
-   */
-  private stepIntoPhoto(): void {
-    const hero = this.heroRef.nativeElement;
-    const story = this.storyRef?.nativeElement;
-    const panel = story?.querySelector<HTMLElement>('.dest-panel');
-    const tilt = hero.querySelector<HTMLElement>('.hero-tilt');
-    const photo = document.querySelector<HTMLElement>('.step-photo');
-    if (!story || !panel || !photo) return;
-    const TILT_DEG = -7, FROM_RADIUS = 22, TO_RADIUS = 32;
-
-    /** The tilted photo's unrotated box (centre and size), or on phones (where it's hidden) a card low in the middle. */
-    const fromBox = () => {
-      if (tilt && tilt.offsetWidth) {
-        const r = tilt.getBoundingClientRect();
-        return { cx: r.left + r.width / 2, cy: r.top + r.height / 2, w: tilt.offsetWidth, h: tilt.offsetHeight };
-      }
-      const w = window.innerWidth * 0.7;
-      return { cx: window.innerWidth / 2, cy: window.innerHeight * 0.78, w, h: w * 0.75 };
-    };
-
-    const morph = (p: number) => {
-      if (p <= 0 || p >= 1) {
-        photo.style.visibility = 'hidden';
-        if (tilt) tilt.style.visibility = p >= 1 ? 'hidden' : '';
-        return;
-      }
-      const a = fromBox();
-      const t = panel.getBoundingClientRect();
-      const e = p * p * (3 - 2 * p);   // ease in and out
-      const w = a.w + (t.width - a.w) * e;
-      const h = a.h + (t.height - a.h) * e;
-      const cx = a.cx + (t.left + t.width / 2 - a.cx) * e;
-      const cy = a.cy + (t.top + t.height / 2 - a.cy) * e;
-      photo.style.visibility = 'visible';
-      photo.style.width = `${w.toFixed(1)}px`;
-      photo.style.height = `${h.toFixed(1)}px`;
-      photo.style.left = `${(cx - w / 2).toFixed(1)}px`;
-      photo.style.top = `${(cy - h / 2).toFixed(1)}px`;
-      photo.style.borderRadius = `${(FROM_RADIUS + (TO_RADIUS - FROM_RADIUS) * e).toFixed(1)}px`;
-      photo.style.transform = `rotate(${(TILT_DEG * (1 - e)).toFixed(2)}deg)`;
-      // The last stretch: fade into the card (the same photo is under it).
-      photo.style.opacity = String(p < 0.88 ? 1 : Math.max(0, 1 - (p - 0.88) / 0.12));
-      if (tilt) tilt.style.visibility = 'hidden';
-    };
-
-    this.triggers.push(ScrollTrigger.create({
-      trigger: story,
-      start: 'top bottom',
-      end: 'top top',
-      onUpdate: st => morph(st.progress),
-      onLeave: () => morph(1),
-      onLeaveBack: () => morph(0),
-    }));
-  }
-
-  ngOnDestroy(): void {
-    this.triggers.forEach(t => t.kill());
-    this.stopReveals.forEach(fn => fn());
-  }
-
-  /**
-   * Is the hero's search on screen (and not faded by the step into the photo)? If not, the
-   * navbar shows a search (wide screens) or a floating one does (narrow), so
-   * there's always a search in reach. The floating one steps aside while the
-   * closing section's own search is on screen.
+   * Is the hero's search showing (on screen, and not faded by the opening or
+   * the dive)? If not, the navbar shows a search (wide screens) or a floating
+   * one does (narrow), so there's always one in reach. The floating one steps
+   * aside while the closing section's own search is on screen.
    */
   private watchSearches(): void {
-    const hero = this.heroRef.nativeElement.querySelector<HTMLElement>('.hero-search');
+    const hero = this.heroRef.nativeElement;
+    const heroSearch = hero.querySelector<HTMLElement>('.hero-search');
     const closing = document.querySelector<HTMLElement>('.cta-search');
     const onScreen = (el: HTMLElement | null) => {
       if (!el) return false;
       const r = el.getBoundingClientRect();
       return r.bottom > 0 && r.top < window.innerHeight;
     };
+    // Its own opacity times its parents' (the hero fades the copy as a whole).
+    const shownOpacity = (el: HTMLElement) => {
+      let o = 1;
+      for (let n: HTMLElement | null = el; n && n !== hero.parentElement; n = n.parentElement) {
+        o *= parseFloat(getComputedStyle(n).opacity || '1');
+      }
+      return o;
+    };
     let queued = false;
     const check = () => {
       queued = false;
-      const heroShown = !!hero && onScreen(hero) && parseFloat(getComputedStyle(hero).opacity || '1') > 0.3;
+      const heroShown = !!heroSearch && onScreen(heroSearch) && shownOpacity(heroSearch) > 0.3;
       const nav = !heroShown;
       const float = !heroShown && !onScreen(closing);
       if (nav !== this.showNavSearch || float !== this.showFloatSearch) {
@@ -285,6 +243,12 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
       window.removeEventListener('resize', onScroll);
     });
     check();
+    setTimeout(check, 300);   // once the opening has set its first frame
+  }
+
+  ngOnDestroy(): void {
+    this.triggers.forEach(t => t.kill());
+    this.stopReveals.forEach(fn => fn());
   }
 
   // ===== Scroll (GSAP) =====
@@ -292,16 +256,72 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
   private scrollEffects(): void {
     const hero = this.heroRef.nativeElement;
 
-    // Hero, pinned for a moment: it opens on the panel, holds, then its words
-    // fade (the tilted photo stays). Then, as the destinations section scrolls
-    // up, the photo flies into its card (stepIntoPhoto).
-    const HOLD = 0.35;
-    const FADE = 0.5;
-    const total = HOLD + FADE;
-    const scrollCue = hero.querySelector<HTMLElement>('.scroll-cue');
+    // Hero, pinned: the opening (the card grows to the full screen), a short
+    // hold to read the headline, then the dive into its full stop.
+    // Scroll length of each part, in screen heights. The dive is long, so the
+    // zoom into the letter feels slow and deliberate.
+    const OPEN = 1.1;
+    const HOLD = 0.6;
+    const DIVE = 2.6;
+    const total = OPEN + HOLD + DIVE;
+    const fadeOut = Array.from(hero.querySelectorAll<HTMLElement>('.hero-search, .hero-facts, .hero-sub, .glass-pill, .scroll-cue'));
+    const media = this.heroMedia.nativeElement;
+    const shade = hero.querySelector<HTMLElement>('.hero-shade');
     const content = this.heroCopy.nativeElement;
-    const search = hero.querySelector<HTMLElement>('.hero-search')!;
-    const copy = Array.from(content.querySelectorAll<HTMLElement>('.hero-panel-bg, .panel-head, .hero-title, .hero-sub, .hero-facts'));
+    const wordTop = hero.querySelector<HTMLElement>('.bw-top');
+    const wordBottom = hero.querySelector<HTMLElement>('.bw-bottom');
+    let target: DiveTarget | null = null;
+
+    /**
+     * The card at the start: centred in the space below the navbar, with the
+     * WAY / RAA letters sized to fit above and below it (they slightly tuck
+     * behind the card's top and bottom edges).
+     */
+    const layoutCard = () => {
+      const w = window.innerWidth, h = window.innerHeight;
+      const areaTop = this.small ? 88 : 120;   // clear of the navbar
+      const areaBottom = h - (this.small ? 20 : 28);
+      const fs = Math.min(w * (this.small ? 0.2 : 0.17), h * 0.17, 272);
+      const cw = this.small ? w * 0.82 : Math.min(w * 0.44, 720);
+      const room = areaBottom - areaTop - fs * 1.3;  // what's left between the words
+      const ch = Math.max(140, Math.min(room, cw * (this.small ? 1.1 : 0.62)));
+      const centre = (areaTop + areaBottom) / 2;
+      const top = centre - ch / 2;
+      const bottom = centre + ch / 2;
+      hero.style.setProperty('--bw-size', `${fs.toFixed(1)}px`);
+      hero.style.setProperty('--card-top', `${top.toFixed(1)}px`);
+      hero.style.setProperty('--card-bottom', `${bottom.toFixed(1)}px`);
+      return { x: (w - cw) / 2, top, bottom: h - bottom };
+    };
+    let card = layoutCard();
+    // The dive goes into the "o" of "world": bold and upright (thick strokes),
+    // near the middle. Falls back to the letter nearest the centre.
+    const preferred = this.intro.title.indexOf(DIVE_LETTER);
+    const pick = () => this.zone.run(() => { this.diveIndex = preferred >= 0 ? preferred : this.nearestLetter(hero); });
+    (document as any).fonts?.ready?.then(pick) ?? pick();
+    const onResize = () => { card = layoutCard(); pick(); };
+    window.addEventListener('resize', onResize);
+    this.stopReveals.push(() => window.removeEventListener('resize', onResize));
+
+    const applyOpening = (o: number) => {
+      const e = o * o * (3 - 2 * o);
+      const ix = card.x * (1 - e), it = card.top * (1 - e), ib = card.bottom * (1 - e);
+      const radius = 32 * (1 - e);
+      media.style.clipPath = `inset(${it.toFixed(1)}px ${ix.toFixed(1)}px ${ib.toFixed(1)}px ${ix.toFixed(1)}px round ${radius.toFixed(1)}px)`;
+      (media.style as any).webkitClipPath = media.style.clipPath;
+      // The photo eases from a slight zoom to rest as the card opens.
+      gsap.set(media.querySelector('img'), { scale: 1.12 - e * 0.12 });
+      // WAY / RAA slide apart behind the growing card.
+      if (wordTop) gsap.set(wordTop, { yPercent: -e * 140, opacity: 1 - e });
+      if (wordBottom) gsap.set(wordBottom, { yPercent: e * 140, opacity: 1 - e });
+      if (shade) gsap.set(shade, { opacity: e });
+      // Then the headline and search rise in, centred.
+      const t = Math.min(1, Math.max(0, (o - 0.7) / 0.3));
+      gsap.set(content, { opacity: t, y: (1 - t) * 30 });
+      content.style.pointerEvents = t > 0.5 ? '' : 'none';
+      return t;
+    };
+    applyOpening(0);
 
     this.heroTrigger = ScrollTrigger.create({
       trigger: hero,
@@ -309,17 +329,46 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
       end: () => '+=' + window.innerHeight * total,
       pin: true,
       anticipatePin: 1,
-      scrub: 1,
+      scrub: 1.2,
       onUpdate: (st) => {
         const all = st.progress * total;
-        const fade = 1 - Math.min(1, Math.max(0, (all - HOLD) / FADE));
-        gsap.set(copy, { opacity: fade, y: -40 * (1 - fade) });
-        search.style.opacity = String(fade);
-        content.style.pointerEvents = fade > 0.5 ? '' : 'none';
-        if (scrollCue) scrollCue.style.opacity = String(fade);
-        // The hero is light throughout: dark navbar text.
-        if (!this.navOnLight) this.zone.run(() => { this.navOnLight = true; });
+        const o = Math.min(1, all / OPEN);
+        const t = applyOpening(o);
+        const zp = Math.min(1, Math.max(0, (all - OPEN - HOLD) / DIVE));
+
+        // The dive: a camera zoom into the highlighted letter. The headline is
+        // swapped for an exact vector copy (SVG) that's zoomed by its viewBox,
+        // so everything stays sharp; the other letters fly past the edges and
+        // the frost letter fills the screen.
+        const svg = this.diveRef?.nativeElement;
+        const title = hero.querySelector<HTMLElement>('.hero-title');
+        if (svg && title) {
+          if (zp === 0) target = null;
+          else if (!target) target = this.buildDive(title, svg);
+          const diving = zp > 0 && !!target;
+          svg.style.opacity = diving ? '1' : '0';
+          if (!diving) svg.style.backgroundColor = 'transparent';
+          title.style.visibility = diving ? 'hidden' : '';
+          if (target) {
+            const W = window.innerWidth, H = window.innerHeight;
+            const k = 1 + Math.pow(zp, 2.4) * (target.kMax - 1);
+            const x0 = target.px - target.px / k;
+            const y0 = target.py - target.py / k;
+            svg.setAttribute('viewBox', `${x0.toFixed(2)} ${y0.toFixed(2)} ${(W / k).toFixed(3)} ${(H / k).toFixed(3)}`);
+            // The last stretch: frost fills in behind the letter, so no photo is left at the edges.
+            const fill = Math.min(1, Math.max(0, (zp - 0.82) / 0.15));
+            svg.style.backgroundColor = `rgba(238, 242, 244, ${fill.toFixed(3)})`;
+          }
+        }
+        // The photo pushes in a little with the zoom.
+        gsap.set(media.querySelector('img'), { scale: 1 + Math.pow(zp, 2) * 0.25 });
+        fadeOut.forEach(el => gsap.set(el, { opacity: 1 - Math.min(1, zp * 4) }));
+
+        // The hero is light throughout (frost page, then the veiled photo): dark navbar text.
+        const light = true;
+        if (light !== this.navOnLight) this.zone.run(() => { this.navOnLight = light; });
       },
+      onLeave: () => { if (!this.navOnLight) this.zone.run(() => { this.navOnLight = true; }); },
     });
     this.triggers.push(this.heroTrigger);
 
@@ -517,6 +566,101 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
         this.stopReveals.push(() => { card.removeEventListener('pointermove', move); card.removeEventListener('pointerleave', leave); });
       });
     }
+  }
+
+  /** Index (in titleChars + emChars) of the letter nearest the screen centre, at rest. */
+  private nearestLetter(hero: HTMLElement): number {
+    const chars = Array.from(hero.querySelectorAll<HTMLElement>('.hero-title .ch'));
+    const content = this.heroCopy.nativeElement;
+    const dy = Number(gsap.getProperty(content, 'y')) || 0; // ignore the fade-in offset
+    const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+    let best = -1, bestD = Infinity;
+    chars.forEach((el, i) => {
+      if (!/[A-Za-z]/.test(el.textContent || '')) return;
+      const r = el.getBoundingClientRect();
+      const d = Math.hypot(r.left + r.width / 2 - cx, r.top - dy + r.height / 2 - cy);
+      if (d < bestD) { bestD = d; best = i; }
+    });
+    return best;
+  }
+
+  /**
+   * Copy the headline into the SVG, letter by letter at exactly the same
+   * places, fonts and colours, and work out the zoom: the point deepest
+   * inside the highlighted letter's stroke, and how far to zoom for it to
+   * cover the whole screen.
+   */
+  private buildDive(title: HTMLElement, svg: SVGSVGElement): DiveTarget | null {
+    const W = window.innerWidth, H = window.innerHeight;
+    const chars = Array.from(title.querySelectorAll<HTMLElement>('.ch'));
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d')!;
+    const NS = 'http://www.w3.org/2000/svg';
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+
+    let targetEl: SVGTextElement | null = null;
+    let targetBox: { rect: DOMRect; font: string; ascent: number; ch: string } | null = null;
+    chars.forEach((el, i) => {
+      const cs = getComputedStyle(el);
+      // Draw the letter as shown (the headline is in capitals via CSS).
+      const raw = el.textContent || '';
+      const ch = cs.textTransform === 'uppercase' ? raw.toUpperCase() : raw;
+      if (!ch.trim()) return;
+      const r = el.getBoundingClientRect();
+      const font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      ctx.font = font;
+      const ascent = ctx.measureText(ch).fontBoundingBoxAscent ?? parseFloat(cs.fontSize) * 0.9;
+      // The span's box is its line box; centre the font's content area in it.
+      const content = ascent + (ctx.measureText(ch).fontBoundingBoxDescent ?? parseFloat(cs.fontSize) * 0.25);
+      const baseline = r.top + (r.height - content) / 2 + ascent;
+      const t = document.createElementNS(NS, 'text');
+      t.textContent = ch;
+      t.setAttribute('x', r.left.toFixed(2));
+      t.setAttribute('y', baseline.toFixed(2));
+      t.setAttribute('font-family', cs.fontFamily);
+      t.setAttribute('font-size', cs.fontSize);
+      t.setAttribute('font-weight', cs.fontWeight);
+      t.setAttribute('font-style', cs.fontStyle);
+      t.setAttribute('fill', cs.color);
+      svg.appendChild(t);
+      if (i === this.diveIndex) {
+        targetEl = t;
+        targetBox = { rect: r, font, ascent: baseline - r.top, ch };
+      }
+    });
+    if (!targetEl || !targetBox) return null;
+    const tb = targetBox as { rect: DOMRect; font: string; ascent: number; ch: string };
+
+    // The point deepest inside the letter: draw it and find the inked pixel
+    // farthest from any blank one (a quick two-pass distance map).
+    const pad = 4;
+    const gw = Math.ceil(tb.rect.width) + pad * 2;
+    const gh = Math.ceil(tb.rect.height) + pad * 2;
+    canvas.width = gw;
+    canvas.height = gh;
+    ctx.font = tb.font;
+    ctx.fillText(tb.ch, pad, pad + tb.ascent);
+    const data = ctx.getImageData(0, 0, gw, gh).data;
+    const dist = new Float32Array(gw * gh);
+    for (let p = 0; p < gw * gh; p++) dist[p] = data[p * 4 + 3] > 128 ? 1e6 : 0;
+    for (let y = 0; y < gh; y++) for (let x = 0; x < gw; x++) {
+      const p = y * gw + x;
+      if (!dist[p]) continue;
+      dist[p] = Math.min(dist[p], (y > 0 ? dist[p - gw] : 0) + 1, (x > 0 ? dist[p - 1] : 0) + 1);
+    }
+    let bx = 0, by = 0, bd = 0;
+    for (let y = gh - 1; y >= 0; y--) for (let x = gw - 1; x >= 0; x--) {
+      const p = y * gw + x;
+      if (!dist[p]) continue;
+      dist[p] = Math.min(dist[p], (y < gh - 1 ? dist[p + gw] : 0) + 1, (x < gw - 1 ? dist[p + 1] : 0) + 1);
+      if (dist[p] > bd) { bd = dist[p]; bx = x; by = y; }
+    }
+    if (!bd) return null;
+    const px = tb.rect.left - pad + bx + 0.5;
+    const py = tb.rect.top - pad + by + 0.5;
+    const far = Math.max(Math.hypot(px, py), Math.hypot(W - px, py), Math.hypot(px, H - py), Math.hypot(W - px, H - py));
+    return { el: targetEl, px, py, kMax: (far / Math.max(1, bd - 1)) * 1.08 };
   }
 
   /** Wrap each word of a heading in a clipping line, for the rising-words reveal (keeps <em>). */
