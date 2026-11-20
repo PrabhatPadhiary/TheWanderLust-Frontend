@@ -1,0 +1,10 @@
+<div class="choice-card" [class.choice-card--compact]="data.compact" role="dialog" [attr.aria-label]="data.title">
+  <h4>{{ data.title }}</h4>
+  <p *ngIf="data.message">{{ data.message }}</p>
+  <div class="choice-list">
+    <button *ngFor="let o of data.options" class="choice" [class.choice--danger]="o.danger" (click)="choose(o.key)">
+      {{ o.label }}
+    </button>
+  </div>
+  <button class="choice-cancel" (click)="cancel()">{{ data.cancelLabel || 'Cancel' }}</button>
+</div>

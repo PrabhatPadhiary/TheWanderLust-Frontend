@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { NavHistoryService } from '../../services/nav-history.service';
 import { ToastrService } from 'ngx-toastr';
 import { AccountService, MyProfile } from '../../services/account.service';
 import { AuthService } from '../../services/auth.service';
@@ -37,6 +38,11 @@ export class ProfileComponent implements OnInit {
   savingName = false;
   showLevels = false;
   readonly levels = LEVELS;
+
+  private readonly navHistory = inject(NavHistoryService);
+
+  /** Back to wherever you came from; Explore if you opened Profile straight from a link. */
+  back(): void { this.navHistory.back('/'); }
 
   constructor(
     private account: AccountService,

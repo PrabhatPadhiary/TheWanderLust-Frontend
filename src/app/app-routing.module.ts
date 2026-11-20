@@ -31,8 +31,11 @@ const routes: Routes = [
   { path: 'my-trips', component: MyTripsComponent, data: { seo: { title: 'My trips · Wayraa', noindex: true } } },
   { path: 'community', component: CommunityComponent, data: { seo: { title: 'Travel stories from real travellers · Wayraa', description: 'Trip stories, itineraries, places and tips shared by real travellers on Wayraa. Read where they went, what they did and what it cost.' } } },
   { path: 'community/write', component: WriteJournalComponent, data: { seo: { title: 'Write a story · Wayraa', noindex: true } } },
-  { path: 'community/journal/:id', component: JournalDetailComponent, data: { seo: { title: 'Travel story · Wayraa' } } },
-  { path: 'my-journals', component: MyJournalsComponent, data: { seo: { title: 'My journals · Wayraa', noindex: true } } },
+  { path: 'community/story/:id', component: JournalDetailComponent, data: { seo: { title: 'Travel story · Wayraa' } } },
+  { path: 'my-stories', component: MyJournalsComponent, data: { seo: { title: 'Your stories · Wayraa', noindex: true } } },
+  // Old addresses (links already shared, and the app's share links): keep working.
+  { path: 'community/journal/:id', redirectTo: 'community/story/:id' },
+  { path: 'my-journals', redirectTo: 'my-stories' },
   { path: 'features', component: FeaturesComponent, data: { seo: { title: 'Features · A group trip planner that does it all · Wayraa', description: 'Find places, save favourites, make a trip, plan every day on a map, plan with friends live, and track the budget and checklist. See how Wayraa works, from first idea to the last photo.' } } },
   { path: 'pricing', component: PricingComponent, data: { seo: { title: 'Pricing · Wayraa', description: 'Wayraa is free while in beta, on the web and on Android.' } } },
   { path: 'about', component: AboutComponent, data: { seo: { title: 'About Wayraa · Built by a traveller, for every traveller', description: 'Why Wayraa exists: years of trying to fix group trip planning, the Excel sheets and endless group chats, and the app that finally came out of it. From founder Prabhat Padhiary.' } } },

@@ -1,9 +1,20 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
-import { JournalService, JournalDetail, JournalComment } from '../../../services/journal.service';
+import { JournalService, JournalDetail, JournalComment, JournalFeedItem } from '../../../services/journal.service';
 import { AuthService } from '../../../services/auth.service';
 import { ToastrService } from 'ngx-toastr';
+import { MatDialog } from '@angular/material/dialog';
+import { AuthGateModalComponent } from '../../auth-gate-modal/auth-gate-modal.component';
 import { SeoService } from '../../../services/seo.service';
+import { StoryActionsService } from '../../../services/story-actions.service';
+import { FavouritesService } from '../../../services/favourites.service';
+import { AddToTripModalComponent, AddToTripModalData } from '../../add-to-trip-modal/add-to-trip-modal.component';
+import { PlaceDto, PlaceDetailsResponse } from '../../../models/destination.model';
+import { firstValueFrom } from 'rxjs';
+import { NavHistoryService } from '../../../services/nav-history.service';
+
+type StoryPlace = JournalDetail['places'][number];
 
 @Component({
   selector: 'app-journal-detail',
@@ -11,7 +22,7 @@ import { SeoService } from '../../../services/seo.service';
   styleUrls: ['./journal-detail.component.scss'],
   standalone: false
 })
-export class JournalDetailComponent implements OnInit {
+export class JournalDetailComponent implements OnInit, OnDestroy {
 
   journal: JournalDetail | null = null;
   loading = true;
@@ -30,13 +41,28 @@ export class JournalDetailComponent implements OnInit {
   newComment = '';
   postingComment = false;
 
+  /** The author's other public stories (up to 3, newest first). */
+  moreFromAuthor: JournalFeedItem[] = [];
+
+  private paramSub?: Subscription;
+
+  // A place from the story, open in the side panel
+  panelPlace: PlaceDto | null = null;
+  panelOpen = false;
+  private panelStoryPlace: StoryPlace | null = null;
+  private panelDetails: PlaceDetailsResponse | null = null;
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private journalService: JournalService,
     public authService: AuthService,
     private toastr: ToastrService,
-    private seo: SeoService
+    private seo: SeoService,
+    private dialog: MatDialog,
+    private storyActions: StoryActionsService,
+    private favourites: FavouritesService,
+    public navHistory: NavHistoryService,
   ) {}
 
   /** The story's own title, summary and photo for search and link previews (private stories stay out). */
@@ -61,14 +87,33 @@ export class JournalDetailComponent implements OnInit {
       datePublished: j.publishedAt || j.createdAt,
       author: { '@type': 'Person', name: j.author?.name || 'Wayraa traveller' },
       publisher: { '@type': 'Organization', name: 'Wayraa', logo: { '@type': 'ImageObject', url: 'https://wayraa.com/assets/images/logo/wayraa_logo_notext.png' } },
-      mainEntityOfPage: `https://wayraa.com/community/journal/${j.id}`,
+      mainEntityOfPage: `https://wayraa.com/community/story/${j.id}`,
       contentLocation: { '@type': 'Place', name: j.destination },
     } : null);
   }
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id');
-    if (!id) { this.notFound = true; this.loading = false; return; }
+    // Follows the id in the URL, so opening another story from "More from…"
+    // (same page, new id) loads that story.
+    this.paramSub = this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      if (!id) { this.notFound = true; this.loading = false; return; }
+      this.load(id);
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.paramSub?.unsubscribe();
+  }
+
+  private load(id: string): void {
+    this.loading = true;
+    this.notFound = false;
+    this.journal = null;
+    this.moreFromAuthor = [];
+    this.activePhotoIndex = 0;
+    this.lightboxOpen = false;
+    this.newComment = '';
 
     this.authService.authReady.then(() => {
       this.journalService.getById(id).subscribe({
@@ -78,15 +123,13 @@ export class JournalDetailComponent implements OnInit {
           this.isLiked = j.isLikedByMe;
           this.likesCount = j.likesCount;
           this.loading = false;
+          this.loadMoreFromAuthor(j);
 
-          // Auto-scroll to comments if fragment is present
-          this.route.fragment.subscribe(fragment => {
-            if (fragment === 'comments') {
-              setTimeout(() => {
-                document.getElementById('comments')?.scrollIntoView({ behavior: 'smooth' });
-              }, 150);
-            }
-          });
+          if (this.route.snapshot.fragment === 'comments') {
+            setTimeout(() => document.getElementById('comments')?.scrollIntoView({ behavior: 'smooth' }), 150);
+          } else if (typeof window !== 'undefined') {
+            window.scrollTo({ top: 0 });
+          }
         },
         error: () => {
           this.notFound = true;
@@ -94,6 +137,26 @@ export class JournalDetailComponent implements OnInit {
         }
       });
     });
+  }
+
+  /**
+   * The author's other public stories, from the community feed (newest public
+   * stories). Hidden when there are none.
+   */
+  private loadMoreFromAuthor(j: JournalDetail): void {
+    this.journalService.getFeed().subscribe({
+      next: (items) => {
+        if (this.journal?.id !== j.id) return;   // moved on to another story meanwhile
+        this.moreFromAuthor = (items || [])
+          .filter(i => i.author?.id === j.author.id && i.id !== j.id)
+          .slice(0, 3);
+      },
+      error: () => { this.moreFromAuthor = []; },
+    });
+  }
+
+  openStory(id: string): void {
+    this.router.navigate(['/community/story', id]);
   }
 
   // ── Helpers ──────────────────────────────────────────────────────────────
@@ -159,6 +222,18 @@ export class JournalDetailComponent implements OnInit {
     return 'Luxury';
   }
 
+  /** The trip's actual spend for the stats card, e.g. "₹12,000". */
+  get budgetAmount(): string {
+    const b = this.journal?.budget;
+    if (!b) return '';
+    const c = this.journal?.currency || 'INR';
+    try {
+      return new Intl.NumberFormat('en-IN', { style: 'currency', currency: c, maximumFractionDigits: 0 }).format(b);
+    } catch {
+      return `${c} ${b.toLocaleString('en-IN')}`;
+    }
+  }
+
   get budgetEmoji(): string {
     const b = this.journal?.budget;
     if (!b) return '';
@@ -217,12 +292,33 @@ export class JournalDetailComponent implements OnInit {
 
   // ── Actions ──────────────────────────────────────────────────────────────
 
+  /** Back to wherever you came from (another story, a place…); Community if you opened this one from a link. */
   goBack(): void {
-    this.router.navigate(['/community']);
+    this.navHistory.back('/community');
+  }
+
+  /** Reading is open to everyone; liking and commenting ask to sign in first, then carry on. */
+  askToSignIn(then?: () => void): void {
+    this.dialog.open(AuthGateModalComponent, {
+      data: { destination: '' },
+      panelClass: 'auth-gate-dialog',
+      maxWidth: '500px',
+      width: '500px',
+    }).afterClosed().subscribe(result => {
+      if (result?.type === 'authenticated') then?.();
+    });
+  }
+
+  /** "Plan a trip like this": straight to planning (the planner asks to sign in when needed). */
+  startPlanning(): void {
+    this.router.navigate(['/']);
   }
 
   toggleLike(): void {
-    if (!this.authService.isLoggedIn) return;
+    if (!this.authService.isLoggedIn) {
+      this.askToSignIn(() => this.toggleLike());
+      return;
+    }
     if (this.likeInFlight) return;
 
     // Optimistic
@@ -266,12 +362,150 @@ export class JournalDetailComponent implements OnInit {
   }
 
   shareJournal(): void {
-    if (navigator.share) {
-      navigator.share({ title: this.journal?.title, url: window.location.href });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      this.toastr.success('Link copied to clipboard');
+    if (this.journal) this.storyActions.share(this.journal);
+  }
+
+  // ── The story's ⋯ menu ────────────────────────────────────────────────────
+
+  get isMine(): boolean {
+    return !!this.journal && this.storyActions.isMine(this.journal);
+  }
+
+  async openStoryMenu(event?: Event): Promise<void> {
+    if (!this.journal) return;
+    const outcome = await this.storyActions.openMenu(this.journal, event?.currentTarget as HTMLElement | null);
+    if (!outcome) return;
+    if (outcome.type === 'visibility') {
+      this.journal.visibility = outcome.visibility;
+      return;
     }
+    // Deleted, hidden, reported or its author blocked: nothing left to read here.
+    this.router.navigate(['/community']);
+  }
+
+  // ── Comments ──────────────────────────────────────────────────────────────
+
+  isMyComment(c: JournalComment): boolean {
+    return !!this.authService.currentUser?.id && c.author?.id === this.authService.currentUser.id;
+  }
+
+  /** Your comment: delete it. Someone else's: block them (signed in). */
+  async openCommentMenu(c: JournalComment, event?: Event): Promise<void> {
+    if (!this.journal) return;
+    const anchor = event?.currentTarget as HTMLElement | null;
+    const journal = this.journal;
+    if (this.isMyComment(c)) {
+      const ok = await this.storyActions.choose({
+        title: 'Delete comment?',
+        options: [{ key: 'delete', label: 'Delete', danger: true }],
+      }, anchor);
+      if (ok !== 'delete') return;
+      try {
+        await firstValueFrom(this.journalService.deleteComment(journal.id, c.id));
+        journal.comments = journal.comments.filter(x => x.id !== c.id);
+        journal.commentsCount = Math.max(0, journal.commentsCount - 1);
+      } catch {
+        this.toastr.error('Couldn\'t delete the comment. Please try again.');
+      }
+      return;
+    }
+    const name = c.author?.name || 'this person';
+    const key = await this.storyActions.choose({
+      title: name,
+      options: [{ key: 'block', label: `Block ${name}`, danger: true }],
+    }, anchor);
+    if (key !== 'block') return;
+    if (!(await this.storyActions.confirmBlock({ id: c.author.id, name }))) return;
+    if (journal.author?.id === c.author.id) {
+      this.router.navigate(['/community']);   // they wrote the story too
+      return;
+    }
+    const left = journal.comments.filter(x => x.author?.id !== c.author.id);
+    journal.commentsCount = Math.max(0, journal.commentsCount - (journal.comments.length - left.length));
+    journal.comments = left;
+  }
+
+  // ── Places mentioned: open one in the side panel ──────────────────────────
+
+  openPlace(place: StoryPlace): void {
+    if (!place.googlePlaceId) return;
+    this.panelStoryPlace = place;
+    this.panelDetails = null;
+    this.panelPlace = {
+      placeId: place.googlePlaceId,
+      name: place.placeName,
+      vicinity: '',
+      rating: null,
+      userRatingsTotal: null,
+      priceLevel: null,
+      geometry: { latitude: place.latitude ?? 0, longitude: place.longitude ?? 0 },
+      photos: [],
+      types: [],
+    };
+    this.panelOpen = true;
+  }
+
+  closePlace(): void {
+    this.panelOpen = false;
+  }
+
+  onPlaceDetails(d: PlaceDetailsResponse): void {
+    this.panelDetails = d;
+  }
+
+  /** The open place with whatever the panel has loaded (address, rating, photo). */
+  private get fullPanelPlace(): PlaceDto | null {
+    if (!this.panelPlace) return null;
+    const d = this.panelDetails;
+    return d ? {
+      ...this.panelPlace,
+      name: d.name || this.panelPlace.name,
+      vicinity: d.formattedAddress || '',
+      rating: d.rating,
+      userRatingsTotal: d.userRatingsTotal,
+      priceLevel: d.priceLevel,
+      geometry: d.geometry || this.panelPlace.geometry,
+      photos: d.photos || [],
+    } : this.panelPlace;
+  }
+
+  async addPlaceToTrip(): Promise<void> {
+    const place = this.fullPanelPlace;
+    if (!place || !this.journal) return;
+    if (!(await this.storyActions.signedIn())) return;
+    const cat = this.panelStoryPlace?.category;
+    const category = cat === 'stay' ? 'stay' : cat === 'food' ? 'food' : 'activity';
+    const ref = this.dialog.open(AddToTripModalComponent, {
+      panelClass: 'custom-dialog-container',
+      data: { place, category, destinationName: this.journal.destination } as AddToTripModalData,
+    });
+    ref.afterClosed().subscribe(result => {
+      if (result === 'create-new') {
+        // A new trip starts from its destination: search for it on Explore.
+        this.panelOpen = false;
+        this.router.navigate(['/']);
+        this.toastr.info(`Search for ${this.journal?.destination || 'your destination'} to start a new trip`);
+      }
+    });
+  }
+
+  toggleFavouritePlace(): void {
+    const place = this.fullPanelPlace;
+    if (!place) return;
+    if (this.favourites.isFavourite(place.placeId)) {
+      this.favourites.remove(place.placeId);
+      return;
+    }
+    const cat = this.panelStoryPlace?.category;
+    this.favourites.add({
+      placeId: place.placeId,
+      placeName: place.name,
+      vicinity: place.vicinity,
+      rating: place.rating,
+      userRatingsTotal: place.userRatingsTotal,
+      photoUrl: place.photos[0]?.url || null,
+      category: cat === 'stay' ? 'lodging' : cat === 'food' ? 'restaurant' : 'tourist_attraction',
+    });
   }
 
   scrollToComments(): void {

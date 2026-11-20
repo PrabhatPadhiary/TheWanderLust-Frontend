@@ -1,8 +1,8 @@
-import { Component, OnInit, HostListener } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { JournalService, JournalFeedItem } from '../../services/journal.service';
-import { ToastrService } from 'ngx-toastr';
+import { StoryActionsService } from '../../services/story-actions.service';
 
 @Component({
   selector: 'app-my-journals',
@@ -16,23 +16,13 @@ export class MyJournalsComponent implements OnInit {
   loading = true;
   activeFilter: 'all' | 'published' | 'draft' = 'all';
 
-  // Menu state
-  openMenuJournalId: string | null = null;
-  menuPosition = { top: 0, right: 0 };
-  journalToDelete: JournalFeedItem | null = null;
-  deletingJournal = false;
 
   constructor(
     private router: Router,
     public authService: AuthService,
     private journalService: JournalService,
-    private toastr: ToastrService
+    private storyActions: StoryActionsService,
   ) {}
-
-  @HostListener('document:click')
-  onDocumentClick(): void {
-    if (this.openMenuJournalId) this.openMenuJournalId = null;
-  }
 
   ngOnInit(): void {
     if (!this.authService.isLoggedIn) {
@@ -80,63 +70,24 @@ export class MyJournalsComponent implements OnInit {
     if (journal.status === 'draft') {
       this.router.navigate(['/community/write'], { queryParams: { edit: journal.id } });
     } else {
-      this.router.navigate(['/community/journal', journal.id]);
+      this.router.navigate(['/community/story', journal.id]);
     }
-  }
-
-  editJournal(journal: JournalFeedItem): void {
-    this.openMenuJournalId = null;
-    this.router.navigate(['/community/write'], { queryParams: { edit: journal.id } });
   }
 
   writeNewJournal(): void {
     this.router.navigate(['/community/write']);
   }
 
-  toggleMenu(journal: JournalFeedItem, event: Event): void {
+  /** Same ⋯ menu as in Community: edit, hide / show, share, delete (drafts: edit, delete). */
+  async openMenu(journal: JournalFeedItem, event: Event): Promise<void> {
     event.stopPropagation();
-    if (this.openMenuJournalId === journal.id) {
-      this.openMenuJournalId = null;
-      return;
+    const outcome = await this.storyActions.openMenu(journal, event.currentTarget as HTMLElement | null);
+    if (!outcome) return;
+    if (outcome.type === 'deleted') {
+      this.journals = this.journals.filter(j => j.id !== journal.id);
+    } else if (outcome.type === 'visibility') {
+      journal.visibility = outcome.visibility;
     }
-    const btn = event.currentTarget as HTMLElement;
-    const rect = btn.getBoundingClientRect();
-    this.menuPosition = {
-      top: rect.bottom + 6,
-      right: window.innerWidth - rect.right
-    };
-    this.openMenuJournalId = journal.id;
-  }
-
-  getOpenMenuJournal(): JournalFeedItem | undefined {
-    return this.journals.find(j => j.id === this.openMenuJournalId);
-  }
-
-  openDeleteConfirm(journal: JournalFeedItem): void {
-    this.openMenuJournalId = null;
-    this.journalToDelete = journal;
-  }
-
-  cancelDelete(): void {
-    this.journalToDelete = null;
-  }
-
-  confirmDelete(): void {
-    if (!this.journalToDelete || this.deletingJournal) return;
-    this.deletingJournal = true;
-
-    this.journalService.deleteJournal(this.journalToDelete.id).subscribe({
-      next: () => {
-        this.journals = this.journals.filter(j => j.id !== this.journalToDelete!.id);
-        this.toastr.success('Journal deleted');
-        this.deletingJournal = false;
-        this.journalToDelete = null;
-      },
-      error: () => {
-        this.toastr.error('Failed to delete journal');
-        this.deletingJournal = false;
-      }
-    });
   }
 
   getAuthorInitial(journal: JournalFeedItem): string {

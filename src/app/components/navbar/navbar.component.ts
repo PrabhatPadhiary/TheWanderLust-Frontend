@@ -15,7 +15,12 @@ declare var google: any;
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss'],
-  standalone: false
+  standalone: false,
+  // Pre-rendered pages are built signed out ("Sign In"). Draw the navbar fresh in
+  // the browser instead of reusing that HTML, so a signed-in visitor sees only
+  // their avatar (Angular removes leftover pre-rendered bits only once a page is
+  // idle, which the animated home page never is).
+  host: { ngSkipHydration: 'true' },
 })
 export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() destinationName: string = '';
@@ -25,6 +30,18 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   @Input() primaryDestinationPlaceId: string = '';
   /** Landing mode: transparent navbar that frosts on scroll, shows section links */
   @Input() isLanding: boolean = false;
+  /** Home page: show the search beside the links (the hero's own search is out of view). */
+  @Input() set homeSearch(on: boolean) {
+    this._homeSearch = on;
+    if (!on) this.homeSearchOpen = false;
+  }
+  get homeSearch(): boolean { return this._homeSearch; }
+  private _homeSearch = false;
+  homeSearchOpen = false;
+
+  toggleHomeSearch(): void {
+    this.homeSearchOpen = !this.homeSearchOpen;
+  }
   /** Dark glass look, for pages over dark/cinematic heroes (the landing page). */
   @Input() dark: boolean = false;
   /** With `dark`: the page under the bar is light now (dark text and icons). */
@@ -64,6 +81,8 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   hideSearchBar = false;
   isCommunityPage = false;
   isStaticLandingPage = false;
+  /** Explore (the home page). */
+  isHomePage = false;
   private searchSubject = new Subject<string>();
   private autocompleteService: any;
   private blurTimeout: any;
@@ -89,7 +108,7 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /** False while pages are pre-rendered at build time (no window, animations or observers then). */
-  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   constructor(
     public authService: AuthService,
@@ -136,16 +155,18 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   get appTabWidth(): number { return typeof window !== 'undefined' && window.innerWidth <= 760 ? 52 : 132; }
 
   private updateIndex(url: string): void {
-    this.appIndex = url.startsWith('/favourites') ? 0 : url.startsWith('/my-trips') ? 1 : url.startsWith('/my-journals') ? 2 : -1;
+    this.appIndex = url.startsWith('/favourites') ? 0 : url.startsWith('/my-trips') ? 1 : url.startsWith('/my-stories') ? 2 : -1;
     if (url.startsWith('/features'))       this.navIndex = 1;
     else if (url.startsWith('/community')) this.navIndex = 2;
     else if (url.startsWith('/pricing'))   this.navIndex = 3;
     else if (url === '/' || url.startsWith('/home') || url.startsWith('/v2') || url.startsWith('/#')) this.navIndex = 0;
     else                                   this.navIndex = -1;   // e.g. Download, Privacy: nothing highlighted
 
-    this.hideSearchBar = url.startsWith('/my-trips') || url.startsWith('/favourites') || url.startsWith('/my-journals');
+    this.hideSearchBar = url.startsWith('/my-trips') || url.startsWith('/favourites') || url.startsWith('/my-stories');
     this.isCommunityPage = url.startsWith('/community');
     this.isStaticLandingPage = url.startsWith('/features') || url.startsWith('/pricing');
+    this.isHomePage = this.navIndex === 0;
+    this.showUserMenu = false;   // a new page closes the menu
   }
 
   ngOnDestroy(): void {
@@ -251,13 +272,13 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
       this.openAuthModal();
       return;
     }
-    this.router.navigate(['/my-journals']);
+    this.router.navigate(['/my-stories']);
   }
 
   onSignIn(): void {
     if (this.authService.isLoggedIn) {
       if (this.isCommunityPage) {
-        this.router.navigate(['/my-journals']);
+        this.router.navigate(['/my-stories']);
       } else {
         this.router.navigate(['/my-trips']);
       }
@@ -271,9 +292,29 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   closeUserMenu(): void {
-    setTimeout(() => {
-      this.showUserMenu = false;
-    }, 150);
+    this.showUserMenu = false;
+  }
+
+  private readonly host = inject(ElementRef<HTMLElement>);
+
+  /** A click anywhere outside the avatar menu closes it (blur alone misses Safari, where buttons don't take focus). */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as Node;
+    if (this.showUserMenu) {
+      const wrapper = this.host.nativeElement.querySelector('.user-menu-wrapper');
+      if (wrapper && !wrapper.contains(target)) this.showUserMenu = false;
+    }
+    if (this.homeSearchOpen) {
+      const search = this.host.nativeElement.querySelector('.home-search');
+      if (search && !search.contains(target)) this.homeSearchOpen = false;
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscape(): void {
+    this.showUserMenu = false;
+    this.homeSearchOpen = false;
   }
 
   async logout(): Promise<void> {

@@ -4,6 +4,7 @@ Disallow: /trip-planner
 Disallow: /favourites
 Disallow: /my-trips
 Disallow: /my-journals
+Disallow: /my-stories
 Disallow: /join/
 Disallow: /community/write
 Disallow: /profile

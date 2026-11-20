@@ -124,6 +124,19 @@
                 </button>
             </div>
 
+            <!-- Stories from Wayraa travellers who tagged this place -->
+            <div class="panel-stories" *ngIf="stories.length">
+                <h3>Stories from Wayraa travellers</h3>
+                <div class="panel-stories-row">
+                    <button class="panel-story" *ngFor="let s of stories" (click)="openStory(s.id)">
+                        <img *ngIf="s.photos?.length" [src]="s.photos![0].url | sized:'thumb'" [alt]="s.title" loading="lazy">
+                        <span *ngIf="!s.photos?.length" class="panel-story-empty">{{ s.destination }}</span>
+                        <strong>{{ s.title }}</strong>
+                        <span class="panel-story-meta">{{ s.author.name }} · ♥ {{ s.likesCount }}</span>
+                    </button>
+                </div>
+            </div>
+
             <!-- Reviews -->
             <div class="panel-reviews" *ngIf="details.reviews.length > 0">
                 <h3>Reviews</h3>

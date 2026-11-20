@@ -426,3 +426,9 @@
   .journal-item-cover { width: 60px; height: 60px; }
   .page-header-top { flex-direction: column; gap: 12px; }
 }
+
+// Published, but hidden from Community.
+.status-hidden {
+  background: #E8EDF0;
+  color: #475969;
+}

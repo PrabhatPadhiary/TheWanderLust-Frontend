@@ -1,29 +1,33 @@
-<app-navbar [isLanding]="true" [dark]="true" [onLight]="navOnLight"></app-navbar>
+<app-navbar [isLanding]="true" [dark]="true" [onLight]="navOnLight" [homeSearch]="showNavSearch"></app-navbar>
+
+<!-- Narrow screens: once the hero's search is out of view, one floats at the bottom. -->
+<div class="float-search" [class.float-search--on]="showFloatSearch" [attr.aria-hidden]="!showFloatSearch">
+  <app-place-search [dropUp]="true" [showButton]="false" placeholder="Search destinations"></app-place-search>
+</div>
 
 <main class="landing">
 
   <!-- ===== HERO: the destination film ===== -->
   <section class="hero" #hero id="explore" aria-labelledby="hero-title">
-    <!-- Opening: the brand word, split around the photo card (behind it). -->
-    <div class="brand-word" aria-hidden="true">
-      <span class="bw-top">WAY</span>
-      <span class="bw-bottom">RAA</span>
-    </div>
-
-    <div class="hero-media" #heroMedia aria-hidden="true">
-      <picture>
-        <source media="(max-width: 720px)" [srcset]="intro.srcSmall">
-        <img class="hero-photo" [src]="intro.src" alt="" fetchpriority="high">
-      </picture>
-    </div>
-    <div class="hero-shade" aria-hidden="true"></div>
-
     <div class="hero-content" #heroCopy>
-      <span class="glass-pill">Free while in beta · Web and Android</span>
+     <!-- The panel on the plain page (editorial, Cycladist-like), with a tilted photo -->
+     <div class="hero-panel">
+      <div class="hero-panel-bg" aria-hidden="true"></div>
+      <div class="hero-tilt">
+        <img src="assets/images/hero/santorini.jpg" alt="Santorini, Greece" fetchpriority="high">
+        <span class="photo-shade" aria-hidden="true"></span>
+      </div>
+      <!-- The panel's own header: the brand, and where it's available -->
+      <div class="panel-head">
+        <span class="panel-brand">
+          <img src="assets/images/logo/wayraa_logo_notext.svg" alt="" width="28" height="28">
+          wayraa
+        </span>
+        <span class="glass-pill">Free while in beta · Web and Android</span>
+      </div>
       <h1 class="hero-title" id="hero-title">
-        <!-- Letter by letter, so the one nearest the centre can be highlighted (the dive's target). -->
-        <span><span *ngFor="let c of titleChars; let i = index" class="ch" [class.target]="i === diveIndex">{{ c }}</span></span>
-        <em><span *ngFor="let c of emChars; let i = index" class="ch" [class.target]="titleChars.length + i === diveIndex">{{ c }}</span></em>
+        <span>{{ intro.title }}</span>
+        <em>{{ intro.em }}.</em>
       </h1>
       <p class="hero-sub">{{ intro.sub }}</p>
 
@@ -59,14 +63,18 @@
         <li>Real Google ratings and photos</li>
         <li>No download needed</li>
       </ul>
+     </div>
     </div>
 
     <div class="scroll-cue" aria-hidden="true"><span></span></div>
 
-    <!-- The dive: a vector copy of the headline, zoomed (by viewBox, so it stays
-         sharp) into the highlighted letter until it fills the screen. -->
-    <svg class="dive" #dive aria-hidden="true" preserveAspectRatio="none"></svg>
   </section>
+
+  <!-- Step into the photo: a copy of the tilted photo that flies into the destinations card below. -->
+  <div class="step-photo" aria-hidden="true">
+    <img src="assets/images/hero/santorini.jpg" alt="">
+    <span class="photo-shade"></span>
+  </div>
 
   <!-- ===== CHOOSE YOUR NEXT DESTINATION: a slider in a rounded panel; it moves
        to the next place as you scroll (the content sticks while you do) ===== -->
@@ -261,10 +269,10 @@
       </div>
       <div class="collage-track">
         <a class="cluster" *ngFor="let j of stories; let i = index" [class.alt]="i % 2 === 1"
-           [routerLink]="['/community/journal', j.id]" [attr.aria-label]="j.title">
-          <img class="ph main" [src]="j.photos![0].url" [alt]="j.destination" loading="lazy">
-          <img class="ph second" *ngIf="j.photos![1]" [src]="j.photos![1].url" alt="" loading="lazy">
-          <img class="ph third" *ngIf="j.photos![2]" [src]="j.photos![2].url" alt="" loading="lazy">
+           [routerLink]="['/community/story', j.id]" [attr.aria-label]="j.title">
+          <img class="ph main" [src]="j.photos![0].url | sized:'cover'" [alt]="j.destination" loading="lazy">
+          <img class="ph second" *ngIf="j.photos![1]" [src]="j.photos![1].url | sized:'thumb'" alt="" loading="lazy">
+          <img class="ph third" *ngIf="j.photos![2]" [src]="j.photos![2].url | sized:'thumb'" alt="" loading="lazy">
           <div class="cluster-card glass">
             <span class="story-tag">{{ j.destination }}</span>
             <h3>{{ j.title }}</h3>
@@ -308,11 +316,11 @@
   <!-- ===== PLAN ON THE WEB, OR GET THE APP ===== -->
   <section class="cta" aria-labelledby="cta-title">
     <div class="cta-panel" data-reveal>
-      <span class="cta-glow" aria-hidden="true"></span>
+      <span class="cta-glow-clip" aria-hidden="true"><span class="cta-glow"></span></span>
       <h2 id="cta-title" data-split>Plan on the web.<br><em>Take it on the road.</em></h2>
       <p>Everything works right here in your browser, on any phone or computer. The Android app is in beta too.</p>
+      <app-place-search class="cta-search"></app-place-search>
       <div class="cta-buttons">
-        <button class="btn primary" (click)="focusSearch()">Start planning</button>
         <a class="btn glass-btn" routerLink="/download">Get the Android app</a>
       </div>
     </div>

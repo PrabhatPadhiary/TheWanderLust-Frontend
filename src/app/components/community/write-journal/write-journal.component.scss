@@ -258,6 +258,7 @@ $accent-hover: #1C2833;
 // ===== VISIBILITY BAR =====
 .wj-visibility-bar {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 14px;
   background: #fff;
@@ -779,4 +780,11 @@ $accent-hover: #1C2833;
   .wj-trip-dropdown { width: 100%; }
   .wj-header-actions { gap: 4px; }
   .wj-draft-btn { display: none; }
+}
+
+// What Public / Private means, next to the toggle.
+.wj-visibility-hint {
+  margin: 0;
+  font-size: 0.78rem;
+  color: #7B8A97;
 }

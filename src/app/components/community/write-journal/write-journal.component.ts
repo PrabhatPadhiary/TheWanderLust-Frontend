@@ -117,7 +117,7 @@ export class WriteJournalComponent implements OnInit {
         // Check if current user is the author
         const currentUserId = this.authService.currentUser?.id;
         if (journal.author.id !== currentUserId) {
-          this.toastr.error('You can only edit your own journals');
+          this.toastr.error('You can only edit your own stories');
           this.router.navigate(['/community']);
           return;
         }
@@ -148,7 +148,7 @@ export class WriteJournalComponent implements OnInit {
         this.loadingJournal = false;
       },
       error: () => {
-        this.toastr.error('Failed to load journal');
+        this.toastr.error('Couldn\'t load the story');
         this.router.navigate(['/community']);
       }
     });
@@ -389,7 +389,7 @@ export class WriteJournalComponent implements OnInit {
   // Publish / Draft
   onPublish(): void {
     if (!this.journalTitle.trim()) {
-      this.toastr.error('Please add a title for your journal');
+      this.toastr.error('Please add a title for your story');
       return;
     }
     if (!this.journalBody.trim()) {
@@ -460,13 +460,13 @@ export class WriteJournalComponent implements OnInit {
             next: () => this.uploadState.setDone(),
             error: () => {
               this.uploadState.setError();
-              this.toastr.warning('Journal saved but some photos failed to upload');
+              this.toastr.warning('Story saved, but some photos failed to upload');
             }
           });
         } else {
           // No photos — navigate immediately
           if (this.isEditMode) {
-            this.toastr.success('Journal updated!');
+            this.toastr.success('Story updated!');
           } else {
             this.uploadState.setUploading(journalId || '', this.journalTitle.trim());
             this.uploadState.setDone();
@@ -477,7 +477,7 @@ export class WriteJournalComponent implements OnInit {
       error: (err) => {
         this.isSubmitting = false;
         const message = err?.error || err?.message || 'Something went wrong';
-        this.toastr.error(typeof message === 'string' ? message : 'Failed to save journal');
+        this.toastr.error(typeof message === 'string' ? message : 'Couldn\'t save the story');
       }
     });
   }

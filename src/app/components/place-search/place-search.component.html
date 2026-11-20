@@ -1,0 +1,25 @@
+<div class="ps" [class.ps--up]="dropUp" role="search">
+  <div class="ps-field">
+    <svg class="ps-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+      <circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path>
+    </svg>
+    <input #field type="text" [placeholder]="placeholder" aria-label="Search a city or country"
+           autocomplete="off" role="combobox" [attr.aria-expanded]="open"
+           (input)="onInput(field.value)" (keydown)="onKeydown($event)"
+           (focus)="onFocus()" (blur)="onBlur()">
+    <button *ngIf="showButton" class="ps-btn" type="button" (click)="explore()">Explore</button>
+  </div>
+
+  <div class="ps-list" *ngIf="open && predictions.length" role="listbox">
+    <button type="button" class="ps-item" role="option" *ngFor="let p of predictions; let i = index"
+            [class.ps-item--active]="i === active" [attr.aria-selected]="i === active"
+            (mousedown)="$event.preventDefault(); select(p)">
+      <span class="ps-text">
+        <strong>{{ p.structured_formatting?.main_text }}</strong>
+        <span *ngIf="p.structured_formatting?.secondary_text">{{ p.structured_formatting.secondary_text }}</span>
+      </span>
+      <span class="ps-label" *ngIf="label(p)">{{ label(p) }}</span>
+    </button>
+    <div class="ps-attribution">Powered by Google</div>
+  </div>
+</div>

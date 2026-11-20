@@ -43,7 +43,7 @@ export class PricingComponent {
         { text: 'Unlimited destination exploration', included: true },
         { text: 'Unlimited trips & itineraries', included: true },
         { text: 'Unlimited favourites', included: true },
-        { text: 'Full community access + post journals', included: true },
+        { text: 'Full community access + post stories', included: true },
         { text: 'Collaborative planning (up to 5 people)', included: true },
         { text: 'Budget & expense tracking', included: true },
         { text: 'Checklists & packing lists', included: true },

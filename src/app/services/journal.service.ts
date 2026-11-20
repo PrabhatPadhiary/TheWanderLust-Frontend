@@ -48,8 +48,10 @@ export interface JournalFeedItem {
   budget?: number | null;
   currency?: string | null;
   proTips?: string | null;
-  vibes?: string[];
+  /** The feed sends "a,b,c"; use vibesOf() to get a list. */
+  vibes?: string | string[] | null;
   status?: string;
+  visibility?: string;
   likesCount: number;
   commentsCount: number;
   isLiked: boolean;
@@ -110,6 +112,42 @@ export interface ToggleLikeResponse {
   likesCount: number;
 }
 
+/** Reasons someone can report a story for (same as the app). */
+export const REPORT_REASONS = [
+  { key: 'spam', label: 'Spam or advertising' },
+  { key: 'inappropriate', label: 'Inappropriate content' },
+  { key: 'harassment', label: 'Harassment or hate' },
+  { key: 'false_info', label: 'False or misleading' },
+  { key: 'other', label: 'Something else' },
+];
+
+const VIBE_LABELS = ['Adventure', 'Relaxing', 'Foodie', 'Cultural', 'Budget', 'Luxury', 'Solo', 'Group', 'Road Trip', 'Nature'];
+
+/** Vibes as a list, whether they came as "a,b,c" (feed) or an array (story). */
+export function vibesOf(raw: string | string[] | null | undefined): string[] {
+  const list = Array.isArray(raw) ? raw : (raw || '').split(',');
+  return list.map(v => (v || '').trim().toLowerCase()).filter(Boolean);
+}
+
+/** "road trip" -> "Road Trip". */
+export function vibeLabel(vibe: string): string {
+  const v = (vibe || '').trim().toLowerCase();
+  return VIBE_LABELS.find(x => x.toLowerCase() === v) || v.replace(/\b\w/g, c => c.toUpperCase());
+}
+
+/** The public link to a story. */
+export function storyUrl(id: string): string {
+  return `https://wayraa.com/community/story/${id}`;
+}
+
+/** Someone you've blocked (Settings → Blocked people). */
+export interface BlockedPerson {
+  id: string;
+  name: string;
+  photoUrl?: string | null;
+  blockedAt: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -117,15 +155,28 @@ export class JournalService {
   private http = inject(HttpClient);
   private authService = inject(AuthService);
 
+  /** The last feed loaded in this visit (dropped when someone signs in or out: likes differ). */
+  private feedCache: JournalFeedItem[] | null = null;
+  private feedCacheUser: string | null | undefined = undefined;
+
+  /** The last feed loaded, to show at once while a fresh one loads (null if none yet). */
+  peekFeed(): JournalFeedItem[] | null {
+    return this.feedCacheUser === (this.authService.currentUser?.id ?? null) ? this.feedCache : null;
+  }
+
   getFeed(): Observable<JournalFeedItem[]> {
-    return new Observable(observer => {
+    return new Observable<JournalFeedItem[]>(observer => {
       this.authService.getFirebaseToken().then(token => {
         const headers = token
           ? new HttpHeaders({ Authorization: `Bearer ${token}` })
           : new HttpHeaders();
         this.http.get<JournalFeedItem[]>(`${environment.apiUrl}/Journals/feed`, { headers })
           .subscribe({
-            next: (res) => { observer.next(res); observer.complete(); },
+            next: (res) => {
+              this.feedCache = res;
+              this.feedCacheUser = this.authService.currentUser?.id ?? null;
+              observer.next(res); observer.complete();
+            },
             error: (err) => observer.error(err)
           });
       });
@@ -244,6 +295,73 @@ export class JournalService {
         if (!token) { observer.error('Not authenticated'); return; }
         const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
         this.http.put<any>(`${environment.apiUrl}/Journals/${journalId}`, dto, { headers })
+          .subscribe({
+            next: (res) => { observer.next(res); observer.complete(); },
+            error: (err) => observer.error(err)
+          });
+      });
+    });
+  }
+
+  /** A signed-in request (errors with 'Not authenticated' when signed out). */
+  private authed<T>(method: 'GET' | 'POST' | 'PUT' | 'DELETE', path: string, body?: unknown): Observable<T> {
+    return new Observable<T>(observer => {
+      this.authService.getFirebaseToken().then(token => {
+        if (!token) { observer.error('Not authenticated'); return; }
+        const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+        this.http.request<T>(method, `${environment.apiUrl}${path}`, { headers, body })
+          .subscribe({
+            next: (res) => { observer.next(res); observer.complete(); },
+            error: (err) => observer.error(err)
+          });
+      });
+    });
+  }
+
+  /** Show your story in Community ('public') or hide it ('private'). */
+  setVisibility(journalId: string, visibility: 'public' | 'private'): Observable<unknown> {
+    return this.authed('PUT', `/Journals/${journalId}`, { visibility });
+  }
+
+  /** Delete one of your comments. */
+  deleteComment(journalId: string, commentId: string): Observable<unknown> {
+    return this.authed('DELETE', `/Journals/${journalId}/comments/${commentId}`);
+  }
+
+  /** Report a story (it also leaves your feed). */
+  report(journalId: string, reason: string): Observable<unknown> {
+    return this.authed('POST', `/Journals/${journalId}/report`, { reason, details: null });
+  }
+
+  /** "Not interested": hide a story from your feed. */
+  hide(journalId: string): Observable<unknown> {
+    return this.authed('POST', `/Journals/${journalId}/hide`);
+  }
+
+  /** Undo "Not interested". */
+  unhide(journalId: string): Observable<unknown> {
+    return this.authed('DELETE', `/Journals/${journalId}/hide`);
+  }
+
+  /** Block someone: their stories and comments are hidden from you. */
+  blockUser(userId: string): Observable<unknown> {
+    return this.authed('POST', `/users/${userId}/block`);
+  }
+
+  unblockUser(userId: string): Observable<unknown> {
+    return this.authed('DELETE', `/users/${userId}/block`);
+  }
+
+  getBlockedUsers(): Observable<BlockedPerson[]> {
+    return this.authed('GET', '/users/me/blocked');
+  }
+
+  /** Public stories that tagged a place (Google place id), newest first. Works signed out. */
+  getForPlace(googlePlaceId: string, limit = 10): Observable<JournalFeedItem[]> {
+    return new Observable(observer => {
+      this.authService.getFirebaseToken().then(token => {
+        const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : new HttpHeaders();
+        this.http.get<JournalFeedItem[]>(`${environment.apiUrl}/Journals/by-place/${encodeURIComponent(googlePlaceId)}?limit=${limit}`, { headers })
           .subscribe({
             next: (res) => { observer.next(res); observer.complete(); },
             error: (err) => observer.error(err)

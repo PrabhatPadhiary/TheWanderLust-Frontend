@@ -1,4 +1,6 @@
 import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Router } from '@angular/router';
+import { JournalService, JournalFeedItem } from '../../services/journal.service';
 import { PlaceDto, PlaceDetailsResponse } from '../../models/destination.model';
 import { DestinationService } from '../../services/destination.service';
 
@@ -14,13 +16,24 @@ export class PlaceDetailPanelComponent implements OnChanges {
   @Output() close = new EventEmitter<void>();
   @Output() addToItinerary = new EventEmitter<PlaceDto>();
   @Output() toggleFav = new EventEmitter<string>();
+  /** The place's full details once loaded (for pages that only had its id and name). */
+  @Output() detailsLoaded = new EventEmitter<PlaceDetailsResponse>();
+  /** Leave this story out of "Stories from Wayraa travellers" (when opened from it). */
+  @Input() excludeStoryId: string | null = null;
+
+  /** Public stories that tagged this place (hidden when there are none). */
+  stories: JournalFeedItem[] = [];
 
   details: PlaceDetailsResponse | null = null;
   loading = false;
   currentPhoto = 0;
   showHours = false;
 
-  constructor(private destinationService: DestinationService) {}
+  constructor(
+    private destinationService: DestinationService,
+    private journalService: JournalService,
+    private router: Router,
+  ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['isOpen'] && this.isOpen && this.place) {
@@ -34,10 +47,21 @@ export class PlaceDetailPanelComponent implements OnChanges {
     this.details = null;
     this.currentPhoto = 0;
 
-    this.destinationService.getDetails(this.place.placeId).subscribe({
+    const placeId = this.place.placeId;
+    this.stories = [];
+    this.journalService.getForPlace(placeId, 6).subscribe({
+      next: (items) => {
+        if (this.place?.placeId !== placeId) return;
+        this.stories = (items || []).filter(j => j.id !== this.excludeStoryId);
+      },
+      error: () => { this.stories = []; },
+    });
+
+    this.destinationService.getDetails(placeId).subscribe({
       next: (data) => {
         this.details = data;
         this.loading = false;
+        this.detailsLoaded.emit(data);
       },
       error: () => {
         this.loading = false;
@@ -61,6 +85,11 @@ export class PlaceDetailPanelComponent implements OnChanges {
     if (this.place) {
       this.toggleFav.emit(this.place.placeId);
     }
+  }
+
+  openStory(id: string): void {
+    this.onClose();
+    this.router.navigate(['/community/story', id]);
   }
 
   nextPhoto(): void {

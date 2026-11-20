@@ -1,10 +1,11 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { AuthGateModalComponent } from '../auth-gate-modal/auth-gate-modal.component';
-import { JournalService, JournalFeedItem } from '../../services/journal.service';
+import { JournalService, JournalFeedItem, vibesOf, vibeLabel } from '../../services/journal.service';
+import { StoryActionsService } from '../../services/story-actions.service';
 import { JournalUploadStateService, JournalUploadState } from '../../services/journal-upload-state.service';
 import { ToastrService } from 'ngx-toastr';
 
@@ -29,6 +30,14 @@ export interface TripJournal {
   saves: number;
   tripBadge: string | null;
   imageUrl: string | null;
+  vibes: string[];
+  publishedAt: string;
+}
+
+/** Most liked first, then most discussed, then newest (as in the app). */
+function byPopularity(a: TripJournal, b: TripJournal): number {
+  return (b.likes - a.likes) || (b.comments - a.comments)
+    || (new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
 }
 
 @Component({
@@ -39,21 +48,15 @@ export interface TripJournal {
 })
 export class CommunityComponent implements OnInit, OnDestroy {
 
-  activeTab: 'journals' | 'squads' = 'journals';
   journalSort: 'recent' | 'popular' = 'recent';
+  searchQuery = '';
+  activeVibe = 'all';
+  readonly vibeLabel = vibeLabel;
 
   journals: TripJournal[] = [];
   feedLoading = true;
   uploadState: JournalUploadState = { status: 'idle', journalId: null, title: null };
   private uploadSub?: Subscription;
-
-  showAuthBlur = false;
-
-  // Journal menu state
-  openMenuJournalId: string | null = null;
-  journalMenuPosition = { top: 0, right: 0 };
-  journalToDelete: TripJournal | null = null;
-  deletingJournal = false;
 
   constructor(
     public authService: AuthService,
@@ -61,16 +64,17 @@ export class CommunityComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private journalService: JournalService,
     public uploadStateService: JournalUploadStateService,
-    private toastr: ToastrService
+    private toastr: ToastrService,
+    private storyActions: StoryActionsService,
   ) {}
 
-  @HostListener('document:click')
-  onDocumentClick(): void {
-    if (this.openMenuJournalId) this.openMenuJournalId = null;
-  }
-
   ngOnInit(): void {
-    this.checkAuth();
+    // Show the feed from last time straight away (if any); a fresh one replaces it below.
+    const cached = this.journalService.peekFeed();
+    if (cached) {
+      this.journals = cached.map(item => this.mapFeedItemToJournal(item));
+      this.feedLoading = false;
+    }
     // Wait for Firebase auth to restore before loading feed
     // so the backend can resolve the current user and return correct isLiked values
     this.authService.authReady.then(() => this.loadFeed());
@@ -84,7 +88,7 @@ export class CommunityComponent implements OnInit, OnDestroy {
   }
 
   private loadFeed(): void {
-    this.feedLoading = true;
+    this.feedLoading = this.journals.length === 0;   // quiet refresh when there's something to show
     this.journalService.getFeed().subscribe({
       next: (items) => {
         this.journals = items.map(item => this.mapFeedItemToJournal(item));
@@ -130,47 +134,34 @@ export class CommunityComponent implements OnInit, OnDestroy {
       comments: item.commentsCount || 0,
       saves: 0,
       tripBadge: tripBadge,
-      imageUrl: item.photos && item.photos.length > 0 ? item.photos[0].url : null
+      imageUrl: item.photos && item.photos.length > 0 ? item.photos[0].url : null,
+      vibes: vibesOf(item.vibes),
+      publishedAt: item.publishedAt || item.createdAt,
     };
   }
 
-  private checkAuth(): void {
-    if (!this.authService.isLoggedIn) {
-      this.showAuthBlur = true;
-      const dialogRef = this.dialog.open(AuthGateModalComponent, {
-        data: { destination: '' },
-        panelClass: 'auth-gate-dialog',
-        maxWidth: '500px',
-        width: '500px',
-        disableClose: true
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        if (result?.type === 'authenticated') {
-          this.showAuthBlur = false;
-        } else {
-          // User dismissed without logging in — redirect home
-          this.router.navigate(['/']);
-        }
-      });
-    }
+  /**
+   * Stories are open to everyone; signing in is only needed to take part
+   * (like, write). Asks to sign in, then carries on with what they were doing.
+   * Closing the box just leaves them reading.
+   */
+  private askToSignIn(then: () => void): void {
+    this.dialog.open(AuthGateModalComponent, {
+      data: { destination: '' },
+      panelClass: 'auth-gate-dialog',
+      maxWidth: '500px',
+      width: '500px',
+    }).afterClosed().subscribe(result => {
+      if (result?.type === 'authenticated') then();
+    });
   }
 
   onWriteJournal(): void {
     if (!this.authService.isLoggedIn) {
-      this.checkAuth();
+      this.askToSignIn(() => this.router.navigate(['/community/write']));
       return;
     }
     this.router.navigate(['/community/write']);
-  }
-
-  editJournal(journal: TripJournal): void {
-    this.openMenuJournalId = null;
-    this.router.navigate(['/community/write'], { queryParams: { edit: journal.id } });
-  }
-
-  isOwnJournal(journal: TripJournal): boolean {
-    return this.authService.currentUser?.id === journal.authorId;
   }
 
   /** Destinations people have written about, most stories first (from the feed). */
@@ -186,21 +177,17 @@ export class CommunityComponent implements OnInit, OnDestroy {
       .slice(0, 5);
   }
 
-  setTab(tab: typeof this.activeTab): void {
-    this.activeTab = tab;
-  }
-
   setSort(sort: typeof this.journalSort): void {
     this.journalSort = sort;
   }
 
   openJournal(journalId: string, fragment?: string): void {
-    this.router.navigate(['/community/journal', journalId], fragment ? { fragment } : {});
+    this.router.navigate(['/community/story', journalId], fragment ? { fragment } : {});
   }
 
   likeJournal(journal: TripJournal): void {
     if (!this.authService.isLoggedIn) {
-      this.checkAuth();
+      this.askToSignIn(() => this.likeJournal(journal));
       return;
     }
 
@@ -224,55 +211,50 @@ export class CommunityComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ── Journal menu actions ──────────────────────────────────────────────────
+  // ── Search, vibes and sort ─────────────────────────────────────────────
 
-  toggleJournalMenu(journal: TripJournal, event: Event): void {
-    event.stopPropagation();
-    if (this.openMenuJournalId === journal.id) {
-      this.openMenuJournalId = null;
-      return;
+  /** Vibes that actually appear in the feed, most used first. */
+  get vibeChips(): string[] {
+    const counts = new Map<string, number>();
+    for (const j of this.journals) for (const v of j.vibes) counts.set(v, (counts.get(v) || 0) + 1);
+    return [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([v]) => v);
+  }
+
+  /** The feed after the search, the vibe and the sort. */
+  get shownJournals(): TripJournal[] {
+    const q = this.searchQuery.trim().toLowerCase();
+    const matching = this.journals
+      .filter(j => this.activeVibe === 'all' || j.vibes.includes(this.activeVibe))
+      .filter(j => !q
+        || (j.destinationName || '').toLowerCase().includes(q)
+        || (j.title || '').toLowerCase().includes(q)
+        || (j.authorName || '').toLowerCase().includes(q));
+    // The feed already comes newest first.
+    return this.journalSort === 'popular' ? [...matching].sort(byPopularity) : matching;
+  }
+
+  trackById(_: number, j: TripJournal): string { return j.id; }
+
+  // ── A story's actions ─────────────────────────────────────────────────
+
+  shareJournal(j: TripJournal): void {
+    this.storyActions.share({ id: j.id, title: j.title });
+  }
+
+  /** The ⋯ menu: edit / hide / share / delete yours; share / not interested / report / block others'. */
+  async openStoryMenu(j: TripJournal, event?: Event): Promise<void> {
+    const outcome = await this.storyActions.openMenu({
+      id: j.id,
+      title: j.title,
+      author: { id: j.authorId, name: j.authorName },
+      visibility: 'public',   // the feed only has public stories
+    }, event?.currentTarget as HTMLElement | null);
+    if (!outcome) return;
+    if (outcome.type === 'blocked') {
+      this.journals = this.journals.filter(x => x.authorId !== outcome.userId);
+    } else if (outcome.type === 'deleted' || outcome.type === 'removed'
+      || (outcome.type === 'visibility' && outcome.visibility === 'private')) {
+      this.journals = this.journals.filter(x => x.id !== j.id);
     }
-    const btn = event.currentTarget as HTMLElement;
-    const rect = btn.getBoundingClientRect();
-    this.journalMenuPosition = {
-      top: rect.bottom + 6,
-      right: window.innerWidth - rect.right
-    };
-    this.openMenuJournalId = journal.id;
-  }
-
-  getOpenMenuJournal(): TripJournal | undefined {
-    return this.journals.find(j => j.id === this.openMenuJournalId);
-  }
-
-  openDeleteConfirm(journal: TripJournal): void {
-    this.openMenuJournalId = null;
-    this.journalToDelete = journal;
-  }
-
-  cancelDeleteJournal(): void {
-    this.journalToDelete = null;
-  }
-
-  confirmDeleteJournal(): void {
-    if (!this.journalToDelete || this.deletingJournal) return;
-    this.deletingJournal = true;
-
-    this.journalService.deleteJournal(this.journalToDelete.id).subscribe({
-      next: () => {
-        this.journals = this.journals.filter(j => j.id !== this.journalToDelete!.id);
-        this.toastr.success('Journal deleted successfully');
-        this.deletingJournal = false;
-        this.journalToDelete = null;
-      },
-      error: () => {
-        this.toastr.error('Failed to delete journal. Try again.');
-        this.deletingJournal = false;
-      }
-    });
-  }
-
-  saveJournal(journal: TripJournal): void {
-    journal.saves++;
   }
 }

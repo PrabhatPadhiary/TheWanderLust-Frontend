@@ -1,0 +1,88 @@
+.choice-card {
+  width: 340px;
+  max-width: calc(100vw - 32px);
+  background: #fff;
+  border-radius: 16px;
+  padding: 22px 18px 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  font-family: 'Poppins', sans-serif;
+  box-sizing: border-box;
+
+  h4 {
+    margin: 0 4px 6px;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #1C2833;
+    overflow-wrap: anywhere;
+  }
+
+  p {
+    margin: 0 4px 12px;
+    font-size: 0.84rem;
+    line-height: 1.5;
+    color: #4F6070;
+  }
+}
+
+.choice-list {
+  display: flex;
+  flex-direction: column;
+  margin: 8px 0 10px;
+}
+
+.choice {
+  text-align: left;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #2B3F51;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover, &:focus-visible { background: #F5F7F8; outline: none; }
+
+  &--danger { color: #C0392B; }
+}
+
+.choice-cancel {
+  width: 100%;
+  padding: 10px;
+  border: 1.5px solid #DCE3E8;
+  border-radius: 20px;
+  background: #fff;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #475969;
+  cursor: pointer;
+
+  &:hover { background: #F6F8F9; }
+}
+
+// Beside its ⋯ button: narrower and tighter, like a dropdown.
+.choice-card--compact {
+  width: 260px;
+  padding: 14px 10px 10px;
+  border-radius: 14px;
+  box-shadow: 0 12px 40px rgba(28, 40, 51, 0.18);
+
+  h4 {
+    margin: 0 8px 4px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #7B8A97;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  p { margin: 0 8px 6px; font-size: 0.78rem; }
+
+  .choice-list { margin: 4px 0 6px; }
+  .choice { padding: 10px; font-size: 0.86rem; }
+  .choice-cancel { padding: 8px; font-size: 0.82rem; }
+}

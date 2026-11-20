@@ -1,6 +1,11 @@
 <app-navbar></app-navbar>
 
 <div class="profile-page">
+  <button class="back-btn" (click)="back()">
+    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Back
+  </button>
+
   <div class="loading-state" *ngIf="loading && !me">
     <div class="spinner"></div>
   </div>
@@ -20,7 +25,7 @@
       <div class="me">
         <div class="avatar-wrap">
           <label class="avatar" [class.busy]="photoBusy" title="Change your photo">
-            <img *ngIf="photo" [src]="photo" alt="Your photo">
+            <img *ngIf="photo" [src]="photo | sized:'avatar'" alt="Your photo">
             <span *ngIf="!photo">{{ initials }}</span>
             <input type="file" accept="image/*" (change)="onPhotoPicked($event)" hidden>
             <span class="camera" aria-hidden="true">
@@ -81,33 +86,9 @@
         </button>
       </section>
 
-      <!-- Your travels -->
-      <section>
-        <h2>Your travels</h2>
-        <div class="group">
-          <button class="row" (click)="go('/my-trips')">
-            <span class="row-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></span>
-            <span class="row-label">My trips</span>
-            <span class="row-value" *ngIf="me.stats.upcomingTrips">{{ me.stats.upcomingTrips }} upcoming</span>
-            <span class="chev">›</span>
-          </button>
-          <button class="row" (click)="go('/favourites')">
-            <span class="row-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z"/></svg></span>
-            <span class="row-label">Favourites</span>
-            <span class="chev">›</span>
-          </button>
-          <button class="row" (click)="go('/my-journals')">
-            <span class="row-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg></span>
-            <span class="row-label">Your stories</span>
-            <span class="row-value" *ngIf="me.stats.journals">{{ me.stats.journals }}</span>
-            <span class="chev">›</span>
-          </button>
-        </div>
-      </section>
-
       <section>
         <div class="group">
-          <button class="row" (click)="go('/settings')">
+          <button class="list-row" (click)="go('/settings')">
             <span class="row-icon"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></span>
             <span class="row-label">Settings</span>
             <span class="row-value">Account, privacy and more</span>

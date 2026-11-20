@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { NavHistoryService } from '../../services/nav-history.service';
 import { ToastrService } from 'ngx-toastr';
 import { AccountService, BlockedPerson } from '../../services/account.service';
 import { AuthService } from '../../services/auth.service';
@@ -103,5 +104,8 @@ export class SettingsComponent implements OnInit {
     });
   }
 
-  back(): void { this.router.navigate(['/profile']); }
+  private readonly navHistory = inject(NavHistoryService);
+
+  /** Back to wherever you came from (Profile, the avatar menu on any page…). */
+  back(): void { this.navHistory.back('/'); }
 }

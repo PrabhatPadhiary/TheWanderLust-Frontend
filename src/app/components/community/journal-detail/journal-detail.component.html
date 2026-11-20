@@ -3,7 +3,7 @@
   <app-navbar [isLanding]="true" [dark]="true" [onLight]="true"></app-navbar>
   <div class="jd-loader-inner">
     <div class="jd-spinner"></div>
-    <p>Loading journal...</p>
+    <p>Loading story...</p>
   </div>
 </div>
 
@@ -15,8 +15,8 @@
       <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
       <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
     </svg>
-    <h2>Journal not found</h2>
-    <p>This journal may have been removed or made private.</p>
+    <h2>Story not found</h2>
+    <p>This story may have been removed or made private.</p>
     <button class="jd-back-btn" (click)="goBack()">← Back to Community</button>
   </div>
 </div>
@@ -28,15 +28,14 @@
 
   <div class="jd-layout">
 
-    <!-- ===== LEFT: Main Content ===== -->
-    <div class="jd-main">
-
+    <!-- Heading: back, author, title, vibes (its own row, so the sidebar lines up with the photos) -->
+    <div class="jd-head">
       <!-- Back link -->
       <button class="jd-back-link" (click)="goBack()">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
           <polyline points="15 18 9 12 15 6"/>
         </svg>
-        Back to Community
+        {{ navHistory.canGoBack ? 'Back' : 'Back to Community' }}
       </button>
 
       <!-- Author row -->
@@ -46,7 +45,12 @@
           <span class="jd-author-name">{{ journal.author.name }}</span>
           <span class="jd-author-meta">{{ journal.destination }}</span>
         </div>
+        <button class="jd-more-btn" (click)="openStoryMenu($event)" aria-label="More options for this story" title="More options">
+          <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/></svg>
+        </button>
       </div>
+
+      <p class="jd-hidden-note" *ngIf="isMine && journal.visibility === 'private'">Hidden from Community · only you can see it</p>
 
       <!-- Trip metadata chips -->
       <div class="jd-meta-chips">
@@ -63,12 +67,16 @@
       <div class="jd-vibes" *ngIf="journal.vibes && journal.vibes.length > 0">
         <span class="jd-vibe" *ngFor="let v of journal.vibes">{{ v }}</span>
       </div>
+    </div>
+
+    <!-- ===== LEFT: Main Content ===== -->
+    <div class="jd-main">
 
       <!-- Photo gallery -->
       <div class="jd-photo-gallery" *ngIf="journal.photos && journal.photos.length > 0">
         <div class="jd-gallery-item" *ngFor="let photo of journal.photos; let i = index"
              (click)="openLightbox(i)">
-          <img [src]="photo.url" [alt]="journal.title + ' photo ' + (i + 1)" loading="lazy">
+          <img [src]="photo.url | sized:'photo'" [alt]="journal.title + ' photo ' + (i + 1)" loading="lazy">
         </div>
       </div>
 
@@ -94,16 +102,18 @@
         </ul>
       </div>
 
-      <!-- Places in this journal -->
+      <!-- Places mentioned (tap one to see it) -->
       <div class="jd-places" *ngIf="journal.places && journal.places.length > 0">
         <h2 class="jd-section-title">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
           </svg>
-          Places in this journal
+          Places mentioned
         </h2>
         <div class="jd-places-list">
-          <div class="jd-place-chip" *ngFor="let place of journal.places">
+          <button type="button" class="jd-place-chip" *ngFor="let place of journal.places"
+                  [class.jd-place-chip--link]="!!place.googlePlaceId" [disabled]="!place.googlePlaceId"
+                  (click)="openPlace(place)">
             <span class="jd-place-chip-icon">
               <svg *ngIf="place.category === 'food'" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/>
@@ -120,7 +130,7 @@
             </span>
             <span class="jd-place-chip-name">{{ place.placeName }}</span>
             <span class="jd-place-chip-cat">{{ place.category }}</span>
-          </div>
+          </button>
         </div>
       </div>
 
@@ -130,10 +140,10 @@
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
-          {{ journal.commentsCount }} Comments
+          {{ journal.commentsCount }} {{ journal.commentsCount === 1 ? 'Comment' : 'Comments' }}
         </h2>
 
-        <div class="jd-comment-input-row">
+        <div class="jd-comment-input-row" *ngIf="authService.isLoggedIn; else signInToComment">
           <span class="jd-comment-avatar" [style.background]="authorColor">
             {{ authService.currentUser?.name?.charAt(0)?.toUpperCase() ?? '?' }}
           </span>
@@ -146,6 +156,13 @@
           </div>
         </div>
 
+        <ng-template #signInToComment>
+          <div class="jd-comment-input-row jd-comment-signin">
+            <p>Sign in to join the conversation.</p>
+            <button class="jd-comment-post-btn" (click)="askToSignIn()">Sign in to comment</button>
+          </div>
+        </ng-template>
+
         <div class="jd-comment-list">
           <div class="jd-comment" *ngFor="let c of journal.comments">
             <span class="jd-comment-avatar" [style.background]="getCommentColor(c)">{{ getCommentInitial(c) }}</span>
@@ -153,6 +170,12 @@
               <div class="jd-comment-meta">
                 <strong>{{ c.author.name }}</strong>
                 <span class="jd-comment-time">{{ relativeTime(c.createdAt) }}</span>
+                <button class="jd-comment-more" *ngIf="isMyComment(c) || authService.isLoggedIn"
+                        (click)="openCommentMenu(c, $event)"
+                        [attr.aria-label]="isMyComment(c) ? 'Delete your comment' : 'More options for this comment'">
+                  <svg *ngIf="isMyComment(c)" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                  <svg *ngIf="!isMyComment(c)" width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/></svg>
+                </button>
               </div>
               <p>{{ c.body }}</p>
             </div>
@@ -177,9 +200,9 @@
           <span class="jd-stat-label">Group size</span>
           <span class="jd-stat-value">{{ travelersLabel || '—' }}</span>
         </div>
-        <div class="jd-stat-row" *ngIf="budgetLabel">
+        <div class="jd-stat-row" *ngIf="budgetAmount">
           <span class="jd-stat-label">Budget</span>
-          <span class="jd-stat-value">{{ budgetLabel }}</span>
+          <span class="jd-stat-value">{{ budgetAmount }}</span>
         </div>
         <div class="jd-stat-row">
           <span class="jd-stat-label">Likes</span>
@@ -203,18 +226,26 @@
           </svg>
           Share
         </button>
-        <button class="jd-sidebar-save-btn">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/>
-          </svg>
-          Save Itinerary
-        </button>
+      </div>
+
+      <!-- For readers without an account: the gentle nudge to plan their own -->
+      <div class="jd-sidebar-card jd-plan-cta" *ngIf="!authService.isLoggedIn">
+        <h3>Plan a trip like this</h3>
+        <p>Find places, plan every day on a map and share one plan with your friends. Free on Wayraa.</p>
+        <button class="jd-sidebar-save-btn" (click)="startPlanning()">Start planning</button>
       </div>
 
       <!-- More from author -->
-      <div class="jd-sidebar-card">
+      <div class="jd-sidebar-card" *ngIf="moreFromAuthor.length">
         <h3 class="jd-sidebar-card-title">More from {{ journal.author.name.split(' ')[0] }}</h3>
-        <p class="jd-sidebar-placeholder">Coming soon</p>
+        <button class="jd-more-item" *ngFor="let s of moreFromAuthor" (click)="openStory(s.id)">
+          <img *ngIf="s.photos?.length" [src]="s.photos![0].url | sized:'thumb'" [alt]="s.title" loading="lazy">
+          <span *ngIf="!s.photos?.length" class="jd-more-thumb-empty">{{ (s.destination || '?').charAt(0) }}</span>
+          <span class="jd-more-text">
+            <strong>{{ s.title }}</strong>
+            <span>{{ s.destination }}</span>
+          </span>
+        </button>
       </div>
 
     </aside>
@@ -231,7 +262,7 @@
       <polyline points="15 18 9 12 15 6"/>
     </svg>
   </button>
-  <img [src]="activePhotoUrl" class="jd-lightbox-img" (click)="$event.stopPropagation()" alt="photo">
+  <img [src]="activePhotoUrl | sized:'full'" class="jd-lightbox-img" (click)="$event.stopPropagation()" alt="photo">
   <button class="jd-lightbox-nav jd-lightbox-nav--next" (click)="$event.stopPropagation(); nextPhoto()">
     <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.5">
       <polyline points="9 18 15 12 9 6"/>
@@ -239,3 +270,14 @@
   </button>
   <span class="jd-lightbox-counter">{{ activePhotoIndex + 1 }} / {{ totalPhotos }}</span>
 </div>
+
+<!-- A place from the story -->
+<app-place-detail-panel
+  [place]="panelPlace"
+  [isOpen]="panelOpen"
+  [excludeStoryId]="journal?.id ?? null"
+  (close)="closePlace()"
+  (detailsLoaded)="onPlaceDetails($event)"
+  (addToItinerary)="addPlaceToTrip()"
+  (toggleFav)="toggleFavouritePlace()">
+</app-place-detail-panel>

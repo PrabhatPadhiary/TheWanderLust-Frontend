@@ -65,12 +65,17 @@
 .jd-layout {
   max-width: 1100px;
   margin: 0 auto;
-  padding: 100px 24px 80px;
+  padding: 128px 24px 80px;   // clear of the floating navbar
   display: grid;
   grid-template-columns: 1fr 300px;
-  gap: 32px;
+  column-gap: 32px;
   align-items: start;
 }
+
+// Heading on top; the story and the sidebar side by side under it, starting level.
+.jd-head { grid-column: 1; grid-row: 1; min-width: 0; }
+.jd-main { grid-column: 1; grid-row: 2; }
+.jd-sidebar { grid-column: 2; grid-row: 2; }
 
 .jd-main {
   min-width: 0;
@@ -79,7 +84,7 @@
 // ── Sidebar ───────────────────────────────────────────────────────────────────
 .jd-sidebar {
   position: sticky;
-  top: 100px;
+  top: 120px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -167,11 +172,60 @@
   &:hover { background: #25394C; transform: translateY(-1px); }
 }
 
-.jd-sidebar-placeholder {
-  font-size: 0.8rem;
-  color: #B6BDC0;
-  margin: 0;
-  font-style: italic;
+// "More from <author>": their other stories.
+.jd-more-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px;
+  margin: 0 -8px;
+  width: calc(100% + 16px);
+  border: none;
+  border-radius: 10px;
+  background: none;
+  font-family: 'Poppins', sans-serif;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover { background: #F5F7F8; }
+
+  img, .jd-more-thumb-empty {
+    width: 52px;
+    height: 52px;
+    border-radius: 8px;
+    flex-shrink: 0;
+    object-fit: cover;
+  }
+
+  .jd-more-thumb-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #E8EDF0;
+    color: #2B3F51;
+    font-weight: 700;
+  }
+}
+
+.jd-more-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  strong {
+    font-size: 0.84rem;
+    font-weight: 600;
+    color: #2B3F51;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  span { font-size: 0.76rem; color: #7B8A97; }
 }
 
 // ── Back link ─────────────────────────────────────────────────────────────────
@@ -214,6 +268,31 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 20px;
+}
+
+// The story's ⋯ menu, at the end of the author row.
+.jd-more-btn {
+  margin-left: auto;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid #DCE3E8;
+  border-radius: 50%;
+  background: #fff;
+  color: #475969;
+  cursor: pointer;
+  transition: all 0.15s;
+
+  &:hover { border-color: #2B3F51; color: #2B3F51; }
+}
+
+.jd-hidden-note {
+  margin: -8px 0 16px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #A53412;
 }
 
 .jd-avatar {
@@ -707,12 +786,17 @@
 @media (max-width: 900px) {
   .jd-layout {
     grid-template-columns: 1fr;
+    row-gap: 24px;
     padding: 88px 16px 60px;
   }
+
+  .jd-head, .jd-main { grid-column: auto; grid-row: auto; }
 
   .jd-sidebar {
     position: relative;
     top: 0;
+    grid-column: auto;
+    grid-row: auto;
     flex-direction: row;
     flex-wrap: wrap;
     gap: 12px;
@@ -735,4 +819,51 @@
   }
 
   .jd-places-list { gap: 8px; }
+}
+
+// Signed out: the comment box becomes a prompt to sign in.
+.jd-comment-signin {
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+
+  p { margin: 0; font-size: 0.88rem; color: #475969; }
+}
+
+// Signed out: "Plan a trip like this".
+.jd-plan-cta {
+  h3 { margin: 0 0 6px; font-size: 1rem; font-weight: 700; color: #2B3F51; }
+  p { margin: 0 0 14px; font-size: 0.82rem; line-height: 1.5; color: #475969; }
+  .jd-sidebar-save-btn { width: 100%; }
+}
+
+// Places mentioned: the ones with a map location open in the side panel.
+button.jd-place-chip {
+  font-family: inherit;
+  cursor: default;
+
+  &:disabled { color: inherit; opacity: 1; }
+}
+
+.jd-place-chip--link {
+  cursor: pointer !important;
+
+  &:hover { border-color: #2B3F51 !important; }
+}
+
+// Delete your comment / block the commenter.
+.jd-comment-more {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: #9AA6B0;
+  cursor: pointer;
+
+  &:hover { background: #E8EDF0; color: #2B3F51; }
 }

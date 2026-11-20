@@ -622,6 +622,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: 50% 20%;
   border-radius: 50%;
 }
 
@@ -1102,18 +1103,41 @@
   }
 }
 
-// Light landing-style pages (Community, Features, Pricing…): once scrolled, a soft
-// frosted strip sits behind the bar so the page doesn't show through the logo and buttons.
-.app-navbar.app-navbar--dark.app-navbar--onlight.app-navbar--scrolled::before {
-  content: '';
-  position: fixed;
-  left: 0; right: 0; top: 0;
-  height: 128px;
-  z-index: -1;
-  background: rgba(238, 242, 244, 0.9);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-  -webkit-mask-image: linear-gradient(to bottom, #000 78%, transparent);
-  mask-image: linear-gradient(to bottom, #000 78%, transparent);
+// Light landing-style pages (Community, Features, Pricing…): no strip behind the
+// bar once scrolled; it stays fully transparent (the faded frosted strip is gone).
+
+// ===== HOME: search beside the links, once the hero's search has scrolled away =====
+.nav-links { gap: 10px; }
+.home-search {
+  position: relative;
+  // Hidden but keeping its space, so the links don't move when it appears.
+  opacity: 0;
+  transform: scale(0.8);
   pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+
+  &.home-search--on { opacity: 1; transform: none; pointer-events: auto; }
 }
+.home-search-btn {
+  width: 58px;
+  height: 58px;
+  padding: 0;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #1C2833;
+  font: inherit;
+  transition: transform 0.15s ease, background 0.2s ease;
+  &:hover { transform: scale(1.05); }
+}
+.home-search-pop {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: -8px;
+  width: 420px;
+  animation: home-search-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+}
+@keyframes home-search-in { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+// Narrower screens: the home page's floating search takes over.
+@media (max-width: 1100px) { .home-search { display: none; } }

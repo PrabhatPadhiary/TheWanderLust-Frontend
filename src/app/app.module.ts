@@ -34,6 +34,7 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { FavouritesComponent } from './components/favourites/favourites.component';
 import { SafePipe } from './pipes/safe.pipe';
 import { WlNamePipe } from './pipes/wl-name.pipe';
+import { SizedPipe } from './pipes/sized.pipe';
 import { TripPlanModalComponent } from './components/trip-planner/modals/trip-plan-modal/trip-plan-modal.component';
 import { MyTripsComponent } from './components/my-trips/my-trips.component';
 import { JoinTripComponent } from './components/join-trip/join-trip.component';
@@ -59,6 +60,8 @@ import { PricingComponent } from './components/pricing/pricing.component';
 import { AboutComponent } from './components/about/about.component';
 import { DeleteAccountComponent } from './components/delete-account/delete-account.component';
 import { MyJournalsComponent } from './components/my-journals/my-journals.component';
+import { ChoiceDialogComponent } from './components/choice-dialog/choice-dialog.component';
+import { PlaceSearchComponent } from './components/place-search/place-search.component';
 
 import { ProfileComponent } from './components/profile/profile.component';
 import { SettingsComponent } from './components/settings/settings.component';
@@ -86,6 +89,7 @@ import { SettingsComponent } from './components/settings/settings.component';
     FavouritesComponent,
     SafePipe,
     WlNamePipe,
+    SizedPipe,
     TripPlanModalComponent,
     MyTripsComponent,
     JoinTripComponent,
@@ -111,6 +115,8 @@ import { SettingsComponent } from './components/settings/settings.component';
     AboutComponent,
     DeleteAccountComponent,
     MyJournalsComponent,
+    ChoiceDialogComponent,
+    PlaceSearchComponent,
   ],
   imports: [
     FormsModule,

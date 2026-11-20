@@ -6,7 +6,7 @@ import { Router } from '@angular/router';
  * About: why Wayraa exists, who builds it, what it stands for, where it is now,
  * and how to get in touch (feedback and partnerships).
  *
- * The founder photo is assets/images/about/prabhat.jpg; until that file exists
+ * The founder photo is assets/images/about/prabhat-headshot.jpg (square crop of prabhat.jpg); until that file exists
  * the card shows initials instead.
  */
 @Component({
