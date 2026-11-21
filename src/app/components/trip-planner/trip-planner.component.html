@@ -169,6 +169,51 @@
         </div>
       </div>
 
+      <!-- Trip at a glance: where you sleep and what each day holds, in a few lines. -->
+      <section class="glance-card" *ngIf="!tripLoading && glance as g" aria-labelledby="glance-title">
+        <div class="glance-head">
+          <h3 id="glance-title">Trip at a glance</h3>
+          <button type="button" class="glance-link" *ngIf="g.stays.length || g.days.length" (click)="setActiveTab('itinerary')">Full plan →</button>
+        </div>
+
+        <button type="button" class="glance-empty" *ngIf="!g.stays.length && !g.days.length" (click)="setActiveTab('itinerary')">
+          <span>Nothing planned yet. Add stays and places to your days and they'll show up here.</span>
+          <strong class="glance-link">Plan your days →</strong>
+        </button>
+
+        <ul class="glance-stays" *ngIf="g.stays.length">
+          <li *ngFor="let st of g.stays">
+            <span class="glance-stay-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 4v16"/><path d="M2 8h18a2 2 0 0 1 2 2v10"/><path d="M2 17h20"/><path d="M6 8v9"/></svg>
+            </span>
+            <span class="glance-stay-text">
+              <strong>{{ st.title }}</strong>
+              <span>{{ nightsLabel(st.fromNight, st.toNight) }}<ng-container *ngIf="destinations.length > 1 && st.stopName"> · {{ st.stopName }}</ng-container></span>
+            </span>
+          </li>
+        </ul>
+
+        <ol class="glance-days" *ngIf="g.days.length">
+          <li *ngFor="let d of (glanceAll ? g.days : g.days.slice(0, glanceCollapsed))">
+            <button type="button" class="glance-day" (click)="openGlanceDay(d.date)"
+              [attr.aria-label]="'Day ' + (d.index + 1) + ', ' + dayLabel(d.day) + '. Open this day'">
+              <span class="glance-day-head">
+                <strong>Day {{ d.index + 1 }}</strong>
+                <span>{{ dayLabel(d.day) }}<ng-container *ngIf="destinations.length > 1 && d.stopName"> · {{ d.stopName }}</ng-container></span>
+                <span class="glance-day-arrow" aria-hidden="true">›</span>
+              </span>
+              <span class="glance-items">
+                <span class="glance-item" *ngFor="let it of d.items"><span aria-hidden="true">{{ glanceIcon(it.category) }}</span>{{ it.title }}</span>
+              </span>
+            </button>
+          </li>
+        </ol>
+
+        <button type="button" class="glance-more" *ngIf="g.days.length > glanceCollapsed" (click)="glanceAll = !glanceAll">
+          {{ glanceAll ? 'Show less' : 'Show all ' + g.days.length + ' days' }}
+        </button>
+      </section>
+
       <!-- Side-by-side: detail panel (left) + map (right) -->
       <div class="dest-split-layout" *ngIf="!tripLoading && destinations.length > 0">
 
@@ -398,7 +443,8 @@
         [fromDate]="fromDate"
         [toDate]="toDate"
         [places]="getAllPlaces()"
-        [destinations]="destinations">
+        [destinations]="destinations"
+        [initialDate]="itineraryStartDate">
       </app-itinerary-tab>
     </div>
 

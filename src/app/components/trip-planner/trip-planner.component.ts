@@ -6,7 +6,8 @@ import { AuthService, UserResponse } from '../../services/auth.service';
 import { DestinationService } from '../../services/destination.service';
 import { PlaceCategoriesResponse, PlaceDto, PlaceDetailsResponse } from '../../models/destination.model';
 import { FavouritesService, FavouriteItem } from '../../services/favourites.service';
-import { TripService, CreateTripDestinationDto, TripMemberResponse, TripPlaceDetailResponse } from '../../services/trip.service';
+import { TripService, CreateTripDestinationDto, TripMemberResponse, TripPlaceDetailResponse, ItineraryItemResponse } from '../../services/trip.service';
+import { tripDays, summarizePlan, nightsLabel, dayLabel, GlanceStay, GlancePlannedDay } from '../../utils/plan-summary';
 import { LoaderService } from '../../services/loader.service';
 import { AddPlaceModalComponent, AddPlaceModalData } from './modals/add-place-modal/add-place-modal.component';
 import { ExploreModalComponent, ExploreModalData } from './modals/explore-modal/explore-modal.component';
@@ -184,6 +185,7 @@ export class TripPlannerComponent implements OnInit {
             }
             this.tripLoading = false;
             this.loaderService.hide();
+            this.loadGlance();
           },
           error: () => {
             if (!this.destinations.length && this.destination) {
@@ -287,7 +289,52 @@ export class TripPlannerComponent implements OnInit {
     return '⭐'.repeat(Math.round(rating));
   }
 
+  // ── Trip at a glance (Overview): where you sleep and what each day holds ──
+  glanceItems: ItineraryItemResponse[] | null = null;
+  glanceAll = false;
+  itineraryStartDate: string | null = null;
+  readonly glanceCollapsed = 3;
+  readonly nightsLabel = nightsLabel;
+  readonly dayLabel = dayLabel;
+
+  private loadGlance(): void {
+    if (!this.tripId) return;
+    this.tripService.getItinerary(this.tripId).subscribe({
+      next: (items) => { this.glanceItems = items || []; },
+      error: () => { this.glanceItems = null; }
+    });
+  }
+
+  // Recomputed only when the items, dates or stops change.
+  private glanceMemo: { key: unknown[]; value: { stays: GlanceStay[]; days: GlancePlannedDay[] } | null } | null = null;
+
+  get glance(): { stays: GlanceStay[]; days: GlancePlannedDay[] } | null {
+    const key = [this.glanceItems, this.fromDate, this.toDate, this.destinations, this.canEdit];
+    if (this.glanceMemo && this.glanceMemo.key.every((k, i) => k === key[i])) return this.glanceMemo.value;
+    let value: { stays: GlanceStay[]; days: GlancePlannedDay[] } | null = null;
+    if (this.glanceItems != null) {
+      const days = tripDays(this.fromDate, this.toDate, this.destinations);
+      if (days.length) {
+        const summary = summarizePlan(this.glanceItems, days);
+        if (summary.stays.length || summary.days.length || this.canEdit) value = summary;
+      }
+    }
+    this.glanceMemo = { key, value };
+    return value;
+  }
+
+  glanceIcon(category: string): string {
+    return category === 'food' ? '🍽' : category === 'transport' ? '🚗' : category === 'activity' ? '📍' : '•';
+  }
+
+  openGlanceDay(date: string): void {
+    this.itineraryStartDate = date;
+    this.setActiveTab('itinerary');
+  }
+
   setActiveTab(tab: 'overview' | 'itinerary' | 'budget' | 'checklist' | 'travellers'): void {
+    if (tab !== 'itinerary') this.itineraryStartDate = null;
+    if (tab === 'overview' && this.activeTab !== 'overview') this.loadGlance();
     this.activeTab = tab;
     this.router.navigate([], {
       relativeTo: this.route,

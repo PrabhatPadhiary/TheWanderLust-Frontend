@@ -7,8 +7,9 @@
     </button>
 
     <div class="options-view">
-        <h2 *ngIf="data?.destination">Plan your trip to <strong>{{ data!.destination }}</strong></h2>
-        <h2 *ngIf="!data?.destination">{{ mode === 'signup' ? 'Create your account' : 'Sign in to continue' }}</h2>
+        <h2 *ngIf="data?.heading">{{ data!.heading }}</h2>
+        <h2 *ngIf="!data?.heading && data?.destination">Plan your trip to <strong>{{ data!.destination }}</strong></h2>
+        <h2 *ngIf="!data?.heading && !data?.destination">{{ mode === 'signup' ? 'Create your account' : 'Sign in to continue' }}</h2>
         <p class="subtitle">Your trips, stories and favourites, on the web and in the app.</p>
         <div class="auth-buttons">
             <button class="auth-btn google-btn" (click)="loginWithGoogle()" [disabled]="isLoading">

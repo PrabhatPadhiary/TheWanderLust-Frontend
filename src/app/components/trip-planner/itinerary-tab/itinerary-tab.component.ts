@@ -19,6 +19,8 @@ export class ItineraryTabComponent implements OnInit, OnChanges, OnDestroy, Afte
   @Input() toDate: string | null = null;
   @Input() places: TripPlaceDetailResponse[] = [];
   @Input() destinations: { id?: string; name: string; startDate: string | null; endDate: string | null; places?: TripPlaceDetailResponse[] }[] = [];
+  /** Open on this day (YYYY-MM-DD), e.g. a day picked in the Overview's "Trip at a glance". */
+  @Input() initialDate: string | null = null;
   @ViewChild('scheduleCol') scheduleColRef!: ElementRef<HTMLElement>;
 
   activeDayIndex = 0;
@@ -130,6 +132,10 @@ export class ItineraryTabComponent implements OnInit, OnChanges, OnDestroy, Afte
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['tripId'] && this.tripId) {
       this.loadItinerary();
+    }
+    if (changes['initialDate'] && this.initialDate) {
+      const idx = this.days.findIndex(d => d.date && this.formatDate(d.date) === this.initialDate);
+      if (idx >= 0) this.activeDayIndex = idx;
     }
   }
 

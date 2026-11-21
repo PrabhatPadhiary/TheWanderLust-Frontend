@@ -23,7 +23,7 @@ export class AuthGateModalComponent {
 
   constructor(
     private dialogRef: MatDialogRef<AuthGateModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { destination?: string } | null,
+    @Inject(MAT_DIALOG_DATA) public data: { destination?: string; heading?: string } | null,
     private toastr: ToastrService,
     private authService: AuthService,
     private favouritesService: FavouritesService

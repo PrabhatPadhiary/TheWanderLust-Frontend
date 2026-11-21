@@ -140,6 +140,24 @@ export interface InvitationPreviewResponse {
   };
 }
 
+/** What anyone with the link can see before signing in (GET /join/{id}/preview). */
+export interface InvitationPublicPreview {
+  id: string;
+  role: string;
+  trip: {
+    id: string;
+    name: string;
+    primaryDestination?: string | null;
+    startDate?: string | null;
+    endDate?: string | null;
+    stopNames: string[];
+    primaryPlaceId?: string | null;
+    travellerCount: number;
+    ownerFirstName?: string | null;
+    ownerPhotoUrl?: string | null;
+  };
+}
+
 export interface PendingInvitationResponse {
   id: string;
   tripId: string;
@@ -208,6 +226,8 @@ export interface ItineraryItemResponse {
   endTime: string | null;
   notes: string | null;
   createdAt: string;
+  slot?: string | null;
+  sortOrder?: number | null;
 }
 
 export interface CreateItineraryItemDto {
@@ -428,6 +448,11 @@ export class TripService {
           });
       });
     });
+  }
+
+  /** Public invite preview: no sign-in needed. */
+  getInvitationPublicPreview(inviteId: string): Observable<InvitationPublicPreview> {
+    return this.http.get<InvitationPublicPreview>(`${environment.apiUrl}/join/${encodeURIComponent(inviteId)}/preview`);
   }
 
   getInvitation(inviteId: string): Observable<InvitationPreviewResponse> {
