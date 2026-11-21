@@ -90,6 +90,24 @@
   background: #E6ECF2; padding: 2px 8px; border-radius: 10px;
 }
 
+.att-trip-near {
+  font-size: 0.7rem; font-weight: 600; color: #B93D17;
+  background: #FDEFEA; padding: 2px 8px; border-radius: 10px; flex-shrink: 0;
+}
+
+.att-far {
+  margin-top: 14px; padding: 12px; border-radius: 12px; background: #FDF3EE;
+}
+.att-far-text {
+  display: flex; gap: 8px; align-items: flex-start; margin: 0 0 10px;
+  font-size: 0.84rem; line-height: 1.45; font-weight: 500; color: #1C2833;
+  svg { flex-shrink: 0; margin-top: 2px; color: #B93D17; }
+}
+.att-far-option {
+  background: #fff;
+  .att-trip-name small { display: block; margin-top: 1px; font-size: 0.72rem; font-weight: 400; color: #7B8A97; }
+}
+
 .att-dest-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
 
 .att-dest-pill {

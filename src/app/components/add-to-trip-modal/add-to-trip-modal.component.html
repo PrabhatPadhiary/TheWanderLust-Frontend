@@ -53,6 +53,7 @@
         (click)="selectTrip(trip)">
         <span class="att-trip-dot" [class.att-trip-dot--active]="selectedTripId === trip.id"></span>
         <span class="att-trip-name">{{ trip.name }}</span>
+        <span class="att-trip-near" *ngIf="isNearby(trip.id) && !isTripDisabled(trip.id)">Nearby</span>
         <span class="att-trip-added" *ngIf="isTripDisabled(trip.id)">Added</span>
         <span class="att-trip-dates" *ngIf="(trip.startDate || trip.endDate) && !isTripDisabled(trip.id)">
           {{ trip.startDate | date:'MMM d' }}<span *ngIf="trip.endDate"> – {{ trip.endDate | date:'MMM d' }}</span>
@@ -65,8 +66,46 @@
       </button>
     </div>
 
+    <div class="att-loading" *ngIf="destsLoading">
+      <div class="att-spinner"></div>
+    </div>
+
+    <!-- Far from every stop on this trip: ask where the place belongs. -->
+    <div class="att-far" *ngIf="far && !destsLoading">
+      <p class="att-far-text">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.2c.4-.3.6-.7.5-1.2z"/></svg>
+        <span>{{ data.place.name }}<ng-container *ngIf="farCity"> is in {{ farCity.name }},</ng-container><ng-container *ngIf="!farCity"> is</ng-container> about {{ formatFarKm(far.km) }} from {{ far.nearName }}.</span>
+      </p>
+
+      <div class="att-loading" *ngIf="far.city === undefined"><div class="att-spinner"></div></div>
+
+      <div class="att-trips" *ngIf="far.city !== undefined" role="radiogroup" aria-label="Where should this place go?">
+        <button *ngIf="farCity" class="att-trip-row att-far-option" role="radio"
+          [attr.aria-checked]="farChoice === 'stop'"
+          [class.att-trip-row--active]="farChoice === 'stop'" (click)="farChoice = 'stop'">
+          <span class="att-trip-dot" [class.att-trip-dot--active]="farChoice === 'stop'"></span>
+          <span class="att-trip-name">
+            Add {{ farCity.name }} as a new stop
+            <small>Saves it under {{ farCity.name }} on {{ getSelectedTrip()?.name }}</small>
+          </span>
+        </button>
+        <button class="att-trip-row att-far-option" role="radio"
+          [attr.aria-checked]="farChoice === 'new'"
+          [class.att-trip-row--active]="farChoice === 'new'" (click)="farChoice = 'new'">
+          <span class="att-trip-dot" [class.att-trip-dot--active]="farChoice === 'new'"></span>
+          <span class="att-trip-name">Start a new trip<ng-container *ngIf="farCity"> to {{ farCity.name }}</ng-container></span>
+        </button>
+        <button class="att-trip-row att-far-option" role="radio"
+          [attr.aria-checked]="farChoice === 'anyway'"
+          [class.att-trip-row--active]="farChoice === 'anyway'" (click)="farChoice = 'anyway'">
+          <span class="att-trip-dot" [class.att-trip-dot--active]="farChoice === 'anyway'"></span>
+          <span class="att-trip-name">Add to {{ anywayName }} anyway</span>
+        </button>
+      </div>
+    </div>
+
     <!-- Destination picker -->
-    <ng-container *ngIf="selectedTripId && selectedTripDestinations.length > 0">
+    <ng-container *ngIf="selectedTripId && !destsLoading && selectedTripDestinations.length > 1 && showStopPicker">
       <div class="att-divider"></div>
       <p class="att-section-label" style="text-transform: none; margin-top: 16px;">Choose destination</p>
       <div class="att-dest-pills">
@@ -87,9 +126,9 @@
   <div class="att-footer">
     <button class="att-cancel" (click)="cancel()">Cancel</button>
     <button class="att-confirm"
-      [disabled]="!selectedTripId || !selectedDestination?.id || addingToTrip"
+      [disabled]="!canConfirm"
       (click)="confirm()">
-      {{ addingToTrip ? 'Adding...' : 'Add to ' + (selectedDestination?.name || 'Trip') }}
+      {{ confirmLabel }}
     </button>
   </div>
 </div>

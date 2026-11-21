@@ -11,6 +11,8 @@ import { TripService, TripResponse } from '../../services/trip.service';
 import { AuthService } from '../../services/auth.service';
 import { FavouritesService, FavouriteItem } from '../../services/favourites.service';
 import { LoaderService } from '../../services/loader.service';
+import { tripCategoryFromTypes, favouriteCategoryFromTypes } from '../../utils/place-category';
+import { ToastrService } from 'ngx-toastr';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Subject } from 'rxjs';
@@ -55,6 +57,15 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
   staysLoading = false;
   tourismLoading = false;
 
+  // "Show more" under each grid: the next page of the paged search for the
+  // tab's current chip ('All' = the whole category). `gen` changes when the
+  // list is replaced (chip / tab), so a late page for the old list is dropped.
+  more: Record<'stays' | 'food' | 'attractions', { page: number; hasMore: boolean; loading: boolean; gen: number }> = {
+    stays: { page: 0, hasMore: true, loading: false, gen: 0 },
+    food: { page: 0, hasMore: true, loading: false, gen: 0 },
+    attractions: { page: 0, hasMore: true, loading: false, gen: 0 },
+  };
+
   // Cache: stores the base (All) results per category so chip "All" never re-fetches
   private categoryCache: Partial<Record<'stays' | 'food' | 'attractions', PlaceDto[]>> = {};
 
@@ -77,14 +88,108 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /** Places currently visible in the active tab — used to pin map markers */
+  // ── "Search in <destination>": anything typed ("ramen"), shown in place of
+  // the Stay / Eat / Do lists, through the backend (cached, kept inside the
+  // destination), with "Show more" up to Google's 60 results.
+  placeSearchText = '';
+  placeSearchQuery = '';          // what the results are for ('' = not searching)
+  placeSearchResults: PlaceDto[] = [];
+  placeSearchLoading = false;
+  placeSearchMore = { page: 0, hasMore: false, loading: false, gen: 0 };
+  private placeSearchSubject = new Subject<string>();
+
+  onPlaceSearchInput(event: Event): void {
+    this.placeSearchText = (event.target as HTMLInputElement).value;
+    this.placeSearchSubject.next(this.placeSearchText);
+  }
+
+  /** Enter: search now, without waiting for the pause. */
+  submitPlaceSearch(): void {
+    this.runPlaceSearch(this.placeSearchText);
+  }
+
+  clearPlaceSearch(): void {
+    this.placeSearchText = '';
+    this.placeSearchSubject.next('');
+    this.endPlaceSearch();
+  }
+
+  private endPlaceSearch(): void {
+    if (!this.placeSearchQuery) return;
+    this.placeSearchQuery = '';
+    this.placeSearchResults = [];
+    this.placeSearchLoading = false;
+    this.placeSearchMore = { page: 0, hasMore: false, loading: false, gen: this.placeSearchMore.gen + 1 };
+    if (this.destMapReady) this.updateDestMarkers();
+  }
+
+  private runPlaceSearch(text: string): void {
+    const q = text.trim();
+    if (q === this.placeSearchQuery) return;
+    if (q.length < 2) { this.endPlaceSearch(); return; }
+    this.placeSearchQuery = q;
+    this.placeSearchResults = [];
+    this.placeSearchLoading = true;
+    const gen = this.placeSearchMore.gen + 1;
+    this.placeSearchMore = { page: 0, hasMore: false, loading: false, gen };
+    this.destinationService.searchInDestination(this.placeId, { query: q, page: 0 }).subscribe({
+      next: (res) => {
+        if (this.placeSearchMore.gen !== gen) return;
+        this.placeSearchResults = res?.places || [];
+        this.placeSearchMore = { page: 1, hasMore: !!res?.hasMore, loading: false, gen };
+        this.placeSearchLoading = false;
+        if (this.destMapReady) this.updateDestMarkers();
+      },
+      error: () => {
+        if (this.placeSearchMore.gen !== gen) return;
+        this.placeSearchLoading = false;
+        this.toastr.error('Search failed. Try again.');
+      }
+    });
+  }
+
+  showMorePlaceSearch(): void {
+    const state = this.placeSearchMore;
+    if (state.loading || !state.hasMore || !this.placeSearchQuery) return;
+    const gen = state.gen;
+    state.loading = true;
+    this.destinationService.searchInDestination(this.placeId, { query: this.placeSearchQuery, page: state.page }).subscribe({
+      next: (res) => {
+        if (this.placeSearchMore.gen !== gen) return;
+        const seen = new Set(this.placeSearchResults.map(p => p.placeId));
+        const fresh = (res?.places || []).filter(p => !seen.has(p.placeId));
+        this.placeSearchResults = [...this.placeSearchResults, ...fresh];
+        this.placeSearchMore = { page: state.page + 1, hasMore: !!res?.hasMore, loading: false, gen };
+        if (this.destMapReady) this.updateDestMarkers();
+        if (!fresh.length && res?.hasMore) this.showMorePlaceSearch();
+      },
+      error: () => {
+        if (this.placeSearchMore.gen !== gen) return;
+        this.placeSearchMore = { ...this.placeSearchMore, loading: false };
+        this.toastr.error('Could not load more places. Try again.');
+      }
+    });
+  }
+
+  /** Emoji for a card without a photo: by tab, or by what a searched place is. */
+  placeholderFor(place: PlaceDto): string {
+    const c = tripCategoryFromTypes(place.types);
+    return c === 'stay' ? '🏨' : c === 'food' ? '🍽️' : '📍';
+  }
+
   get activePlaces(): PlaceDto[] {
     if (!this.destination) return [];
+    if (this.placeSearchQuery) return this.placeSearchResults;
     if (this.activeSection === 'stays') return this.destination.lodging;
     if (this.activeSection === 'food') return this.destination.restaurants;
     return this.destination.touristAttractions;
   }
 
   setActiveSection(tab: 'stays' | 'food' | 'attractions'): void {
+    // Picking Stay / Eat / Do leaves a search.
+    this.placeSearchText = '';
+    this.placeSearchSubject.next('');
+    this.endPlaceSearch();
     this.activeSection = tab;
     this.loadCategoryIfNeeded(tab);
     // markers update after data loads — triggered from applyCategoryCache
@@ -111,7 +216,8 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
     public favouritesService: FavouritesService,
     private tripService: TripService,
     private loaderService: LoaderService,
-    private seo: SeoService
+    private seo: SeoService,
+    private toastr: ToastrService
   ) {}
 
   /** Title and description for search, once the place's name is known. */
@@ -124,6 +230,11 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.placeSearchSubject.pipe(
+      debounceTime(500),
+      distinctUntilChanged()
+    ).subscribe(text => this.runPlaceSearch(text));
+
     this.route.paramMap.subscribe(params => {
       this.placeId = params.get('placeId') || '';
       if (this.placeId) {
@@ -133,6 +244,9 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
         this.existingTrip = null;
         this.categoryCache = {};
         this.activeSection = 'stays';
+        this.placeSearchText = '';
+        this.placeSearchSubject.next('');
+        this.endPlaceSearch();
         this.activeFoodChip = 'All';
         this.activeStaysChip = 'All';
         this.activeTourismChip = 'All';
@@ -245,8 +359,61 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  private resetMore(tab: 'stays' | 'food' | 'attractions'): void {
+    const m = this.more[tab];
+    this.more[tab] = { page: 0, hasMore: true, loading: false, gen: m.gen + 1 };
+  }
+
+  private listFor(tab: 'stays' | 'food' | 'attractions'): PlaceDto[] {
+    if (!this.destination) return [];
+    return tab === 'stays' ? this.destination.lodging
+      : tab === 'food' ? this.destination.restaurants
+      : this.destination.touristAttractions;
+  }
+
+  private setList(tab: 'stays' | 'food' | 'attractions', places: PlaceDto[]): void {
+    if (!this.destination) return;
+    if (tab === 'stays') this.destination.lodging = places;
+    else if (tab === 'food') this.destination.restaurants = places;
+    else this.destination.touristAttractions = places;
+  }
+
+  /** Append the next page of places for this tab's chip, skipping ones already shown. */
+  showMore(tab: 'stays' | 'food' | 'attractions'): void {
+    const state = this.more[tab];
+    if (!this.destination || state.loading || !state.hasMore) return;
+    const chip = tab === 'stays' ? this.activeStaysChip : tab === 'food' ? this.activeFoodChip : this.activeTourismChip;
+    const category = tab === 'stays' ? 'stays' : tab === 'food' ? 'restaurants' : 'attractions';
+    const gen = state.gen;
+    state.loading = true;
+
+    this.destinationService.searchInDestination(this.placeId, {
+      category: chip === 'All' ? category : undefined,
+      filter: chip === 'All' ? undefined : chip.toLowerCase(),
+      page: state.page,
+    }).subscribe({
+      next: (res) => {
+        if (this.more[tab].gen !== gen) return;
+        const shown = this.listFor(tab);
+        const seen = new Set(shown.map(p => p.placeId));
+        const fresh = (res?.places || []).filter(p => !seen.has(p.placeId));
+        this.setList(tab, [...shown, ...fresh]);
+        this.more[tab] = { page: state.page + 1, hasMore: !!res?.hasMore, loading: false, gen };
+        if (this.destMapReady) this.updateDestMarkers();
+        // A page of only places already shown: go straight on to the next.
+        if (!fresh.length && res?.hasMore) this.showMore(tab);
+      },
+      error: () => {
+        if (this.more[tab].gen !== gen) return;
+        this.more[tab] = { ...this.more[tab], loading: false };
+        this.toastr.error('Could not load more places. Try again.');
+      }
+    });
+  }
+
   private applyCategoryCache(tab: 'stays' | 'food' | 'attractions'): void {
     if (!this.destination) return;
+    this.resetMore(tab);
     const places = this.categoryCache[tab] ?? [];
     if (tab === 'stays')       this.destination.lodging = places;
     else if (tab === 'food')   this.destination.restaurants = places;
@@ -306,6 +473,7 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onStaysChipClick(chip: string): void {
     this.activeStaysChip = chip;
+    this.resetMore('stays');
     if (chip === 'All') { this.applyCategoryCache('stays'); return; }
     this.staysLoading = true;
     this.destinationService.filter(this.placeId, chip.toLowerCase()).subscribe({
@@ -316,6 +484,7 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onFoodChipClick(chip: string): void {
     this.activeFoodChip = chip;
+    this.resetMore('food');
     if (chip === 'All') { this.applyCategoryCache('food'); return; }
     this.foodLoading = true;
     this.destinationService.filter(this.placeId, chip.toLowerCase()).subscribe({
@@ -326,6 +495,7 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onTourismChipClick(chip: string): void {
     this.activeTourismChip = chip;
+    this.resetMore('attractions');
     if (chip === 'All') { this.applyCategoryCache('attractions'); return; }
     this.tourismLoading = true;
     this.destinationService.filter(this.placeId, chip.toLowerCase()).subscribe({
@@ -418,7 +588,8 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
     const allPlaces = [
       ...(this.destination?.restaurants || []),
       ...(this.destination?.lodging || []),
-      ...(this.destination?.touristAttractions || [])
+      ...(this.destination?.touristAttractions || []),
+      ...this.placeSearchResults
     ];
     const place = allPlaces.find(p => p.placeId === placeId);
 
@@ -427,7 +598,8 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
     } else if (place) {
       const category = this.destination!.restaurants.includes(place) ? 'restaurant'
         : this.destination!.lodging.includes(place) ? 'lodging'
-        : 'tourist_attraction';
+        : this.destination!.touristAttractions.includes(place) ? 'tourist_attraction'
+        : favouriteCategoryFromTypes(place.types);
 
       this.favouritesService.add({
         placeId: place.placeId,
@@ -473,7 +645,8 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    const category = this.destination?.lodging.includes(place) ? 'stay'
+    const category = this.placeSearchResults.includes(place) ? tripCategoryFromTypes(place.types)
+      : this.destination?.lodging.includes(place) ? 'stay'
       : this.destination?.restaurants.includes(place) ? 'food'
       : 'activity';
 
@@ -482,7 +655,9 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
       data: {
         place,
         category,
-        destinationName: this.destination?.name || ''
+        destinationName: this.destination?.name || '',
+        // The place is in the destination being browsed.
+        city: this.placeId ? { placeId: this.placeId, name: this.destination?.name || '' } : null
       } as AddToTripModalData
     });
 
@@ -954,6 +1129,7 @@ export class DestinationComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.placeSearchSubject.complete();
     ScrollTrigger.getAll().forEach(trigger => trigger.kill());
     if (this.slideInterval) {
       clearInterval(this.slideInterval);

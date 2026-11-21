@@ -1,13 +1,12 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, OnDestroy } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, takeUntil } from 'rxjs/operators';
 import { DestinationService } from '../../../../services/destination.service';
 import { PlaceDto } from '../../../../models/destination.model';
 import { TripService, CreateTripPlaceDto, TripPlaceDetailResponse } from '../../../../services/trip.service';
 import { ToastrService } from 'ngx-toastr';
-
-declare var google: any;
+import { tripCategoryFromTypes } from '../../../../utils/place-category';
 
 export interface ExploreModalData {
   tripId: string;
@@ -30,7 +29,13 @@ export interface ExploreModalResult {
   styleUrls: ['./explore-modal.component.scss'],
   standalone: false
 })
-export class ExploreModalComponent implements OnInit {
+/**
+ * "Browse & Add Places" for one trip stop: Stay / Food / Activities lists
+ * with filter chips, or a search for anything in the destination ("ramen",
+ * "bookstores"). Both go through our backend (cached, kept inside the
+ * destination) and grow with "Show more", up to Google's 60 results.
+ */
+export class ExploreModalComponent implements OnInit, OnDestroy {
   activeSection: 'stays' | 'food' | 'attractions' = 'stays';
   places: PlaceDto[] = [];
   loading = false;
@@ -39,12 +44,16 @@ export class ExploreModalComponent implements OnInit {
   addedPlaces: TripPlaceDetailResponse[] = [];
   addedCount = 0;
 
-  // Search
+  // Search: `searchQuery` is the box; `activeQuery` is what the grid shows
+  // results for ('' = the Stay / Food / Activities lists).
   searchQuery = '';
-  searchPredictions: any[] = [];
-  showSearchDropdown = false;
-  searchLoading = false;
+  activeQuery = '';
   private searchSubject = new Subject<string>();
+  private destroy$ = new Subject<void>();
+
+  // "Show more": the next page of the paged search for what the grid shows.
+  // `gen` changes whenever the grid is replaced, so late pages are dropped.
+  more = { page: 0, hasMore: true, loading: false, gen: 0 };
 
   // Chips
   staysChips = ['All', 'Hotels', 'Resorts', 'Boutique', 'Hostels', 'Villas'];
@@ -87,100 +96,132 @@ export class ExploreModalComponent implements OnInit {
     this.initSearch();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private initSearch(): void {
     this.searchSubject.pipe(
-      debounceTime(300),
+      debounceTime(500),
       distinctUntilChanged(),
-      filter(v => v.length >= 2)
+      takeUntil(this.destroy$)
     ).subscribe(value => this.runSearch(value));
   }
 
+  /** Show search results for `query` in the grid (or the lists again when it's cleared). */
   private runSearch(query: string): void {
-    if (typeof google === 'undefined' || !google.maps?.places) return;
-    this.searchLoading = true;
-    const mapDiv = document.createElement('div');
-    const service = new google.maps.places.PlacesService(mapDiv);
-    const request: any = { query, type: this.getPlaceTypeForSection() };
-    if (this.data.latitude && this.data.longitude) {
-      request.location = new google.maps.LatLng(this.data.latitude, this.data.longitude);
-      request.radius = 50000;
+    const q = query.trim();
+    if (q === this.activeQuery) return;
+    if (q.length < 2) {
+      if (this.activeQuery) this.exitSearch();
+      return;
     }
-    service.textSearch(request, (results: any[], status: string) => {
-      this.searchLoading = false;
-      if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-        this.searchPredictions = results.slice(0, 8).map(r => ({
-          placeId: r.place_id,
-          name: r.name,
-          vicinity: r.vicinity || r.formatted_address || '',
-          rating: r.rating || null,
-          userRatingsTotal: r.user_ratings_total || null,
-          geometry: {
-            latitude: r.geometry?.location?.lat() ?? null,
-            longitude: r.geometry?.location?.lng() ?? null
-          },
-          photos: r.photos ? [{ url: r.photos[0]?.getUrl?.({ maxWidth: 400 }) || '' }] : [],
-          types: r.types || [],
-          priceLevel: r.price_level || null,
-          _raw: r
-        }));
-        this.showSearchDropdown = this.searchPredictions.length > 0;
-      } else {
-        this.searchPredictions = [];
-        this.showSearchDropdown = false;
+    this.activeQuery = q;
+    this.places = [];
+    this.loading = true;
+    const gen = this.resetMore();
+    this.destinationService.searchInDestination(this.data.googlePlaceId, { query: q, page: 0 }).subscribe({
+      next: (res) => {
+        if (this.more.gen !== gen) return;
+        this.places = res?.places || [];
+        this.more = { page: 1, hasMore: !!res?.hasMore, loading: false, gen };
+        this.loading = false;
+      },
+      error: () => {
+        if (this.more.gen !== gen) return;
+        this.loading = false;
+        this.toastr.error('Search failed. Try again.');
       }
     });
   }
 
-  private getPlaceTypeForSection(): string {
-    if (this.activeSection === 'stays') return 'lodging';
-    if (this.activeSection === 'food') return 'restaurant';
-    return 'tourist_attraction';
+  private exitSearch(): void {
+    this.activeQuery = '';
+    this.activeChip = 'All';
+    this.loadCategory(this.activeSection);
+  }
+
+  private resetMore(): number {
+    this.more = { page: 0, hasMore: true, loading: false, gen: this.more.gen + 1 };
+    return this.more.gen;
+  }
+
+  /** Append the next page for what the grid shows, skipping places already in it. */
+  showMore(): void {
+    const state = this.more;
+    if (state.loading || !state.hasMore || this.loading) return;
+    const category = this.activeSection === 'stays' ? 'stays'
+      : this.activeSection === 'food' ? 'restaurants' : 'attractions';
+    const opts = this.activeQuery
+      ? { query: this.activeQuery, page: state.page }
+      : this.activeChip === 'All'
+        ? { category, page: state.page }
+        : { filter: this.activeChip.toLowerCase(), page: state.page };
+    const gen = state.gen;
+    state.loading = true;
+    this.destinationService.searchInDestination(this.data.googlePlaceId, opts).subscribe({
+      next: (res) => {
+        if (this.more.gen !== gen) return;
+        const seen = new Set(this.places.map(p => p.placeId));
+        const fresh = (res?.places || []).filter(p => !seen.has(p.placeId));
+        this.places = [...this.places, ...fresh];
+        this.more = { page: state.page + 1, hasMore: !!res?.hasMore, loading: false, gen };
+        // A page of only places already shown: go straight on to the next.
+        if (!fresh.length && res?.hasMore) this.showMore();
+      },
+      error: () => {
+        if (this.more.gen !== gen) return;
+        this.more = { ...this.more, loading: false };
+        this.toastr.error('Could not load more places. Try again.');
+      }
+    });
   }
 
   onSearchInput(event: Event): void {
-    const value = (event.target as HTMLInputElement).value;
-    this.searchQuery = value;
-    if (value.length < 2) {
-      this.searchPredictions = [];
-      this.showSearchDropdown = false;
-      return;
-    }
-    this.searchSubject.next(value);
+    this.searchQuery = (event.target as HTMLInputElement).value;
+    this.searchSubject.next(this.searchQuery);
   }
 
-  onSearchBlur(): void {
-    setTimeout(() => { this.showSearchDropdown = false; }, 200);
+  /** Enter: search now, without waiting for the pause. */
+  submitSearch(): void {
+    this.runSearch(this.searchQuery);
   }
 
   clearSearch(): void {
     this.searchQuery = '';
-    this.searchPredictions = [];
-    this.showSearchDropdown = false;
+    this.searchSubject.next('');
+    if (this.activeQuery) this.exitSearch();
   }
 
   setSection(section: 'stays' | 'food' | 'attractions'): void {
     this.activeSection = section;
     this.activeChip = 'All';
-    this.clearSearch();
+    this.searchQuery = '';
+    this.searchSubject.next('');
+    this.activeQuery = '';
     this.loadCategory(section);
   }
 
   onChipClick(chip: string): void {
     this.activeChip = chip;
+    const gen = this.resetMore();
     if (chip === 'All') {
       this.places = this.categoryCache[this.activeSection] || [];
       return;
     }
     this.loading = true;
     this.destinationService.filter(this.data.googlePlaceId, chip.toLowerCase()).subscribe({
-      next: (data) => { this.places = data; this.loading = false; },
-      error: () => { this.loading = false; }
+      next: (data) => { if (this.more.gen === gen) { this.places = data; this.loading = false; } },
+      error: () => { if (this.more.gen === gen) this.loading = false; }
     });
   }
 
   private loadCategory(section: 'stays' | 'food' | 'attractions'): void {
+    const gen = this.resetMore();
     if (this.categoryCache[section]) {
       this.places = this.categoryCache[section]!;
+      this.loading = false;
       return;
     }
 
@@ -192,14 +233,17 @@ export class ExploreModalComponent implements OnInit {
     this.destinationService.getPlacesByCategory(this.data.googlePlaceId, categoryParam as any).subscribe({
       next: (places) => {
         this.categoryCache[section] = places;
+        if (this.more.gen !== gen) return;
         this.places = places;
         this.loading = false;
       },
-      error: () => { this.loading = false; }
+      error: () => { if (this.more.gen === gen) this.loading = false; }
     });
   }
 
-  private getCategoryForDto(): string {
+  private getCategoryForDto(place?: PlaceDto): string {
+    // A searched place can be anything: go by what Google says it is.
+    if (this.activeQuery && place) return tripCategoryFromTypes(place.types);
     if (this.activeSection === 'stays') return 'stay';
     if (this.activeSection === 'food') return 'food';
     return 'activity';
@@ -218,7 +262,7 @@ export class ExploreModalComponent implements OnInit {
       rating: place.rating,
       userRatingsTotal: place.userRatingsTotal,
       photoUrl,
-      category: this.getCategoryForDto(),
+      category: this.getCategoryForDto(place),
       notes: null,
       latitude: place.geometry?.latitude || null,
       longitude: place.geometry?.longitude || null
@@ -244,55 +288,6 @@ export class ExploreModalComponent implements OnInit {
         };
         this.addedPlaces.push(addedPlace);
         this.toastr.success(`${place.name} added to trip`);
-      },
-      error: () => {
-        this.addingPlaceId = null;
-        this.toastr.error('Failed to add place');
-      }
-    });
-  }
-
-  addSearchResult(place: any): void {
-    if (this.addingPlaceId || this.isAdded(place.placeId)) return;
-    this.addingPlaceId = place.placeId;
-
-    const photoUrl = place.photos?.length > 0 ? place.photos[0].url : null;
-
-    const dto: CreateTripPlaceDto = {
-      placeId: place.placeId,
-      placeName: place.name,
-      vicinity: place.vicinity || null,
-      rating: place.rating,
-      userRatingsTotal: place.userRatingsTotal,
-      photoUrl,
-      category: this.getCategoryForDto(),
-      notes: null,
-      latitude: place.geometry?.latitude || null,
-      longitude: place.geometry?.longitude || null
-    };
-
-    this.tripService.addPlace(this.data.tripId, this.data.destinationId, dto).subscribe({
-      next: (res) => {
-        this.addingPlaceId = null;
-        this.addedPlaceIds.push(place.placeId);
-        this.addedCount++;
-        const addedPlace: TripPlaceDetailResponse = {
-          id: res.id,
-          placeId: dto.placeId,
-          placeName: dto.placeName,
-          vicinity: dto.vicinity,
-          rating: dto.rating,
-          userRatingsTotal: dto.userRatingsTotal,
-          photoUrl: dto.photoUrl,
-          category: dto.category,
-          notes: null,
-          latitude: dto.latitude,
-          longitude: dto.longitude
-        };
-        this.addedPlaces.push(addedPlace);
-        this.toastr.success(`${place.name} added to trip`);
-        this.showSearchDropdown = false;
-        this.searchQuery = '';
       },
       error: () => {
         this.addingPlaceId = null;

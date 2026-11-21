@@ -23,43 +23,30 @@
         <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
       </svg>
       <input
-        type="text"
+        type="search"
         class="explore-search-input"
         [value]="searchQuery"
-        placeholder="Search for places in {{ data.destinationName }}..."
+        placeholder="Search anything in {{ data.destinationName }}: ramen, rooftop bars, bookstores…"
+        [attr.aria-label]="'Search places in ' + data.destinationName"
         (input)="onSearchInput($event)"
-        (blur)="onSearchBlur()"
+        (keydown.enter)="submitSearch()"
         autocomplete="off">
-      <button class="explore-search-clear" *ngIf="searchQuery" (click)="clearSearch()">
+      <button class="explore-search-clear" *ngIf="searchQuery" (click)="clearSearch()" aria-label="Clear search">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5">
           <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
         </svg>
       </button>
     </div>
+  </div>
 
-    <!-- Search results dropdown -->
-    <div class="explore-search-results" *ngIf="showSearchDropdown && searchPredictions.length > 0">
-      <div class="explore-search-item" *ngFor="let p of searchPredictions" (mousedown)="addSearchResult(p)">
-        <div class="explore-search-item-img">
-          <img *ngIf="p.photos?.length > 0 && p.photos[0].url" [src]="p.photos[0].url" [alt]="p.name">
-          <span *ngIf="!p.photos?.length || !p.photos[0].url" class="explore-search-item-placeholder">{{ tabIcon }}</span>
-        </div>
-        <div class="explore-search-item-info">
-          <strong>{{ p.name }}</strong>
-          <span>{{ p.vicinity }}</span>
-          <span class="explore-search-item-rating" *ngIf="p.rating">⭐ {{ p.rating }}</span>
-        </div>
-        <button class="explore-search-item-add" [disabled]="addingPlaceId === p.placeId || isAdded(p.placeId)">
-          <span *ngIf="isAdded(p.placeId)">✓</span>
-          <span *ngIf="!isAdded(p.placeId) && addingPlaceId !== p.placeId">+ Add</span>
-          <span *ngIf="addingPlaceId === p.placeId">...</span>
-        </button>
-      </div>
-    </div>
+  <!-- Searching: what the grid shows, and the way back to the lists -->
+  <div class="explore-search-heading" *ngIf="activeQuery">
+    <span>Results for <strong>"{{ activeQuery }}"</strong> in {{ data.destinationName }}</span>
+    <button type="button" class="explore-search-back" (click)="clearSearch()">Back to {{ activeSection === 'stays' ? 'stays' : activeSection === 'food' ? 'food' : 'activities' }}</button>
   </div>
 
   <!-- Tabs -->
-  <div class="explore-modal-tabs">
+  <div class="explore-modal-tabs" *ngIf="!activeQuery">
     <button class="explore-tab" [class.explore-tab--active]="activeSection === 'stays'" (click)="setSection('stays')">
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
@@ -86,7 +73,7 @@
   </div>
 
   <!-- Chip filters -->
-  <div class="explore-modal-chips">
+  <div class="explore-modal-chips" *ngIf="!activeQuery">
     <button class="explore-chip" *ngFor="let chip of chips"
       [class.explore-chip--active]="activeChip === chip"
       (click)="onChipClick(chip)">{{ chip }}</button>
@@ -157,9 +144,18 @@
       </div>
     </div>
 
+    <!-- Show more -->
+    <div class="explore-more" *ngIf="!loading && places.length > 0 && more.hasMore">
+      <button type="button" class="explore-more-btn" (click)="showMore()" [disabled]="more.loading">
+        <span class="explore-more-spinner" *ngIf="more.loading" aria-hidden="true"></span>
+        {{ more.loading ? 'Loading more…' : 'Show more places' }}
+      </button>
+    </div>
+
     <!-- Empty state -->
     <div class="explore-empty" *ngIf="!loading && places.length === 0">
-      <p>No places found. Try searching above or switch categories.</p>
+      <p *ngIf="activeQuery">Nothing found for "{{ activeQuery }}" in {{ data.destinationName }}. Try other words.</p>
+      <p *ngIf="!activeQuery">No places found. Try searching above or switch categories.</p>
     </div>
   </div>
 </div>

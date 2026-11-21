@@ -22,6 +22,95 @@
       <ng-container *ngIf="!loading && destination">
         <div class="content-sections">
 
+          <!-- ===== SEARCH IN THIS DESTINATION ===== -->
+          <div class="section-inner place-search-inner">
+            <div class="place-search" role="search">
+              <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+                <circle cx="11" cy="11" r="8"></circle><path d="M21 21l-4.35-4.35"></path>
+              </svg>
+              <input type="search"
+                     [value]="placeSearchText"
+                     [placeholder]="'Search in ' + destination.name + ': ramen, rooftop bars, bookstores…'"
+                     [attr.aria-label]="'Search places in ' + destination.name"
+                     (input)="onPlaceSearchInput($event)"
+                     (keydown.enter)="submitPlaceSearch()"
+                     autocomplete="off">
+              <button type="button" class="place-search-clear" *ngIf="placeSearchText" (click)="clearPlaceSearch()" aria-label="Clear search">
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- ===== SEARCH RESULTS (in place of the Stay / Eat / Do lists) ===== -->
+          <section class="dest-section" id="search" *ngIf="placeSearchQuery" aria-live="polite">
+            <div class="section-inner">
+              <div class="section-intro search-intro">
+                <h2 class="section-title">Results for "{{ placeSearchQuery }}"</h2>
+                <button type="button" class="search-back" (click)="clearPlaceSearch()">
+                  Back to {{ activeSection === 'stays' ? 'stays' : activeSection === 'food' ? 'food' : 'things to do' }}
+                </button>
+              </div>
+
+              <div class="places-grid">
+                <ng-container *ngIf="placeSearchLoading">
+                  <div class="place-card skeleton" *ngFor="let i of [1,2,3,4]">
+                    <div class="skeleton-img"></div>
+                    <div class="skeleton-body">
+                      <div class="skeleton-line wide"></div>
+                      <div class="skeleton-line medium"></div>
+                      <div class="skeleton-line narrow"></div>
+                    </div>
+                  </div>
+                </ng-container>
+                <ng-container *ngIf="!placeSearchLoading">
+                  <div class="place-card" *ngFor="let place of placeSearchResults" (click)="openPanel(place)">
+                    <div class="place-card-img">
+                      <img *ngIf="place.photos.length > 0" [src]="place.photos[0].url" [alt]="place.name">
+                      <div *ngIf="place.photos.length === 0" class="place-card-placeholder">{{ placeholderFor(place) }}</div>
+                      <button class="fav-btn" [class.active]="favouritesService.isFavourite(place.placeId)"
+                        (click)="toggleFavourite(place.placeId); $event.stopPropagation()" title="Add to favourites">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                        </svg>
+                      </button>
+                    </div>
+                    <div class="place-card-body">
+                      <h3>{{ place.name }}</h3>
+                      <p class="place-vicinity">{{ place.vicinity }}</p>
+                      <span class="place-rating" *ngIf="place.rating">⭐ {{ place.rating }}
+                        <span class="rating-count" *ngIf="place.userRatingsTotal"> · {{ place.userRatingsTotal }} reviews</span>
+                      </span>
+                      <div class="card-actions">
+                        <app-add-to-trip-btn [place]="place" (addToTrip)="openAddToTripModal($event)"></app-add-to-trip-btn>
+                        <a class="maps-btn" (click)="$event.stopPropagation()"
+                          [href]="'https://www.google.com/maps/search/?api=1&query=' + place.geometry.latitude + ',' + place.geometry.longitude"
+                          target="_blank" title="View on Google Maps">
+                          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                            <circle cx="12" cy="10" r="3"></circle>
+                          </svg>
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+              </div>
+
+              <div class="show-more" *ngIf="!placeSearchLoading && placeSearchResults.length > 0 && placeSearchMore.hasMore">
+                <button type="button" class="show-more-btn" (click)="showMorePlaceSearch()" [disabled]="placeSearchMore.loading">
+                  <span class="show-more-spinner" *ngIf="placeSearchMore.loading" aria-hidden="true"></span>
+                  {{ placeSearchMore.loading ? 'Loading more…' : 'Show more places' }}
+                </button>
+              </div>
+
+              <p class="no-results" *ngIf="!placeSearchLoading && placeSearchResults.length === 0">
+                Nothing found for "{{ placeSearchQuery }}" in {{ destination.name }}. Try other words.
+              </p>
+            </div>
+          </section>
+
+          <ng-container *ngIf="!placeSearchQuery">
+
           <!-- ===== STAYS TAB ===== -->
           <section class="dest-section" id="stays" *ngIf="activeSection === 'stays'">
             <div class="section-inner">
@@ -84,6 +173,13 @@
                     </div>
                   </div>
                 </ng-container>
+              </div>
+
+              <div class="show-more" *ngIf="!staysLoading && destination.lodging.length > 0 && more.stays.hasMore">
+                <button type="button" class="show-more-btn" (click)="showMore('stays')" [disabled]="more.stays.loading">
+                  <span class="show-more-spinner" *ngIf="more.stays.loading" aria-hidden="true"></span>
+                  {{ more.stays.loading ? 'Loading more…' : 'Show more places' }}
+                </button>
               </div>
 
               <p class="no-results" *ngIf="!staysLoading && destination.lodging.length === 0">
@@ -154,6 +250,13 @@
                 </ng-container>
               </div>
 
+              <div class="show-more" *ngIf="!foodLoading && destination.restaurants.length > 0 && more.food.hasMore">
+                <button type="button" class="show-more-btn" (click)="showMore('food')" [disabled]="more.food.loading">
+                  <span class="show-more-spinner" *ngIf="more.food.loading" aria-hidden="true"></span>
+                  {{ more.food.loading ? 'Loading more…' : 'Show more places' }}
+                </button>
+              </div>
+
               <p class="no-results" *ngIf="!foodLoading && destination.restaurants.length === 0">
                 No results found for "{{ activeFoodChip }}". Try another filter.
               </p>
@@ -221,12 +324,21 @@
                 </ng-container>
               </div>
 
+              <div class="show-more" *ngIf="!tourismLoading && destination.touristAttractions.length > 0 && more.attractions.hasMore">
+                <button type="button" class="show-more-btn" (click)="showMore('attractions')" [disabled]="more.attractions.loading">
+                  <span class="show-more-spinner" *ngIf="more.attractions.loading" aria-hidden="true"></span>
+                  {{ more.attractions.loading ? 'Loading more…' : 'Show more places' }}
+                </button>
+              </div>
+
               <p class="no-results" *ngIf="!tourismLoading && destination.touristAttractions.length === 0">
                 No results found for "{{ activeTourismChip }}". Try another filter.
               </p>
 
             </div>
           </section>
+
+          </ng-container>
 
         </div> <!-- end content-sections -->
       </ng-container>

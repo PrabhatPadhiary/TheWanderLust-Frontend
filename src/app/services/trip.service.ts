@@ -192,6 +192,8 @@ export interface TripResponse {
   destinations?: TripDestinationResponse[];
   members?: TripMemberResponse[];
   placeIds?: string[];
+  /** Coordinates of each stop (trip list only). */
+  stops?: { latitude?: number | null; longitude?: number | null }[];
 }
 
 export interface ItineraryItemResponse {
