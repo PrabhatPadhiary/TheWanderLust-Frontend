@@ -32,7 +32,9 @@
              [value]="!searchActive ? destinationName : ''"
              [placeholder]="searchActive ? 'Search another destination' : (destinationName || 'Search destination...')"
              [attr.aria-label]="'Destination: ' + destinationName + '. Type to search another'"
+             autocomplete="off"
              (input)="onSearchInput($event)"
+             (keydown)="onSearchKeydown($event)"
              (focus)="searchActive = true; mobileSearchOpen = true; showDropdown = predictions.length > 0"
              (blur)="onBlur(); searchActive = false">
       <button class="search-close" type="button" (mousedown)="mobileSearchOpen = false" aria-label="Close search">
@@ -40,7 +42,9 @@
       </button>
     </div>
     <div class="search-dropdown" *ngIf="showDropdown && predictions.length > 0">
-      <div class="dropdown-item" *ngFor="let prediction of predictions" (mousedown)="selectPlace(prediction)">
+      <div class="dropdown-item" *ngFor="let prediction of predictions; let i = index"
+           [class.dropdown-item--active]="i === activeIndex" (mouseenter)="activeIndex = i"
+           (mousedown)="selectPlace(prediction)">
         <span class="dropdown-main">{{ prediction.structured_formatting.main_text }}</span>
         <span class="dropdown-secondary">{{ prediction.structured_formatting.secondary_text }}</span>
       </div>

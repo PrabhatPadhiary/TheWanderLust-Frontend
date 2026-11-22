@@ -8,6 +8,7 @@ import { TripResponse } from '../../services/trip.service';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 import { ToastrService } from 'ngx-toastr';
+import { suggestionKeys } from '../../utils/suggestion-keys';
 
 declare var google: any;
 
@@ -72,6 +73,7 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
 
   predictions: any[] = [];
   showDropdown = false;
+  activeIndex = -1;
   showUserMenu = false;
   searchActive = false;
   showTripTooltip = false;
@@ -224,6 +226,7 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
                   return priority(a.types) - priority(b.types);
                 });
               this.showDropdown = this.predictions.length > 0;
+              this.activeIndex = -1;
             } else {
               this.predictions = [];
               this.showDropdown = false;
@@ -237,12 +240,22 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   onSearchInput(event: Event): void {
     this.initAutocomplete();
     const value = (event.target as HTMLInputElement).value;
+    this.activeIndex = -1;
     if (value.length < 2) {
       this.predictions = [];
       this.showDropdown = false;
       return;
     }
     this.searchSubject.next(value);
+  }
+
+  onSearchKeydown(e: KeyboardEvent): void {
+    this.activeIndex = suggestionKeys(e, this.activeIndex, this.predictions.length, {
+      pick: i => this.selectPlace(this.predictions[i]),
+      close: () => { this.showDropdown = false; },
+      open: () => { this.showDropdown = true; },
+      isOpen: this.showDropdown,
+    });
   }
 
   onLocalSearch(event: Event): void {

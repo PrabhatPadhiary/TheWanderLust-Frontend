@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
 import { TripService, CreateTripPlaceDto, TripPlaceDetailResponse } from '../../../../services/trip.service';
+import { suggestionKeys } from '../../../../utils/suggestion-keys';
 
 declare var google: any;
 
@@ -30,6 +31,7 @@ export class AddPlaceModalComponent {
   addPlacePredictions: any[] = [];
   addPlaceShowDropdown = false;
   addingPlaceId: string | null = null;
+  activeIndex = -1;
 
   private addPlaceSubject = new Subject<string>();
   private initialized = false;
@@ -91,6 +93,7 @@ export class AddPlaceModalComponent {
           }
         }));
         this.addPlaceShowDropdown = this.addPlacePredictions.length > 0;
+        this.activeIndex = -1;
       } else {
         this.addPlacePredictions = [];
         this.addPlaceShowDropdown = false;
@@ -101,12 +104,20 @@ export class AddPlaceModalComponent {
   onSearchInput(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     this.addPlaceSearch = value;
+    this.activeIndex = -1;
     if (value.length < 2) {
       this.addPlacePredictions = [];
       this.addPlaceShowDropdown = false;
       return;
     }
     this.addPlaceSubject.next(value);
+  }
+
+  onSearchKeydown(e: KeyboardEvent): void {
+    this.activeIndex = suggestionKeys(e, this.activeIndex, this.addPlacePredictions.length, {
+      pick: i => this.addPlace(this.addPlacePredictions[i]),
+      close: () => { this.addPlacePredictions = []; this.addPlaceShowDropdown = false; },
+    });
   }
 
   onBlur(): void {

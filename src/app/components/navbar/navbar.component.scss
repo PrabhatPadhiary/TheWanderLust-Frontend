@@ -324,7 +324,7 @@
       padding: 11px 16px;
       cursor: pointer;
       transition: background 0.1s;
-      &:hover { background: #FEF8F6; }
+      &:hover, &.dropdown-item--active { background: #FEF8F6; }
       .dropdown-main { font-size: 0.85rem; font-weight: 600; color: #1C2833; }
       .dropdown-secondary { font-size: 0.72rem; color: #7B8A97; }
     }

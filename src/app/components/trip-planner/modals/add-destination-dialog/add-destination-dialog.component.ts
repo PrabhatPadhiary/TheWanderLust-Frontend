@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatCalendarCellClassFunction } from '@angular/material/datepicker';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
+import { suggestionKeys } from '../../../../utils/suggestion-keys';
 
 declare var google: any;
 
@@ -34,6 +35,7 @@ export class AddDestinationDialogComponent {
   destSearchQuery = '';
   destSearchPredictions: any[] = [];
   destSearchShowDropdown = false;
+  activeIndex = -1;
   selectedDestPrediction: any = null;
   addDestStart: Date | null = null;
   addDestEnd: Date | null = null;
@@ -101,6 +103,7 @@ export class AddDestinationDialogComponent {
                 p.types?.some((t: string) => allowed.includes(t))
               );
               this.destSearchShowDropdown = this.destSearchPredictions.length > 0;
+              this.activeIndex = -1;
             } else {
               this.destSearchPredictions = [];
               this.destSearchShowDropdown = false;
@@ -115,6 +118,7 @@ export class AddDestinationDialogComponent {
     const value = (event.target as HTMLInputElement).value;
     this.destSearchQuery = value;
     this.selectedDestPrediction = null;
+    this.activeIndex = -1;
     if (value.length < 2) {
       this.destSearchPredictions = [];
       this.destSearchShowDropdown = false;
@@ -147,6 +151,15 @@ export class AddDestinationDialogComponent {
         }
       );
     }
+  }
+
+  onSearchKeydown(e: KeyboardEvent): void {
+    this.activeIndex = suggestionKeys(e, this.activeIndex, this.destSearchPredictions.length, {
+      pick: i => this.selectPrediction(this.destSearchPredictions[i]),
+      close: () => { this.destSearchShowDropdown = false; },
+      open: () => { this.destSearchShowDropdown = true; },
+      isOpen: this.destSearchShowDropdown,
+    });
   }
 
   onBlur(): void {

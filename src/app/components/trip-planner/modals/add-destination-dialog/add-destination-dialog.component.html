@@ -11,10 +11,12 @@
         </svg>
       </span>
       <input type="text" class="dest-search-input" [value]="destSearchQuery"
-        placeholder="Search destination..." (input)="onSearchInput($event)"
+        placeholder="Search destination..." (input)="onSearchInput($event)" (keydown)="onSearchKeydown($event)"
         (blur)="onBlur()" autocomplete="off" [disabled]="data.lockDestination">
       <div class="dest-search-dropdown" *ngIf="destSearchShowDropdown && destSearchPredictions.length > 0 && !data.lockDestination">
-        <div class="dest-dropdown-item" *ngFor="let p of destSearchPredictions" (mousedown)="selectPrediction(p)">
+        <div class="dest-dropdown-item" *ngFor="let p of destSearchPredictions; let i = index"
+             [class.dest-dropdown-item--active]="i === activeIndex" (mouseenter)="activeIndex = i"
+             (mousedown)="selectPrediction(p)">
           <span class="dest-dropdown-main">{{ p.structured_formatting.main_text }}</span>
           <span class="dest-dropdown-secondary">{{ p.structured_formatting.secondary_text }}</span>
         </div>

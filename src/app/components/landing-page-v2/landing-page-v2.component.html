@@ -40,14 +40,18 @@
           <input #searchInput type="text"
                  placeholder="Where do you want to go?"
                  aria-label="Search a city or country"
+                 autocomplete="off" role="combobox" [attr.aria-expanded]="showDropdown && predictions.length > 0"
                  (input)="onSearchInput($event)"
+                 (keydown)="onSearchKeydown($event)"
                  (focus)="showDropdown = predictions.length > 0"
                  (blur)="onBlur()">
           <button class="search-btn" (click)="onExplore()">Explore</button>
         </div>
         <div class="search-dropdown" *ngIf="showDropdown && predictions.length > 0" role="listbox">
           <div class="dropdown-item" role="option"
-               *ngFor="let prediction of predictions"
+               *ngFor="let prediction of predictions; let i = index"
+               [class.dropdown-item--active]="i === activeIndex" [attr.aria-selected]="i === activeIndex"
+               (mouseenter)="activeIndex = i"
                (mousedown)="selectPlace(prediction)">
             <div class="dropdown-text">
               <span class="dropdown-main">{{ prediction.structured_formatting.main_text }}</span>

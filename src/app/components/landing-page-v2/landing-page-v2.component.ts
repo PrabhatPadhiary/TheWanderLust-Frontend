@@ -10,6 +10,7 @@ import { Subject } from 'rxjs';
 import { tripMapStory, TRIP_STOPS } from './trip-map';
 import { planTogetherStory, CREW } from './plan-together';
 import { debounceTime, distinctUntilChanged, filter } from 'rxjs/operators';
+import { suggestionKeys } from '../../utils/suggestion-keys';
 
 declare var google: any;
 
@@ -127,6 +128,7 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
   // Hero search
   predictions: any[] = [];
   showDropdown = false;
+  activeIndex = -1;
   selectedPlace: any = null;
   private searchSubject = new Subject<string>();
   private autocompleteService: any;
@@ -730,6 +732,7 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
                   return priority(a.types) - priority(b.types);
                 });
               this.showDropdown = this.predictions.length > 0;
+              this.activeIndex = -1;
             } else {
               this.predictions = [];
               this.showDropdown = false;
@@ -742,6 +745,7 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
 
   onSearchInput(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
+    this.activeIndex = -1;
     if (value.length < 2) {
       this.predictions = [];
       this.showDropdown = false;
@@ -756,6 +760,16 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
     this.showDropdown = false;
     this.router.navigate(['/destination', prediction.place_id], {
       state: { destinationName: prediction.structured_formatting?.main_text || prediction.description }
+    });
+  }
+
+  onSearchKeydown(e: KeyboardEvent): void {
+    if (e.key === 'Enter' && !this.predictions.length) { this.onExplore(); return; }
+    this.activeIndex = suggestionKeys(e, this.activeIndex, this.predictions.length, {
+      pick: i => this.selectPlace(this.predictions[i]),
+      close: () => { this.showDropdown = false; },
+      open: () => { this.showDropdown = true; },
+      isOpen: this.showDropdown,
     });
   }
 

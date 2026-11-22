@@ -20,7 +20,7 @@
 .dest-search-icon { position: absolute; left: 12px; color: #2B3F51; display: flex; align-items: center; pointer-events: none; }
 .dest-search-input { width: 100%; font-family: 'Poppins', sans-serif; font-size: 0.9rem; padding: 11px 14px 11px 36px; border: 1.5px solid #DCE3E8; border-radius: 10px; color: #1C2833; background: #fff; outline: none; box-sizing: border-box; transition: border-color 0.2s; &:focus { border-color: #2B3F51; } &::placeholder { color: #B6BDC0; } }
 .dest-search-dropdown { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: #fff; border: 1px solid #DCE3E8; border-radius: 10px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); z-index: 100; overflow: hidden; }
-.dest-dropdown-item { display: flex; flex-direction: column; padding: 10px 14px; cursor: pointer; transition: background 0.15s; &:hover { background: #F5F7F8; } .dest-dropdown-main { font-size: 0.88rem; font-weight: 600; color: #1C2833; } .dest-dropdown-secondary { font-size: 0.75rem; color: #7F8D99; margin-top: 2px; } }
+.dest-dropdown-item { display: flex; flex-direction: column; padding: 10px 14px; cursor: pointer; transition: background 0.15s; &:hover, &.dest-dropdown-item--active { background: #F5F7F8; } .dest-dropdown-main { font-size: 0.88rem; font-weight: 600; color: #1C2833; } .dest-dropdown-secondary { font-size: 0.75rem; color: #7F8D99; margin-top: 2px; } }
 
 // ===== EXISTING DESTINATIONS INFO =====
 .existing-dests-info {
