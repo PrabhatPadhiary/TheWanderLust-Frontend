@@ -17,6 +17,7 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'download', renderMode: RenderMode.Prerender },
   { path: 'privacy', renderMode: RenderMode.Prerender },
   { path: 'terms', renderMode: RenderMode.Prerender },
+  { path: 'child-safety', renderMode: RenderMode.Prerender },
   { path: 'delete-account', renderMode: RenderMode.Prerender },
   { path: '**', renderMode: RenderMode.Client },
 ];

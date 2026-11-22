@@ -4,6 +4,7 @@
   <nav class="legal-switch" aria-label="Legal documents">
     <a routerLink="/privacy" routerLinkActive="active">Privacy</a>
     <a routerLink="/terms" routerLinkActive="active">Terms</a>
+    <a routerLink="/child-safety" routerLinkActive="active">Child safety</a>
   </nav>
   <!-- ─────────────────────────── PRIVACY POLICY ─────────────────────────── -->
   <article *ngIf="doc === 'privacy'">
@@ -51,6 +52,12 @@
         block, and content you report.
       </li>
       <li>
+        <strong>Notifications:</strong> if you allow notifications, a push token for your phone (an
+        ID that lets us send it notifications) and the notifications we've sent you, so they also
+        show under the bell in the app. You can turn notifications off any time in your phone's
+        settings.
+      </li>
+      <li>
         <strong>Technical information:</strong> like most online services, our servers record basic
         technical details such as your IP address, device and app version, and errors. We use these
         to keep Wayraa secure (for example, to stop abuse) and to fix problems.
@@ -94,6 +101,11 @@
         <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google Privacy Policy</a>.
       </li>
       <li><strong>Cloudinary</strong> to store and resize photos.</li>
+      <li>
+        <strong>Expo</strong>, with <strong>Firebase Cloud Messaging</strong> (Android) and
+        <strong>Apple Push Notification service</strong> (iPhone), to deliver notifications to your
+        phone. They receive your push token and the text of each notification.
+      </li>
       <li><strong>Render</strong> and <strong>Neon</strong> to host our servers and database.</li>
       <li><strong>Cloudflare</strong> to deliver our website.</li>
     </ul>
@@ -119,7 +131,8 @@
       <li>See and edit your profile in the app at any time.</li>
       <li>Make a story private, or delete it.</li>
       <li>Turn off location access in your phone's settings.</li>
-      <li>Block or report people and content.</li>
+      <li>Turn off notifications in your phone's settings.</li>
+      <li>Block or report people and content. Reports are anonymous to the person reported; our moderators see them so they can review the content.</li>
       <li>
         Ask us for a copy of your information, to correct it, or to delete it, by emailing
         <a [href]="'mailto:' + SUPPORT_EMAIL">{{ SUPPORT_EMAIL }}</a>. Depending on where you live, you
@@ -191,8 +204,10 @@
       <li>is spam, a scam, or pretends to be someone else.</li>
     </ul>
     <p>
-      You can report content and block people in the app. We may remove content and suspend or close
-      accounts that break these rules.
+      You can report stories, comments and replies, and block people, in the app. We review reports
+      within 24 hours. We may remove content and suspend or close accounts that break these rules.
+      We have zero tolerance for child sexual abuse and exploitation: see our
+      <a routerLink="/child-safety">Child Safety Standards</a>.
     </p>
 
     <h2>5. Shared trips</h2>
@@ -245,6 +260,71 @@
     <h2>12. Contact</h2>
     <p>Questions: <a [href]="'mailto:' + SUPPORT_EMAIL">{{ SUPPORT_EMAIL }}</a>.</p>
   </article>
+  <!-- ──────────────────────── CHILD SAFETY STANDARDS ──────────────────────── -->
+  <article *ngIf="doc === 'child-safety'">
+    <h1>Child Safety Standards</h1>
+    <p class="updated">Last updated {{ LAST_UPDATED }}</p>
+
+    <p class="lead">
+      Wayraa has zero tolerance for child sexual abuse and exploitation (CSAE), including child
+      sexual abuse material (CSAM). These standards apply to everything on Wayraa: stories,
+      journals, photos, comments, replies, profiles and shared trips, in the mobile app and on
+      wayraa.com.
+    </p>
+
+    <h2>1. What isn't allowed</h2>
+    <ul>
+      <li>Any content that sexualises, exploits or endangers children, including CSAM in any form (real, drawn or generated).</li>
+      <li>Grooming: contacting, befriending or manipulating a child for sexual purposes.</li>
+      <li>Sextortion, trafficking, or offering, asking for or sharing content of this kind.</li>
+      <li>Links to, or advertising of, any of the above.</li>
+    </ul>
+    <p>Wayraa is only for people aged 13 and over (or the minimum age for online services where they live).</p>
+
+    <h2>2. How to report it</h2>
+    <ul>
+      <li>
+        <strong>In the app:</strong> on a story, tap <strong>⋯ → Report story</strong>; on a comment or
+        reply, tap <strong>⋯ → Report comment</strong>. You can also block the person.
+      </li>
+      <li>
+        <strong>By email:</strong> write to
+        <a [href]="'mailto:' + SUPPORT_EMAIL + '?subject=Child%20safety%20report'">{{ SUPPORT_EMAIL }}</a>
+        with a link to the story or a description of what you saw. Please don't send us the
+        content itself.
+      </li>
+      <li>
+        If a child is in immediate danger, contact your local police or emergency services first.
+      </li>
+    </ul>
+
+    <h2>3. What we do</h2>
+    <ul>
+      <li>Our moderators are alerted to every report straight away and review it within 24 hours; child safety reports come first.</li>
+      <li>We remove content that breaks these standards and permanently close the accounts involved.</li>
+      <li>
+        We report child sexual abuse material and exploitation to the authorities as the law
+        requires, including the National Center for Missing &amp; Exploited Children (NCMEC) and
+        India's National Cyber Crime Reporting Portal (cybercrime.gov.in), and we keep the
+        information they need for an investigation.
+      </li>
+      <li>We cooperate with law enforcement requests made through proper legal channels.</li>
+    </ul>
+
+    <h2>4. The law</h2>
+    <p>
+      We comply with child safety laws where we operate, including India's Protection of Children
+      from Sexual Offences (POCSO) Act and Information Technology Act, and the laws of the countries
+      where Wayraa is available.
+    </p>
+
+    <h2>5. Contact for child safety</h2>
+    <p>
+      Our designated contact for child safety, including for regulators and law enforcement, is
+      <a [href]="'mailto:' + SUPPORT_EMAIL + '?subject=Child%20safety'">{{ SUPPORT_EMAIL }}</a>.
+      See also our <a routerLink="/terms">Terms of Use</a> and <a routerLink="/privacy">Privacy Policy</a>.
+    </p>
+  </article>
 </main>
 
 <footer class="legal-foot">
@@ -252,6 +332,7 @@
   <a routerLink="/about">About</a>
   <a routerLink="/privacy">Privacy</a>
   <a routerLink="/terms">Terms</a>
+  <a routerLink="/child-safety">Child safety</a>
   <a routerLink="/delete-account">Delete account</a>
   <a [href]="'mailto:' + SUPPORT_EMAIL">{{ SUPPORT_EMAIL }}</a>
 </footer>

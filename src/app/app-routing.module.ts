@@ -42,6 +42,7 @@ const routes: Routes = [
   { path: 'delete-account', component: DeleteAccountComponent, data: { seo: { title: 'Delete your account · Wayraa', description: 'How to delete your Wayraa account and its data: in the app, on the website or by email, and what happens to your information.' } } },
   // Linked from the mobile app and from Google's sign-in consent screen.
   { path: 'privacy', component: LegalComponent, data: { doc: 'privacy', seo: { title: 'Privacy Policy · Wayraa', description: 'What information Wayraa collects, why, who can see it, and how to delete it.' } } },
+  { path: 'child-safety', component: LegalComponent, data: { doc: 'child-safety', seo: { title: 'Child Safety Standards · Wayraa', description: 'Wayraa\'s standards against child sexual abuse and exploitation, and how to report it.' } } },
   { path: 'terms', component: LegalComponent, data: { doc: 'terms', seo: { title: 'Terms of Use · Wayraa', description: 'The terms for using Wayraa\'s app and website.' } } },
   { path: 'download', component: DownloadComponent, data: { seo: { title: 'Get Wayraa for Android (Beta)', description: 'Download the Wayraa Android app: plan trips together, find places and keep the whole trip in one place. Free beta.' } } },
   { path: 'profile', component: ProfileComponent, data: { seo: { title: 'Your profile · Wayraa', noindex: true } } },
