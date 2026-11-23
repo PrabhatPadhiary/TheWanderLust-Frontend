@@ -1,0 +1,87 @@
+// Motion pieces shared across pages (see src/app/shared/motion).
+// After Motion Primitives: Text Shimmer, Sliding Number, Animated Background,
+// Border Trail. Everything is still with reduced motion.
+
+.wl-sr-only {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0);
+  white-space: nowrap; border: 0;
+}
+
+// ── Text shimmer: a light band sweeps across the text ──
+.wl-shimmer {
+  --wl-shimmer-base: currentColor;
+  --wl-shimmer-light: rgba(255, 255, 255, 0.95);
+  background: linear-gradient(100deg, var(--wl-shimmer-base) 0 40%, var(--wl-shimmer-light) 50%, var(--wl-shimmer-base) 60% 100%) 0 0 / 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: wl-shimmer 2.6s ease-in-out 1.2s infinite;
+}
+// Twice, then still (for badges that are always on screen).
+.wl-shimmer--twice { animation-iteration-count: 2; }
+@keyframes wl-shimmer { from { background-position: 100% 0; } to { background-position: -50% 0; } }
+
+// ── Sliding number: digit columns that roll like an odometer ──
+.sn-cols { display: inline-flex; vertical-align: top; }
+.sn-col {
+  display: inline-block;
+  height: 1em;
+  line-height: 1;
+  overflow: hidden;
+  width: 0.62em;
+  transition: width 0.45s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+  &.lead { width: 0; opacity: 0; }
+}
+.sn-track {
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  span { height: 1em; text-align: center; }
+}
+
+// ── Sliding highlight: one pill that moves between items ──
+.wl-hl-host { position: relative; isolation: isolate; }
+.wl-hl {
+  position: absolute;
+  left: 0; top: 0;
+  z-index: -1;
+  border-radius: var(--wl-hl-radius, 999px);
+  background: var(--wl-hl-bg, rgba(28, 40, 51, 0.06));
+  box-shadow: var(--wl-hl-shadow, none);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.32s cubic-bezier(0.22, 1, 0.36, 1), width 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+              height 0.32s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.18s ease;
+  &.wl-hl--jump, &.wl-hl--still { transition: opacity 0.18s ease; }
+}
+
+// ── Border trail: a light that runs round a rounded box's edge ──
+@property --wl-trail { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+.wl-trail { position: relative; }
+.wl-trail::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from var(--wl-trail), transparent 0 70%, rgba(201, 67, 26, 0.0) 72%, var(--orange) 84%, #fff 88%, transparent 92%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+  animation: wl-trail 5s linear infinite;
+  transition: opacity 0.3s ease;
+}
+// Once you're typing, it steps aside.
+.wl-trail:focus-within::after { opacity: 0; animation-play-state: paused; }
+@keyframes wl-trail { to { --wl-trail: 360deg; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .wl-shimmer { animation: none; background: none; -webkit-text-fill-color: currentColor; }
+  .sn-track, .sn-col { transition: none; }
+  .wl-trail::after { animation: none; opacity: 0; }
+}

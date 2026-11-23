@@ -169,6 +169,7 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
     this.isStaticLandingPage = url.startsWith('/features') || url.startsWith('/pricing');
     this.isHomePage = this.navIndex === 0;
     this.showUserMenu = false;   // a new page closes the menu
+    this.phoneMenuOpen = false;
   }
 
   ngOnDestroy(): void {
@@ -340,12 +341,17 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
       const search = this.host.nativeElement.querySelector('.home-search');
       if (search && !search.contains(target)) this.homeSearchOpen = false;
     }
+    if (this.phoneMenuOpen) {
+      const menu = this.host.nativeElement.querySelector('.phone-menu');
+      if (menu && !menu.contains(target)) this.phoneMenuOpen = false;
+    }
   }
 
   @HostListener('document:keydown.escape')
   onEscape(): void {
     this.showUserMenu = false;
     this.homeSearchOpen = false;
+    this.phoneMenuOpen = false;
   }
 
   async logout(): Promise<void> {
@@ -386,6 +392,17 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
 
   goHome(): void {
     this.router.navigate(['/']);
+  }
+
+  /** Phones: the menu with the section links (they don't fit in the bar there). */
+  phoneMenuOpen = false;
+
+  /** "Home" in the bar: on the home page itself, back to the top instead of a reload. */
+  onHomeClick(event: MouseEvent): void {
+    if (!this.isHomePage) return;
+    event.preventDefault();
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
   }
 
   scrollToSection(section: string): void {

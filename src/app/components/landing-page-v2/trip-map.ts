@@ -1,4 +1,5 @@
 import { gsap } from 'gsap';
+import { setSlidingNumber } from '../../shared/motion/sliding-number';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import type { Map as GLMap, GeoJSONSource, StyleSpecification } from 'maplibre-gl';
 
@@ -180,6 +181,10 @@ export function tripMapStory(section: HTMLElement, onTrigger: (t: ScrollTrigger)
       interactive: false,
       attributionControl: { compact: true },
       fadeDuration: 0,
+      // Room for the areas the trip visits (see warmUp), but no more: a big
+      // cache is held in graphics memory, and in Safari that made the rest of
+      // the page's scroll animations stutter.
+      maxTileCacheSize: 350,
     });
     onCleanup(() => map?.remove());
 
@@ -196,31 +201,93 @@ export function tripMapStory(section: HTMLElement, onTrigger: (t: ScrollTrigger)
       holder.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show');
       panel.classList.add('loaded');
       render();
+      warmUp();
     });
     const ro = new ResizeObserver(() => { map?.resize(); render(); });
     ro.observe(panel);
     onCleanup(() => ro.disconnect());
   };
 
-  // Load the map library and style only when the section comes near.
-  const io = new IntersectionObserver(entries => {
-    if (!entries.some(e => e.isIntersecting)) return;
+  /**
+   * Preload the whole trip: while the section is still off screen, the camera
+   * visits every shot (and the halfway points between them) and waits for that
+   * area's tiles. They stay cached, so when the plane gets there the land is
+   * already drawn. Stops at once if the section comes on screen.
+   */
+  let onScreen = false;
+  const warmUp = async () => {
+    if (!map) return;
+    const order = ['region', 'home', 'route', 'dubai', 'road', 'west', 'east', 'final'].map(k => shots[k]);
+    const visits: Cam[] = [];
+    order.forEach((c, i) => {
+      visits.push(c);
+      const n = order[i + 1];
+      if (n) visits.push({
+        lng: (c.lng + n.lng) / 2, lat: (c.lat + n.lat) / 2,
+        zoom: Math.min(c.zoom, n.zoom) - 0.3,   // a halfway camera is pulled back
+        pitch: (c.pitch + n.pitch) / 2, bearing: (c.bearing + n.bearing) / 2,
+      });
+    });
+    for (const c of visits) {
+      if (dead || onScreen || !map) break;
+      map.jumpTo({ center: [c.lng, c.lat], zoom: c.zoom + zoomShift(), pitch: c.pitch, bearing: c.bearing });
+      await new Promise<void>(done => {
+        const t = setTimeout(done, 6000);   // a slow tile server doesn't hold the rest up
+        map!.once('idle', () => { clearTimeout(t); done(); });
+      });
+    }
+    if (!dead) render();   // back to where the story is
+  };
+
+  // Is the section on screen (then the warm-up stops and the story drives the camera)?
+  const seen = new IntersectionObserver(entries => {
+    onScreen = entries.some(e => e.isIntersecting);
+    if (onScreen) render();
+  });
+  seen.observe(section);
+  onCleanup(() => seen.disconnect());
+
+  // Build the map soon after the page has loaded (quietly, when the browser is
+  // idle), so it's ready and warmed up long before you scroll to it. If you get
+  // close first, it starts straight away.
+  let started = false;
+  const start = () => {
+    if (started || dead) return;
+    started = true;
     io.disconnect();
     buildMap().catch(() => { /* the cards and numbers still work without the map */ });
+  };
+  const io = new IntersectionObserver(entries => {
+    if (entries.some(e => e.isIntersecting)) start();
   }, { rootMargin: '200% 0px' });
   io.observe(section);
   onCleanup(() => io.disconnect());
+  const idle = (cb: () => void) => ('requestIdleCallback' in window)
+    ? (window as any).requestIdleCallback(cb, { timeout: 4000 })
+    : setTimeout(cb, 1500);
+  const afterLoad = () => idle(start);
+  if (document.readyState === 'complete') afterLoad();
+  else { window.addEventListener('load', afterLoad, { once: true }); onCleanup(() => window.removeEventListener('load', afterLoad)); }
 
   const nums = { days: 0, stops: 0, spots: 0 };
   const numEls = { days: q<HTMLElement>('[data-num="days"]'), stops: q<HTMLElement>('[data-num="stops"]'), spots: q<HTMLElement>('[data-num="spots"]') };
   // Each number flashes orange and lifts as it changes, so the count is noticed.
-  const showNums = () => (Object.keys(nums) as (keyof typeof nums)[]).forEach(k => {
-    const el = numEls[k];
-    const v = String(Math.round(nums[k]));
-    if (!el || el.textContent === v) return;
-    el.textContent = v;
-    if (animated) el.animate([{ color: '#D9481C', transform: 'translateY(-4px)' }, { transform: 'none' }], { duration: 700, easing: 'ease-out' });
-  });
+  const units = { days: ['day', 'days'], stops: ['stop', 'stops'], spots: ['spot', 'spots'] } as const;
+  const showNums = () => {
+    (Object.keys(nums) as (keyof typeof nums)[]).forEach(k => {
+      const el = numEls[k];
+      const n = Math.round(nums[k]);
+      const v = String(n);
+      const unit = q<HTMLElement>(`[data-unit="${k}"]`);
+      if (unit) unit.textContent = units[k][n === 1 ? 0 : 1];
+      if (!el || el.dataset['sn'] === v) return;
+      // The digits roll to the new value (Sliding Number), with a flash of orange.
+      setSlidingNumber(el, n);
+      if (animated) el.animate([{ color: '#C9431A' }, { color: '' }], { duration: 900, easing: 'ease-out' });
+    });
+    // The counter shows once the trip has its first stop.
+    section.classList.toggle('has-count', Math.round(nums.days) > 0);
+  };
 
   if (!animated) {
     // Reduced motion: the finished trip, still.

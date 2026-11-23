@@ -78,9 +78,13 @@ $accent: #A8360F;
     color: $ink;
     cursor: pointer;
     animation: mini-stop 0.6s var(--ease-out) both;
-    animation-delay: calc(0.3s + var(--i) * 0.12s);
-    &:hover .mini-num, &:focus-visible .mini-num { background: var(--orange); color: #fff; border-color: var(--orange); transform: translateY(-2px); }
-    &:focus-visible { outline: none; }
+    animation-delay: calc(0.2s + var(--i) * 0.06s);
+    @media (hover: hover) and (pointer: fine) {
+      &:hover .mini-num { background: var(--orange); color: #fff; border-color: var(--orange); transform: translateY(-2px); }
+    }
+    &:focus-visible .mini-num { background: var(--orange); color: #fff; border-color: var(--orange); }
+    &:focus-visible { outline: 2px solid var(--orange); outline-offset: 4px; border-radius: 12px; }
+    &:active .mini-num { transform: scale(0.94); }
   }
 }
 .mini-num {
@@ -90,7 +94,7 @@ $accent: #A8360F;
   background: #fff;
   border: 2px solid rgba(28, 40, 51, 0.15);
   font-size: 0.75rem; font-weight: 700;
-  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease, transform 160ms var(--ease-out);
 }
 .mini-name { font-size: 0.78rem; font-weight: 600; color: $ink-2; }
 @keyframes mini-line { from { transform: scaleX(0); } to { transform: scaleX(1); } }
@@ -142,7 +146,7 @@ $accent: #A8360F;
   font-family: var(--font-display);
   font-style: italic;
   font-size: 1.1rem;
-  color: $ink-3;
+  color: var(--muted);
   white-space: nowrap;
   transition: color 0.4s ease, border-color 0.4s ease, background 0.4s ease, box-shadow 0.4s ease, scale 0.4s var(--ease-out);
   scale: 0.94;
@@ -182,7 +186,7 @@ $accent: #A8360F;
   border: 2px solid rgba(28, 40, 51, 0.15);
   font-weight: 700;
   font-size: 0.95rem;
-  color: $ink-3;
+  color: var(--muted);
   transition: background 0.4s ease, color 0.4s ease, border-color 0.4s ease, transform 0.5s var(--ease-out), box-shadow 0.4s ease;
   &.reached {
     background: var(--orange);
@@ -275,11 +279,15 @@ $accent: #A8360F;
   will-change: transform;
   video { display: block; width: 100%; height: 100%; object-fit: cover; }
 }
-.film-sound {
+.film-controls {
   position: absolute;
   left: 50%;
   bottom: 18px;
   translate: -50% 0;
+  display: flex;
+  gap: 8px;
+}
+.film-sound {
   display: inline-flex; align-items: center; gap: 8px;
   padding: 10px 16px;
   border: 0;
@@ -290,9 +298,13 @@ $accent: #A8360F;
   color: #fff;
   font: inherit; font-size: 0.82rem; font-weight: 600;
   cursor: pointer;
-  &:hover { background: $ink; }
+  white-space: nowrap;
+  transition: background 0.15s ease, transform 160ms var(--ease-out);
+  @media (hover: hover) and (pointer: fine) { &:hover { background: $ink; } }
+  &:active { transform: scale(0.96); }
   &:focus-visible { outline: 2px solid var(--orange); outline-offset: 3px; }
 }
+.film-play { width: 40px; padding: 10px 0; justify-content: center; }
 
 // ══ EACH STOP'S STAGE: a phone with a real screenshot, the mock-up beside it, two labels ══
 .ch-stage {
@@ -321,6 +333,10 @@ $accent: #A8360F;
 .ch-stage.has-phone .mock { width: 340px; }
 .ch-stage:not(.has-phone) { display: flex; align-items: center; justify-content: center; }
 .chapter.flip .phone { left: auto; right: 0; }
+// The real screenshot on its own (no mock-up beside it): centred in the stage.
+.ch-stage.has-phone .phone, .chapter.flip .ch-stage.has-phone .phone { left: 50%; right: auto; translate: -50% 0; }
+.ch-stage.has-phone .float-chip.f1 { right: 4%; }
+.chapter.flip .ch-stage.has-phone .float-chip.f1 { right: auto; left: 4%; }
 .chapter.flip .ch-stage.has-phone .ch-mock { right: auto; left: 0; }
 
 .float-chip {
@@ -637,9 +653,11 @@ $accent: #A8360F;
   font-weight: 600;
   font-size: 0.95rem;
   cursor: pointer;
-  transition: background var(--dur-fast), transform var(--dur-fast);
-  &:hover { transform: translateY(-2px); }
-  &.primary { border: 0; background: var(--orange); color: #fff; &:hover { background: var(--orange-dark); } }
+  transition: background var(--dur-fast), transform 160ms var(--ease-out);
+  @media (hover: hover) and (pointer: fine) { &:hover { transform: translateY(-2px); } }
+  &:active { transform: scale(0.97); }
+  &:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+  &.primary { border: 0; background: var(--orange); color: #fff; @media (hover: hover) and (pointer: fine) { &:hover { background: var(--orange-dark); } } }
   &.ghost { border: 1px solid rgba(255, 255, 255, 0.3); background: rgba(255, 255, 255, 0.08); color: #fff; }
 }
 
@@ -648,9 +666,16 @@ $accent: #A8360F;
 @media (max-width: 760px) {
   .f-hero { padding-top: 130px; }
   .mini-route {
-    flex-wrap: wrap; justify-content: center; gap: 14px 6px;
-    &::before { display: none; }
-    button { flex: 0 0 auto; width: 76px; }
+    // One row you can swipe, with the dashed line kept under it.
+    flex-wrap: nowrap; justify-content: flex-start; gap: 4px;
+    margin-left: -16px; margin-right: -16px;
+    padding: 4px 16px 8px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+    &::before { left: 52px; right: auto; width: calc(6 * 80px); top: 21px; }
+    button { flex: 0 0 76px; scroll-snap-align: start; }
   }
   .journey { padding: 80px 16px 40px; }
   .chapter, .chapter.flip {
@@ -666,7 +691,8 @@ $accent: #A8360F;
   .film-copy.left { text-align: center; }
   .film-copy p { margin: 0 auto; }
   .ch-stage, .ch-stage.has-phone { min-height: 0; display: flex; flex-direction: column; }
-  .phone { position: relative; width: 190px; align-self: flex-start; }
+  .phone { position: relative; width: 190px; align-self: center; }
+  .ch-stage.has-phone .phone, .chapter.flip .ch-stage.has-phone .phone { left: auto; translate: none; }
   .chapter.flip .phone { right: auto; }
   .ch-stage.has-phone .ch-mock, .chapter.flip .ch-stage.has-phone .ch-mock { position: relative; top: auto; left: auto; right: auto; margin-top: -190px; align-self: flex-end; width: 88%; }
   .ch-stage.has-phone .mock { width: 100%; }

@@ -2,6 +2,7 @@
 @import '../node_modules/ngx-toastr/toastr.css';
 // Fonts (Playfair Display, Poppins) load from index.html, so they start downloading straight away.
 @import 'styles/tokens';
+@import 'styles/motion';
 
 html,
 body {

@@ -462,14 +462,17 @@
   font-weight: 600;
   cursor: pointer;
   font-family: 'Poppins', sans-serif;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 160ms var(--ease-out);
   white-space: nowrap;
 
-  &:hover {
-    background: #2F3B46;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  @media (hover: hover) and (pointer: fine) {
+    &:hover {
+      background: #2F3B46;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
   }
+  &:active { transform: scale(0.97); }
 }
 
 .nav-action-btn {
@@ -604,7 +607,7 @@
   border-radius: 999px;
   background: #FDF1ED;
   color: #AA3613;
-  font-size: 0.65rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 1px;
   text-transform: uppercase;
@@ -1168,4 +1171,92 @@
     transition: opacity 0.35s ease;
   }
   .app-navbar.app-navbar--hides.app-navbar--backed::before { opacity: 1; }
+}
+
+
+// ===== Logo is a link now: no link styling =====
+a.navbar-brand { color: inherit; &:focus-visible { outline: 2px solid var(--orange); outline-offset: 4px; border-radius: 12px; } }
+
+// Press feedback on the bar's buttons
+.get-app-btn, .nav-action-btn, .user-avatar-btn, .nav-link { &:active { transform: scale(0.97); } }
+
+// ===== PHONES: the section links move into a menu =====
+.phone-menu { display: none; position: relative; }
+@media (max-width: 768px) {
+  .phone-menu { display: block; }
+}
+.phone-menu-btn {
+  width: 42px; height: 42px;
+  display: grid; place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.16);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  color: #fff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.2s ease, color 0.4s ease, border-color 0.4s ease, transform 160ms var(--ease-out);
+  &:active { transform: scale(0.94); }
+  &:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+}
+.app-navbar--onlight .phone-menu-btn {
+  color: var(--ink);
+  border-color: rgba(28, 40, 51, 0.25);
+  background: rgba(255, 255, 255, 0.6);
+}
+.phone-menu-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  min-width: 220px;
+  padding: 8px;
+  display: flex; flex-direction: column;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 18px 44px rgba(28, 40, 51, 0.18), 0 2px 6px rgba(28, 40, 51, 0.08);
+  transform-origin: top right;
+  animation: phone-menu-in 180ms var(--ease-out);
+  z-index: 10;
+  a {
+    display: flex; align-items: center; gap: 8px;
+    min-height: 46px;
+    padding: 0 14px;
+    border-radius: 12px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--ink);
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background 0.15s ease;
+    &:active { background: var(--frost); }
+    &.active { color: var(--orange-deep); font-weight: 600; }
+    &:focus-visible { outline: 2px solid var(--orange); outline-offset: -2px; }
+  }
+  .phone-menu-app {
+    margin-top: 6px;
+    border-top: 1px solid var(--frost-deep);
+    border-radius: 0 0 12px 12px;
+    span {
+      padding: 1px 7px; border-radius: 999px;
+      background: var(--orange-tint); color: var(--orange-deep);
+      font-size: 0.72rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    }
+  }
+}
+@keyframes phone-menu-in { from { opacity: 0; transform: scale(0.96) translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) {
+  .phone-menu-panel { animation: phone-menu-fade 150ms ease; }
+  .app-navbar, .sign-in-btn, .get-app-btn { transition-property: color, background, border-color, opacity !important; }
+}
+@keyframes phone-menu-fade { from { opacity: 0; } }
+
+// ===== Motion (after Motion Primitives) =====
+// Beta badge: an orange light passes over it twice.
+.get-app-beta .wl-shimmer { --wl-shimmer-light: #F0A07F; }
+// Phone menu: one pill rests on the current page and slides to the link you press.
+.phone-menu-panel {
+  --wl-hl-bg: var(--frost);
+  --wl-hl-radius: 12px;
+  a { position: relative; &:active { background: none; } }
 }

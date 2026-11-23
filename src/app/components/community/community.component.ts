@@ -9,6 +9,8 @@ import { StoryActionsService } from '../../services/story-actions.service';
 import { JournalUploadStateService, JournalUploadState } from '../../services/journal-upload-state.service';
 import { ToastrService } from 'ngx-toastr';
 
+declare var google: any;
+
 export interface TripJournal {
   id: string;
   authorId: string;
@@ -34,6 +36,11 @@ export interface TripJournal {
   photos: string[];
   vibes: string[];
   publishedAt: string;
+}
+
+/** A place's short name: "Goa, India" → "Goa". */
+function placeName(destination: string | null | undefined): string {
+  return (destination || '').split(',')[0].trim();
 }
 
 /** Most liked first, then most discussed, then newest (as in the app). */
@@ -167,17 +174,71 @@ export class CommunityComponent implements OnInit, OnDestroy {
     this.router.navigate(['/community/write']);
   }
 
-  /** Destinations people have written about, most stories first (from the feed). */
+  /**
+   * Destinations people have written about, most stories first (from the feed).
+   * "Goa" and "Goa, India" are the same place: grouped by the part before the
+   * first comma, and shown by that short name.
+   */
   get popularDestinations(): { name: string; count: number }[] {
-    const counts = new Map<string, number>();
+    const counts = new Map<string, { name: string; count: number }>();
     for (const j of this.journals) {
-      const name = (j.destinationName || '').trim();
-      if (name) counts.set(name, (counts.get(name) || 0) + 1);
+      const name = placeName(j.destinationName);
+      if (!name) continue;
+      const key = name.toLowerCase();
+      const entry = counts.get(key) || { name, count: 0 };
+      entry.count++;
+      counts.set(key, entry);
     }
-    return [...counts.entries()]
-      .map(([name, count]) => ({ name, count }))
+    return [...counts.values()]
       .sort((a, b) => b.count - a.count)
       .slice(0, 5);
+  }
+
+  /** A place in the sidebar: show its stories (again to show everything). */
+  filterByPlace(name: string): void {
+    this.searchQuery = this.searchQuery === name ? '' : name;
+    this.activeVibe = 'all';
+    const feed = document.querySelector('.community-head');
+    if (feed && feed.getBoundingClientRect().top < 0) {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      feed.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    }
+  }
+
+  clearFilters(): void {
+    this.searchQuery = '';
+    this.activeVibe = 'all';
+  }
+
+  /**
+   * "Plan yours" on a story: open the story's place in the planner. The feed
+   * only has the place's name, so it's looked up (Google Places) on the click.
+   */
+  planTrip(j: TripJournal): void {
+    const name = (j.destinationName || '').trim();
+    const svc = typeof google !== 'undefined' && google.maps?.places ? new google.maps.places.AutocompleteService() : null;
+    if (!name || !svc) { this.router.navigate(['/']); return; }
+    svc.getPlacePredictions({ input: name, types: ['(regions)'] }, (predictions: any[] | null) => {
+      const p = predictions?.[0];
+      if (p?.place_id) {
+        this.router.navigate(['/destination', p.place_id], {
+          state: { destinationName: p.structured_formatting?.main_text || placeName(name) },
+        });
+      } else {
+        this.router.navigate(['/']);
+      }
+    });
+  }
+
+  /** Phones: the "Write a story" button steps aside while you scroll down to read. */
+  fabHidden = false;
+  private lastY = 0;
+  @HostListener('window:scroll')
+  onScroll(): void {
+    const y = window.scrollY;
+    if (Math.abs(y - this.lastY) < 8) return;
+    this.fabHidden = y > this.lastY && y > 120;
+    this.lastY = y;
   }
 
   setSort(sort: typeof this.journalSort): void {

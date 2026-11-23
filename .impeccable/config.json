@@ -1,0 +1,44 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "low-contrast",
+        "value": "*",
+        "files": [
+          "src/app/components/features/features.component.html"
+        ],
+        "createdAt": "2026-11-23T06:43:38.957Z",
+        "reason": "claude: static scan can't resolve component SCSS, falls back to black #000 text at line 0; live URL scans at 1440/390 show no such pairs"
+      },
+      {
+        "rule": "low-contrast",
+        "value": "*",
+        "files": [
+          "src/app/components/landing-page-v2/landing-page-v2.component.html"
+        ],
+        "createdAt": "2026-11-23T06:43:38.972Z",
+        "reason": "claude: static scan can't resolve component SCSS, falls back to black #000 text at line 0; live URL scans at 1440/390 show no such pairs"
+      },
+      {
+        "rule": "border-accent-on-rounded",
+        "value": "*",
+        "files": [
+          "src/app/components/community/community.component.scss"
+        ],
+        "createdAt": "2026-11-23T06:43:38.986Z",
+        "reason": "claude: .ctab border-bottom is overridden later in the same file (border: 0; border-radius: 999px), never drawn"
+      },
+      {
+        "rule": "gradient-text",
+        "value": "*",
+        "files": [
+          "src/styles/_motion.scss"
+        ],
+        "createdAt": "2026-11-23T07:13:04.490Z",
+        "reason": "user confirmed: chose the Text Shimmer effect (Motion Primitives) in this session; the gradient is the animated sweep, base colour stays solid"
+      }
+    ]
+  }
+}

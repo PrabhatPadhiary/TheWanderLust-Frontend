@@ -6,9 +6,9 @@
 <div class="community-hero">
   <div class="community-hero-inner">
     <span class="community-label">Community</span>
-    <h1>Stories from <em>fellow travellers</em></h1>
+    <h1 appBlurIn>Real trips from <em>real travellers</em></h1>
     <p>Trips, tips and itineraries shared by real people on Wayraa.</p>
-    <button class="write-journal-btn" (click)="onWriteJournal()">
+    <button class="write-journal-btn" appMagnetic (click)="onWriteJournal()">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
         <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
       </svg>
@@ -51,7 +51,7 @@
               </button>
             </div>
           </div>
-          <div class="sort-toggle" role="group" aria-label="Order">
+          <div class="sort-toggle" role="group" aria-label="Order" appHoverHighlight="active" highlightItems="button">
             <button [class.active]="journalSort === 'recent'"  (click)="setSort('recent')">Recent</button>
             <button [class.active]="journalSort === 'popular'" (click)="setSort('popular')">Popular</button>
           </div>
@@ -89,14 +89,16 @@
             <ng-container *ngIf="uploadState.status === 'done'">Story published! <strong>{{ uploadState.title }}</strong></ng-container>
             <ng-container *ngIf="uploadState.status === 'error'">Photos failed to upload. The story was saved without them.</ng-container>
           </span>
-          <button class="upload-banner-dismiss" (click)="uploadStateService.clear()">✕</button>
+          <button class="upload-banner-dismiss" type="button" (click)="uploadStateService.clear()" aria-label="Dismiss">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
         </div>
       </div>
 
       <!-- Loading state -->
       <div class="feed-loader" *ngIf="feedLoading">
         <div class="feed-loader-spinner"></div>
-        <span>Loading stories...</span>
+        <span class="wl-shimmer">Loading stories…</span>
       </div>
 
       <!-- Empty state -->
@@ -110,43 +112,61 @@
       <!-- Nothing matches the search / vibe -->
       <div class="feed-empty" *ngIf="!feedLoading && journals.length > 0 && shownJournals.length === 0">
         <p>No matching stories. Try another search or vibe.</p>
+        <button type="button" class="feed-reset" (click)="clearFilters()">Show all stories</button>
       </div>
 
       <div class="journal-grid cluster-grid">
       <!-- A story as a small collage (as on the home page): the main photo, up to two more, and a glass card -->
       <article class="cluster" *ngFor="let j of shownJournals; trackBy: trackById"
-               [class.solo]="j.photos.length < 2" (click)="openJournal(j.id)">
+               [class.solo]="j.photos.length < 2" [class.duo]="j.photos.length === 2">
+       <!-- The photos open the story too (the title below is the real, focusable link) -->
+       <a class="cluster-cover" [routerLink]="['/community/story', j.id]" tabindex="-1" aria-hidden="true"></a>
        <div class="cluster-stage">
         <img class="ph main" *ngIf="j.photos[0]" [src]="j.photos[0] | sized:'cover'" [alt]="j.title" loading="lazy">
         <div class="ph main ph-empty" *ngIf="!j.photos[0]"><span>{{ j.destinationName }}</span></div>
         <img class="ph second" *ngIf="j.photos[1]" [src]="j.photos[1] | sized:'thumb'" alt="" loading="lazy">
         <img class="ph third" *ngIf="j.photos[2]" [src]="j.photos[2] | sized:'thumb'" alt="" loading="lazy">
-        <span class="cluster-badge" *ngIf="j.tripBadge">{{ j.tripBadge }}</span>
+        <!-- Progressive blur: the photo softens toward the caption -->
+        <div class="pblur" *ngIf="j.photos[0]" aria-hidden="true"><i></i><i></i><i></i></div>
+        <!-- Read a story, then plan the same trip: this place, in the planner -->
+        <button type="button" class="cluster-badge" *ngIf="j.destinationName" (click)="planTrip(j)"
+                [attr.aria-label]="'Plan your own trip to ' + j.destinationName">
+          <span *ngIf="j.tripBadge">{{ j.tripBadge }} ·</span> Plan yours
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.6" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </button>
 
         <div class="cluster-card">
           <span class="story-tag">{{ j.destinationName }} · {{ j.month }}</span>
-          <h3>{{ j.title }}</h3>
+          <!-- The title is the story's link; it stretches over the whole tile -->
+          <h3><a class="cluster-link" [routerLink]="['/community/story', j.id]">{{ j.title }}</a></h3>
           <div class="cluster-foot">
             <span class="story-by">
               <i [style.background]="j.authorColor">{{ j.authorInitial }}</i>
               <span>{{ j.authorName }}</span>
             </span>
             <button class="cluster-act" [class.cluster-act--liked]="j.isLiked"
-                    (click)="$event.stopPropagation(); likeJournal(j)" [attr.aria-label]="'Like · ' + j.likes">
+                    (click)="likeJournal(j)" [attr.aria-label]="(j.isLiked ? 'Unlike' : 'Like') + ' · ' + j.likes + (j.likes === 1 ? ' like' : ' likes')" [attr.aria-pressed]="j.isLiked">
               <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" [attr.fill]="j.isLiked ? 'currentColor' : 'none'"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
               {{ j.likes }}
             </button>
-            <button class="cluster-act" (click)="$event.stopPropagation(); openJournal(j.id, 'comments')" [attr.aria-label]="j.comments + ' comments'">
+            <button class="cluster-act" (click)="openJournal(j.id, 'comments')" [attr.aria-label]="j.comments + (j.comments === 1 ? ' comment' : ' comments')">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
               {{ j.comments }}
             </button>
-            <button class="cluster-act" (click)="$event.stopPropagation(); openStoryMenu(j, $event)" aria-label="More options for this story" title="Share and more">
+            <button class="cluster-act" (click)="openStoryMenu(j, $event)" aria-label="More options for this story" title="Share and more">
               <svg width="14" height="14" fill="currentColor" viewBox="0 0 16 16"><path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3m5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3"/></svg>
             </button>
           </div>
         </div>
        </div>
       </article>
+      </div>
+
+      <!-- The end of the feed: from reading to planning -->
+      <div class="feed-end" *ngIf="!feedLoading && shownJournals.length">
+        <h2 appBlurIn>Inspired? <em>Plan your own.</em></h2>
+        <p>Pick a place, invite your friends and build the trip together, day by day.</p>
+        <a class="feed-end-btn" routerLink="/" appMagnetic>Start planning</a>
       </div>
     </div>
 
@@ -161,12 +181,15 @@
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
         Popular in stories
       </div>
-      <div class="trending-item" *ngFor="let d of popularDestinations">
+      <button type="button" class="trending-item" *ngFor="let d of popularDestinations"
+              (click)="filterByPlace(d.name)" [class.on]="searchQuery === d.name"
+              [attr.aria-label]="'Show stories from ' + d.name">
         <div class="trending-item-info">
           <strong>{{ d.name }}</strong>
           <span>{{ d.count }} {{ d.count === 1 ? 'story' : 'stories' }}</span>
         </div>
-      </div>
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+      </button>
     </div>
 
     <!-- Share yours -->
@@ -185,10 +208,12 @@
 
 </div>
 
+<app-site-footer></app-site-footer>
+
 </div><!-- end .community-page-wrapper -->
 
-<!-- Fixed FAB - always visible -->
-<button class="write-journal-fab" (click)="onWriteJournal()">
+<!-- Phones: write a story (hides while you scroll down to read) -->
+<button class="write-journal-fab" [class.write-journal-fab--hidden]="fabHidden" (click)="onWriteJournal()">
   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
     <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
   </svg>

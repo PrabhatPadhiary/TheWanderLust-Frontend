@@ -31,6 +31,11 @@ import { ManageDestinationsModalComponent } from './components/trip-planner/moda
 import { InviteModalComponent } from './components/trip-planner/modals/invite-modal/invite-modal.component';
 import { ExploreModalComponent } from './components/trip-planner/modals/explore-modal/explore-modal.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
+import { SiteFooterComponent } from './components/site-footer/site-footer.component';
+import { TextLoopComponent } from './shared/motion/text-loop.component';
+import { BlurInDirective } from './shared/motion/blur-in.directive';
+import { MagneticDirective } from './shared/motion/magnetic.directive';
+import { HoverHighlightDirective } from './shared/motion/hover-highlight.directive';
 import { FavouritesComponent } from './components/favourites/favourites.component';
 import { SafePipe } from './pipes/safe.pipe';
 import { WlNamePipe } from './pipes/wl-name.pipe';
@@ -86,6 +91,11 @@ import { SettingsComponent } from './components/settings/settings.component';
     InviteModalComponent,
     ExploreModalComponent,
     NavbarComponent,
+    SiteFooterComponent,
+    TextLoopComponent,
+    BlurInDirective,
+    MagneticDirective,
+    HoverHighlightDirective,
     FavouritesComponent,
     SafePipe,
     WlNamePipe,

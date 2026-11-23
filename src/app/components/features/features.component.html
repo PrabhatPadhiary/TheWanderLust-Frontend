@@ -5,7 +5,7 @@
   <!-- ===== HERO: the whole route at a glance ===== -->
   <header class="f-hero">
     <span class="f-label">Features</span>
-    <h1>From first idea <em>to the last photo</em></h1>
+    <h1 appBlurIn>From first idea <em>to the last photo</em></h1>
     <p>One trip, start to finish. Follow the line to see how Wayraa helps at every step.</p>
     <nav class="mini-route" aria-label="Jump to a feature">
       <button *ngFor="let c of chapters; let i = index" type="button" (click)="jumpTo(c.id)" [style.--i]="i">
@@ -19,18 +19,25 @@
   <section class="film" #film aria-labelledby="film-title">
     <div class="film-copy left">
       <span class="f-label">The launch film</span>
-      <h2 id="film-title">Wayraa in <em>35 seconds</em></h2>
+      <h2 id="film-title" appBlurIn>Wayraa in 35 seconds</h2>
     </div>
     <div class="film-card">
       <video #filmVideo muted playsinline loop preload="none" poster="assets/video/wayraa-launch-poster.jpg"
              aria-label="The Wayraa launch film: search a city, start a trip, plan each day on the map">
         <source src="assets/video/wayraa-launch.mp4" type="video/mp4">
       </video>
+      <div class="film-controls">
+      <button class="film-sound film-play" type="button" (click)="togglePlay()"
+              [attr.aria-label]="filmPaused ? 'Play the film' : 'Pause the film'">
+        <svg *ngIf="!filmPaused" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg>
+        <svg *ngIf="filmPaused" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5z"/></svg>
+      </button>
       <button class="film-sound" type="button" (click)="toggleSound()" [attr.aria-pressed]="!filmMuted">
         <svg *ngIf="filmMuted" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M23 9l-6 6M17 9l6 6"/></svg>
         <svg *ngIf="!filmMuted" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg>
         {{ filmMuted ? 'Sound on' : 'Sound off' }}
       </button>
+      </div>
     </div>
     <div class="film-copy right">
       <p>Search a city, start a trip, invite your friends, drag places into each day and watch the whole plan come alive on the map.</p>
@@ -54,7 +61,7 @@
              [class.flip]="i % 2 === 1" [attr.aria-labelledby]="'ch-title-' + c.id">
       <div class="ch-text">
         <span class="ch-kicker">{{ c.kicker }}</span>
-        <h2 [id]="'ch-title-' + c.id">{{ c.title }} <em>{{ c.em }}</em></h2>
+        <h2 [id]="'ch-title-' + c.id">{{ c.title }} {{ c.em }}</h2>
         <p>{{ c.text }}</p>
         <ul class="ch-points">
           <li *ngFor="let p of c.points; let j = index" [style.--i]="j">{{ p }}</li>
@@ -66,8 +73,8 @@
       <div class="ch-stage" [class.has-phone]="c.shot">
         <div class="phone" *ngIf="c.shot"><img [src]="'assets/images/app/' + c.shot + '.jpg'" [alt]="c.shotAlt" loading="lazy"></div>
         <span class="float-chip f1" aria-hidden="true">{{ c.chips[0] }}</span>
-        <span class="float-chip f2" aria-hidden="true">{{ c.chips[1] }}</span>
-      <div class="ch-mock" [ngSwitch]="c.id" aria-hidden="true">
+        <span class="float-chip f2" *ngIf="!c.shot" aria-hidden="true">{{ c.chips[1] }}</span>
+      <div class="ch-mock" *ngIf="!c.shot" [ngSwitch]="c.id" aria-hidden="true">
 
         <!-- 01 Discover -->
         <div class="mock glass" *ngSwitchCase="'discover'">
@@ -172,7 +179,7 @@
             <span class="m-over">Dubai, UAE</span>
             <strong>Old Dubai, new heights</strong>
             <div class="m-tags"><span>Burj Khalifa</span><span>Al Fahidi</span><span>Dubai Frame</span></div>
-            <div class="m-story-foot"><span><i class="face" style="background:#D9481C">R</i>Riya · Dec 2026</span><span class="likes"><i class="m-heart on"></i>128 · 24 comments</span></div>
+            <div class="m-story-foot"><span><i class="face" style="background:#D9481C">R</i>Riya · Dec 2025</span><span class="likes"><i class="m-heart on"></i>14 · 3 comments</span></div>
           </div>
         </div>
 
@@ -185,12 +192,14 @@
   <section class="f-cta">
     <div class="f-cta-panel">
       <span class="f-cta-glow" aria-hidden="true"></span>
-      <h2>Your next trip <em>starts here</em></h2>
+      <h2 appBlurIn>Your next trip <em>starts here</em></h2>
       <p>Everything works in your browser, on any phone or computer. The Android app is in beta too.</p>
       <div class="f-cta-buttons">
-        <button class="btn primary" type="button" (click)="goToExplore()">Start planning</button>
+        <button class="btn primary" type="button" appMagnetic (click)="goToExplore()">Start planning</button>
         <button class="btn ghost" type="button" (click)="goToDownload()">Get the Android app</button>
       </div>
     </div>
   </section>
 </main>
+
+<app-site-footer></app-site-footer>

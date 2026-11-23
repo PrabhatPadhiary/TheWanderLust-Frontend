@@ -14,15 +14,9 @@ import { suggestionKeys } from '../../utils/suggestion-keys';
 
 declare var google: any;
 
-/** The dive's zoom target: the letter (in the SVG), a point deep inside it, and how far to zoom. */
-interface DiveTarget { el: SVGTextElement; px: number; py: number; kMax: number; }
-
 /** Community stories: the one that leads the collage, and any left out of it. */
 const LEAD_STORY = '29242fa1-9f03-4a53-87a8-adebf6ca50a4';   // Sun, Sand, and Squad Goals (Goa)
 const HIDDEN_STORIES = ['e709adcf-7570-4196-9328-39931e4c065f']; // Official Trip to Mysore
-
-/** The letter of the headline's first line that the dive zooms into. */
-const DIVE_LETTER = 'o';
 
 
 
@@ -56,7 +50,6 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
     if (this.collageEl && this.animating) setTimeout(() => this.zone.runOutsideAngular(() => this.collageStory()));
   }
   private collageEl?: HTMLElement;
-  @ViewChild('dive') diveRef!: ElementRef<SVGSVGElement>;
   @ViewChild('tripMap') tripMapRef!: ElementRef<HTMLElement>;
 
   /** The trip on the map. */
@@ -66,13 +59,15 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
   readonly crew = CREW;
 
   readonly year = new Date().getFullYear();
-  /** The page under the navbar is light (after the dive), so it uses dark text. */
+  /** The page under the navbar is light, so it uses dark text (off over the dark closing panel). */
   navOnLight = false;
   /** The hero's search isn't showing: the navbar shows its own (wide screens). */
   showNavSearch = false;
   /** …and on narrow screens a floating one, unless the closing section's search is on screen. */
   showFloatSearch = false;
-  /** The hero: one photo and its headline (the full stop is the dive's target). */
+  /** The headline's last word, in turn (the first is what screen readers and search engines read). */
+  readonly heroWords = ['beautifully.', 'together.', 'day by day.'];
+  /** The hero: one photo and its headline. */
   readonly intro = {
     src: 'assets/images/hero/santorini.jpg',
     srcSmall: 'assets/images/hero/santorini-sm.jpg',
@@ -80,10 +75,6 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
     em: 'planned beautifully', // shown with a full stop
     sub: 'Find places, plan trips with friends and keep every day of the journey in one place, right in your browser.',
   };
-  /** The headline, letter by letter (spaces kept), and which letter the dive goes into. */
-  readonly titleChars = this.intro.title.split('');
-  readonly emChars = (this.intro.em + '.').split('');
-  diveIndex = -1;
 
   /** The destination being shown in the slider, and the one before (it stays under the next as that grows in). */
   activeStep = 0;
@@ -106,16 +97,6 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
       src: 'assets/images/hero/cape-town.jpg', srcSmall: 'assets/images/hero/cape-town-sm.jpg',
       text: 'Table Mountain over the harbour, with beaches and vineyards close by.' },
   ];
-  readonly features = [
-    { icon: 'search', title: 'Smart discovery', text: 'Stays, food and things to do for any destination, with ratings and photos from Google.' },
-    { icon: 'calendar', title: 'Day-by-day planner', text: 'Drag places into days, set times and see your whole trip at a glance.' },
-    { icon: 'users', title: 'Plan together', text: 'Invite friends with a link, plan in real time and keep everyone on the same page.' },
-    { icon: 'heart', title: 'Favourites', text: 'Your wishlist of places, saved from anywhere and sorted by city.' },
-    { icon: 'map', title: 'Maps', text: 'Every stop on a map, so you can see your route and what is close by.' },
-    { icon: 'check', title: 'Budget and checklists', text: 'Split costs, track spending and tick off packing lists together.' },
-  ];
-
-  private heroTrigger: ScrollTrigger | null = null;
   private storyTrigger: ScrollTrigger | null = null;
   private triggers: ScrollTrigger[] = [];
   private stopReveals: (() => void)[] = [];
@@ -227,14 +208,27 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
       }
       return o;
     };
+    // Sections whose content sticks to the screen while you scroll through
+    // them: the floating search would sit on their controls, so it steps aside.
+    const sticky = Array.from(document.querySelectorAll<HTMLElement>('.landing .story, .landing .tripmap, .landing .together'));
+    const covering = (el: HTMLElement) => {
+      const r = el.getBoundingClientRect();
+      return r.top < window.innerHeight * 0.25 && r.bottom > window.innerHeight * 0.75;
+    };
+    // Dark panels (the closing section and the footer): light navbar text over them.
+    const dark = Array.from(document.querySelectorAll<HTMLElement>('.landing .cta-panel, app-site-footer'));
+    const lightDefault = this.navOnLight;
     let queued = false;
     const check = () => {
       queued = false;
       const heroShown = !!heroSearch && onScreen(heroSearch) && shownOpacity(heroSearch) > 0.3;
       const nav = !heroShown;
-      const float = !heroShown && !onScreen(closing);
-      if (nav !== this.showNavSearch || float !== this.showFloatSearch) {
-        this.zone.run(() => { this.showNavSearch = nav; this.showFloatSearch = float; });
+      const float = !heroShown && !onScreen(closing) && !sticky.some(covering);
+      // The bar sits about 24-104px from the top.
+      const overDark = dark.some(el => { const r = el.getBoundingClientRect(); return r.top < 70 && r.bottom > 50; });
+      const onLight = overDark ? false : lightDefault;
+      if (nav !== this.showNavSearch || float !== this.showFloatSearch || onLight !== this.navOnLight) {
+        this.zone.run(() => { this.showNavSearch = nav; this.showFloatSearch = float; this.navOnLight = onLight; });
       }
     };
     const onScroll = () => { if (!queued) { queued = true; requestAnimationFrame(check); } };
@@ -258,21 +252,17 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
   private scrollEffects(): void {
     const hero = this.heroRef.nativeElement;
 
-    // Hero, pinned: the opening (the card grows to the full screen), a short
-    // hold to read the headline, then the dive into its full stop.
-    // Scroll length of each part, in screen heights. The dive is long, so the
-    // zoom into the letter feels slow and deliberate.
-    const OPEN = 1.1;
-    const HOLD = 0.6;
-    const DIVE = 2.6;
-    const total = OPEN + HOLD + DIVE;
-    const fadeOut = Array.from(hero.querySelectorAll<HTMLElement>('.hero-search, .hero-facts, .hero-sub, .glass-pill, .scroll-cue'));
+    // Hero: the opening plays by itself, once, as the page loads (not tied to
+    // scroll): WAY / RAA around the photo card, the card grows to the full
+    // screen, then the headline and search rise in. Nothing is pinned, so the
+    // page scrolls normally from the first moment.
+    const HOLD = 0.35;      // seconds on WAY / RAA before the card opens
+    const OPEN = 1.25;      // seconds for the card to open and the copy to arrive
     const media = this.heroMedia.nativeElement;
     const shade = hero.querySelector<HTMLElement>('.hero-shade');
     const content = this.heroCopy.nativeElement;
     const wordTop = hero.querySelector<HTMLElement>('.bw-top');
     const wordBottom = hero.querySelector<HTMLElement>('.bw-bottom');
-    let target: DiveTarget | null = null;
 
     /**
      * The card at the start: centred in the space below the navbar, with the
@@ -296,20 +286,12 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
       return { x: (w - cw) / 2, top, bottom: h - bottom };
     };
     let card = layoutCard();
-    // The dive goes into the "o" of "world": bold and upright (thick strokes),
-    // near the middle. Falls back to the letter nearest the centre.
-    const preferred = this.intro.title.indexOf(DIVE_LETTER);
-    const pick = () => this.zone.run(() => { this.diveIndex = preferred >= 0 ? preferred : this.nearestLetter(hero); });
-    (document as any).fonts?.ready?.then(pick) ?? pick();
-    const onResize = () => { card = layoutCard(); pick(); };
-    window.addEventListener('resize', onResize);
-    this.stopReveals.push(() => window.removeEventListener('resize', onResize));
 
     const applyOpening = (o: number) => {
       const e = o * o * (3 - 2 * o);
       const ix = card.x * (1 - e), it = card.top * (1 - e), ib = card.bottom * (1 - e);
       const radius = 32 * (1 - e);
-      media.style.clipPath = `inset(${it.toFixed(1)}px ${ix.toFixed(1)}px ${ib.toFixed(1)}px ${ix.toFixed(1)}px round ${radius.toFixed(1)}px)`;
+      media.style.clipPath = o >= 1 ? '' : `inset(${it.toFixed(1)}px ${ix.toFixed(1)}px ${ib.toFixed(1)}px ${ix.toFixed(1)}px round ${radius.toFixed(1)}px)`;
       (media.style as any).webkitClipPath = media.style.clipPath;
       // The photo eases from a slight zoom to rest as the card opens.
       gsap.set(media.querySelector('img'), { scale: 1.12 - e * 0.12 });
@@ -318,61 +300,42 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
       if (wordBottom) gsap.set(wordBottom, { yPercent: e * 140, opacity: 1 - e });
       if (shade) gsap.set(shade, { opacity: e });
       // Then the headline and search rise in, centred.
-      const t = Math.min(1, Math.max(0, (o - 0.7) / 0.3));
-      gsap.set(content, { opacity: t, y: (1 - t) * 30 });
+      const t = Math.min(1, Math.max(0, (o - 0.6) / 0.4));
+      gsap.set(content, { opacity: t, y: (1 - t) * 24 });
       content.style.pointerEvents = t > 0.5 ? '' : 'none';
-      return t;
     };
-    applyOpening(0);
 
-    this.heroTrigger = ScrollTrigger.create({
-      trigger: hero,
-      start: 'top top',
-      end: () => '+=' + window.innerHeight * total,
-      pin: true,
-      anticipatePin: 1,
-      scrub: 1.2,
-      onUpdate: (st) => {
-        const all = st.progress * total;
-        const o = Math.min(1, all / OPEN);
-        const t = applyOpening(o);
-        const zp = Math.min(1, Math.max(0, (all - OPEN - HOLD) / DIVE));
+    // Scrolled down already (a reload part-way down the page): no opening.
+    if (window.scrollY > window.innerHeight * 0.5) {
+      applyOpening(1);
+    } else {
+      applyOpening(0);
+      const state = { o: 0 };
+      const tween = gsap.to(state, {
+        o: 1, duration: OPEN, delay: HOLD, ease: 'power2.inOut',
+        onUpdate: () => applyOpening(state.o),
+      });
+      // Anyone who starts scrolling or typing straight away skips to the end.
+      const skip = () => { if (tween.isActive() || tween.progress() < 1) tween.progress(1); };
+      window.addEventListener('wheel', skip, { once: true, passive: true });
+      window.addEventListener('touchmove', skip, { once: true, passive: true });
+      window.addEventListener('keydown', skip, { once: true });
+      this.stopReveals.push(() => {
+        tween.kill();
+        window.removeEventListener('wheel', skip);
+        window.removeEventListener('touchmove', skip);
+        window.removeEventListener('keydown', skip);
+      });
+    }
+    const onResize = () => { card = layoutCard(); };
+    window.addEventListener('resize', onResize);
+    this.stopReveals.push(() => window.removeEventListener('resize', onResize));
 
-        // The dive: a camera zoom into the highlighted letter. The headline is
-        // swapped for an exact vector copy (SVG) that's zoomed by its viewBox,
-        // so everything stays sharp; the other letters fly past the edges and
-        // the frost letter fills the screen.
-        const svg = this.diveRef?.nativeElement;
-        const title = hero.querySelector<HTMLElement>('.hero-title');
-        if (svg && title) {
-          if (zp === 0) target = null;
-          else if (!target) target = this.buildDive(title, svg);
-          const diving = zp > 0 && !!target;
-          svg.style.opacity = diving ? '1' : '0';
-          if (!diving) svg.style.backgroundColor = 'transparent';
-          title.style.visibility = diving ? 'hidden' : '';
-          if (target) {
-            const W = window.innerWidth, H = window.innerHeight;
-            const k = 1 + Math.pow(zp, 2.4) * (target.kMax - 1);
-            const x0 = target.px - target.px / k;
-            const y0 = target.py - target.py / k;
-            svg.setAttribute('viewBox', `${x0.toFixed(2)} ${y0.toFixed(2)} ${(W / k).toFixed(3)} ${(H / k).toFixed(3)}`);
-            // The last stretch: frost fills in behind the letter, so no photo is left at the edges.
-            const fill = Math.min(1, Math.max(0, (zp - 0.82) / 0.15));
-            svg.style.backgroundColor = `rgba(238, 242, 244, ${fill.toFixed(3)})`;
-          }
-        }
-        // The photo pushes in a little with the zoom.
-        gsap.set(media.querySelector('img'), { scale: 1 + Math.pow(zp, 2) * 0.25 });
-        fadeOut.forEach(el => gsap.set(el, { opacity: 1 - Math.min(1, zp * 4) }));
-
-        // The hero is light throughout (frost page, then the veiled photo): dark navbar text.
-        const light = true;
-        if (light !== this.navOnLight) this.zone.run(() => { this.navOnLight = light; });
-      },
-      onLeave: () => { if (!this.navOnLight) this.zone.run(() => { this.navOnLight = true; }); },
-    });
-    this.triggers.push(this.heroTrigger);
+    // As the hero scrolls away, the photo drifts a little slower than the page.
+    this.triggers.push(ScrollTrigger.create({
+      trigger: hero, start: 'top top', end: 'bottom top', scrub: true,
+      animation: gsap.fromTo(media, { yPercent: 0 }, { yPercent: 18, ease: 'none' }),
+    }));
 
     // How it works: pinned on large screens, the steps change as you scroll.
     const story = this.storyRef?.nativeElement;
@@ -469,7 +432,7 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
       if (third) tl.fromTo(third, { y: 140, rotation: alt ? 22 : -22, opacity: 0 }, { y: 0, rotation: alt ? 4 : -4, opacity: 1, duration: 0.8 }, 0.35);
       if (card) tl.fromTo(card, { y: 60, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, 0.5);
       this.triggers.push(ScrollTrigger.create({
-        trigger: c, containerAnimation: slide, start: 'left 100%', end: 'left 50%', scrub: 0.6, animation: tl,
+        trigger: c, containerAnimation: slide, start: 'left 100%', end: 'left 50%', scrub: true, animation: tl,
       }));
     });
 
@@ -493,7 +456,7 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
 
   /** Fade and rise sections, split headings into rising words, stagger cards, and add parallax and tilt. */
   private reveals(): void {
-    // The page's <main> (not the hero's parent: GSAP wraps the pinned hero in a spacer).
+    // The page's <main>.
     const root = (this.heroRef.nativeElement.closest('main') ?? document.body) as HTMLElement;
     const ease = [0.22, 1, 0.36, 1] as const;
 
@@ -526,143 +489,6 @@ export class LandingPageV2Component implements OnInit, AfterViewInit, OnDestroy 
       }));
     });
 
-    // Feature cards: fade in one after another; each icon pops in and draws its lines, then the words follow.
-    const grid = root.querySelector<HTMLElement>('.feature-grid');
-    if (grid) {
-      const cards = Array.from(grid.querySelectorAll<HTMLElement>('.feature'));
-      cards.forEach(card => {
-        card.style.opacity = '0';
-        card.querySelectorAll('.feature-icon svg > *').forEach(el => el.setAttribute('pathLength', '1'));
-        card.querySelectorAll<HTMLElement>('.feature-icon, h3, p').forEach(el => (el.style.opacity = '0'));
-      });
-      grid.classList.add('armed');   // icon lines start undrawn (see .feature-grid.armed in the styles)
-      this.stopReveals.push(inView(grid, () => {
-        cards.forEach((card, i) => {
-          const d = i * 0.1;
-          animate(card, { opacity: [0, 1] }, { duration: 1.1, delay: d, ease: 'easeOut' });
-          const icon = card.querySelector<HTMLElement>('.feature-icon')!;
-          animate(icon, { opacity: [0, 1], transform: ['scale(0.3) rotate(-25deg)', 'scale(1) rotate(0deg)'] },
-            { type: 'spring', stiffness: 320, damping: 14, delay: d + 0.25 });
-          setTimeout(() => card.classList.add('drawn'), (d + 0.4) * 1000);              // the lines draw (CSS)
-          setTimeout(() => { icon.style.transform = ''; }, (d + 1.6) * 1000);            // hand the transform back to the CSS hover
-          animate(Array.from(card.querySelectorAll('h3, p')), { opacity: [0, 1], transform: ['translateY(12px)', 'translateY(0px)'] },
-            { duration: 0.6, delay: stagger(0.08, { startDelay: d + 0.35 }), ease });
-        });
-      }, { amount: 0.2 }));
-    }
-
-    // Feature cards lean towards the mouse.
-    if (!this.small) {
-      root.querySelectorAll<HTMLElement>('.feature').forEach(card => {
-        const move = (e: PointerEvent) => {
-          const r = card.getBoundingClientRect();
-          const x = (e.clientX - r.left) / r.width - 0.5;
-          const y = (e.clientY - r.top) / r.height - 0.5;
-          animate(card, { transform: `perspective(800px) rotateX(${(-y * 8).toFixed(2)}deg) rotateY(${(x * 10).toFixed(2)}deg) translateY(-4px)` },
-            { type: 'spring', stiffness: 260, damping: 22 });
-        };
-        const leave = () => animate(card, { transform: 'perspective(800px) rotateX(0deg) rotateY(0deg) translateY(0px)' },
-          { type: 'spring', stiffness: 200, damping: 20 });
-        card.addEventListener('pointermove', move);
-        card.addEventListener('pointerleave', leave);
-        this.stopReveals.push(() => { card.removeEventListener('pointermove', move); card.removeEventListener('pointerleave', leave); });
-      });
-    }
-  }
-
-  /** Index (in titleChars + emChars) of the letter nearest the screen centre, at rest. */
-  private nearestLetter(hero: HTMLElement): number {
-    const chars = Array.from(hero.querySelectorAll<HTMLElement>('.hero-title .ch'));
-    const content = this.heroCopy.nativeElement;
-    const dy = Number(gsap.getProperty(content, 'y')) || 0; // ignore the fade-in offset
-    const cx = window.innerWidth / 2, cy = window.innerHeight / 2;
-    let best = -1, bestD = Infinity;
-    chars.forEach((el, i) => {
-      if (!/[A-Za-z]/.test(el.textContent || '')) return;
-      const r = el.getBoundingClientRect();
-      const d = Math.hypot(r.left + r.width / 2 - cx, r.top - dy + r.height / 2 - cy);
-      if (d < bestD) { bestD = d; best = i; }
-    });
-    return best;
-  }
-
-  /**
-   * Copy the headline into the SVG, letter by letter at exactly the same
-   * places, fonts and colours, and work out the zoom: the point deepest
-   * inside the highlighted letter's stroke, and how far to zoom for it to
-   * cover the whole screen.
-   */
-  private buildDive(title: HTMLElement, svg: SVGSVGElement): DiveTarget | null {
-    const W = window.innerWidth, H = window.innerHeight;
-    const chars = Array.from(title.querySelectorAll<HTMLElement>('.ch'));
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d')!;
-    const NS = 'http://www.w3.org/2000/svg';
-    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-    while (svg.firstChild) svg.removeChild(svg.firstChild);
-
-    let targetEl: SVGTextElement | null = null;
-    let targetBox: { rect: DOMRect; font: string; ascent: number; ch: string } | null = null;
-    chars.forEach((el, i) => {
-      const cs = getComputedStyle(el);
-      // Draw the letter as shown (the headline is in capitals via CSS).
-      const raw = el.textContent || '';
-      const ch = cs.textTransform === 'uppercase' ? raw.toUpperCase() : raw;
-      if (!ch.trim()) return;
-      const r = el.getBoundingClientRect();
-      const font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
-      ctx.font = font;
-      const ascent = ctx.measureText(ch).fontBoundingBoxAscent ?? parseFloat(cs.fontSize) * 0.9;
-      // The span's box is its line box; centre the font's content area in it.
-      const content = ascent + (ctx.measureText(ch).fontBoundingBoxDescent ?? parseFloat(cs.fontSize) * 0.25);
-      const baseline = r.top + (r.height - content) / 2 + ascent;
-      const t = document.createElementNS(NS, 'text');
-      t.textContent = ch;
-      t.setAttribute('x', r.left.toFixed(2));
-      t.setAttribute('y', baseline.toFixed(2));
-      t.setAttribute('font-family', cs.fontFamily);
-      t.setAttribute('font-size', cs.fontSize);
-      t.setAttribute('font-weight', cs.fontWeight);
-      t.setAttribute('font-style', cs.fontStyle);
-      t.setAttribute('fill', cs.color);
-      svg.appendChild(t);
-      if (i === this.diveIndex) {
-        targetEl = t;
-        targetBox = { rect: r, font, ascent: baseline - r.top, ch };
-      }
-    });
-    if (!targetEl || !targetBox) return null;
-    const tb = targetBox as { rect: DOMRect; font: string; ascent: number; ch: string };
-
-    // The point deepest inside the letter: draw it and find the inked pixel
-    // farthest from any blank one (a quick two-pass distance map).
-    const pad = 4;
-    const gw = Math.ceil(tb.rect.width) + pad * 2;
-    const gh = Math.ceil(tb.rect.height) + pad * 2;
-    canvas.width = gw;
-    canvas.height = gh;
-    ctx.font = tb.font;
-    ctx.fillText(tb.ch, pad, pad + tb.ascent);
-    const data = ctx.getImageData(0, 0, gw, gh).data;
-    const dist = new Float32Array(gw * gh);
-    for (let p = 0; p < gw * gh; p++) dist[p] = data[p * 4 + 3] > 128 ? 1e6 : 0;
-    for (let y = 0; y < gh; y++) for (let x = 0; x < gw; x++) {
-      const p = y * gw + x;
-      if (!dist[p]) continue;
-      dist[p] = Math.min(dist[p], (y > 0 ? dist[p - gw] : 0) + 1, (x > 0 ? dist[p - 1] : 0) + 1);
-    }
-    let bx = 0, by = 0, bd = 0;
-    for (let y = gh - 1; y >= 0; y--) for (let x = gw - 1; x >= 0; x--) {
-      const p = y * gw + x;
-      if (!dist[p]) continue;
-      dist[p] = Math.min(dist[p], (y < gh - 1 ? dist[p + gw] : 0) + 1, (x < gw - 1 ? dist[p + 1] : 0) + 1);
-      if (dist[p] > bd) { bd = dist[p]; bx = x; by = y; }
-    }
-    if (!bd) return null;
-    const px = tb.rect.left - pad + bx + 0.5;
-    const py = tb.rect.top - pad + by + 0.5;
-    const far = Math.max(Math.hypot(px, py), Math.hypot(W - px, py), Math.hypot(px, H - py), Math.hypot(W - px, H - py));
-    return { el: targetEl, px, py, kMax: (far / Math.max(1, bd - 1)) * 1.08 };
   }
 
   /** Wrap each word of a heading in a clipping line, for the rising-words reveal (keeps <em>). */

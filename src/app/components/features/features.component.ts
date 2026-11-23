@@ -100,7 +100,7 @@ export class FeaturesComponent implements AfterViewInit, OnDestroy {
       id: 'stories', num: '07', kicker: 'Community', title: 'Share the', em: 'story',
       text: 'Write about the trip with your photos and the places you went, and read other travellers\' stories for your next idea.',
       points: ['Photos and places', 'Likes and comments'],
-      chips: ['♥ 128', '24 comments'],
+      chips: ['♥ 14', '3 comments'],
     },
   ];
 
@@ -123,12 +123,21 @@ export class FeaturesComponent implements AfterViewInit, OnDestroy {
     window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 120, behavior: reduce ? 'auto' : 'smooth' });
   }
 
+  /** The film can be paused (it loops, so it must be): it then stays paused, even scrolled back to. */
+  filmPaused = false;
+  togglePlay(): void {
+    const v = this.filmVideo?.nativeElement;
+    if (!v) return;
+    this.filmPaused = !this.filmPaused;
+    if (this.filmPaused) v.pause(); else v.play().catch(() => {});
+  }
+
   toggleSound(): void {
     const v = this.filmVideo?.nativeElement;
     if (!v) return;
     this.filmMuted = !this.filmMuted;
     v.muted = this.filmMuted;
-    if (!this.filmMuted) { v.currentTime = 0; v.play().catch(() => {}); }
+    if (!this.filmMuted) { v.currentTime = 0; this.filmPaused = false; v.play().catch(() => {}); }
   }
 
   ngAfterViewInit(): void {
@@ -147,7 +156,7 @@ export class FeaturesComponent implements AfterViewInit, OnDestroy {
     const video = this.filmVideo?.nativeElement;
     if (!section || !video) return;
     const io = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { video.preload = 'auto'; video.play().catch(() => {}); } else video.pause();
+      if (e.isIntersecting) { video.preload = 'auto'; if (!this.filmPaused) video.play().catch(() => {}); } else video.pause();
     }, { threshold: 0.35 });
     io.observe(video);
     this.cleanups.push(() => io.disconnect());

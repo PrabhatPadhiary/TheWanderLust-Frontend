@@ -13,10 +13,10 @@
 
   <!-- ===== LOGO (and, on a destination, the place beside it) ===== -->
   <div class="nav-left">
-  <div class="navbar-brand" (click)="goHome()">
-    <img src="assets/images/logo/wayraa_logo_notext.svg" alt="Wayraa" class="brand-logo-img">
-    <span class="brand-name">wayraa</span>
-  </div>
+  <a class="navbar-brand" routerLink="/" aria-label="Wayraa home">
+    <img src="assets/images/logo/wayraa_logo_notext.svg" alt="" class="brand-logo-img">
+    <span class="brand-name" aria-hidden="true">wayraa</span>
+  </a>
 
   <!-- Destination: the place, as plain text; click it to search somewhere else -->
   <ng-container *ngIf="isDestination && !isTripPlanner">
@@ -72,7 +72,7 @@
       <div class="nav-pill-bg" *ngIf="landingPill >= 0"
            [style.transform]="pillTransform"
            [style.transition]="pillReady ? 'transform 0.45s cubic-bezier(0.22,1,0.36,1)' : 'none'"></div>
-      <button class="nav-link" [class.active]="navIndex === 0" (click)="scrollToSection('explore')">Explore</button>
+      <a      class="nav-link" [class.active]="navIndex === 0" routerLink="/" (click)="onHomeClick($event)">Home</a>
       <a      class="nav-link" [class.active]="navIndex === 1" routerLink="/features">Features</a>
       <a      class="nav-link" [class.active]="navIndex === 2" routerLink="/community">Community</a>
       <a      class="nav-link" [class.active]="navIndex === 3" routerLink="/pricing">Pricing</a>
@@ -196,7 +196,7 @@
         <path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>
       </svg>
       <span>Get the app</span>
-      <span class="get-app-beta">Beta</span>
+      <span class="get-app-beta"><span class="wl-shimmer wl-shimmer--twice">Beta</span></span>
     </a>
 
     <!-- Who's signed in is only known in the browser: pre-rendered pages leave
@@ -208,6 +208,24 @@
     <button class="sign-in-btn" *ngIf="isLanding && authService.isLoggedIn && (isHomePage || isCommunityPage)" (click)="onSignIn()">
       {{ isCommunityPage ? 'My Stories' : 'My Trips' }}
     </button>
+
+    <!-- Phones, landing-style pages: the section links (hidden from the bar there) live in a menu -->
+    <div class="phone-menu" *ngIf="isLanding && !isTripPlanner">
+      <button class="phone-menu-btn" type="button" (click)="phoneMenuOpen = !phoneMenuOpen"
+              [attr.aria-expanded]="phoneMenuOpen" aria-controls="phone-menu-panel" aria-label="Menu">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+          <path *ngIf="!phoneMenuOpen" d="M4 7h16M4 12h16M4 17h16"/>
+          <path *ngIf="phoneMenuOpen" d="M6 6l12 12M18 6L6 18"/>
+        </svg>
+      </button>
+      <div class="phone-menu-panel" id="phone-menu-panel" *ngIf="phoneMenuOpen" appHoverHighlight="both" highlightItems="a">
+        <a routerLink="/" [class.active]="navIndex === 0" (click)="phoneMenuOpen = false">Home</a>
+        <a routerLink="/features" [class.active]="navIndex === 1" (click)="phoneMenuOpen = false">Features</a>
+        <a routerLink="/community" [class.active]="navIndex === 2" (click)="phoneMenuOpen = false">Community</a>
+        <a routerLink="/pricing" [class.active]="navIndex === 3" (click)="phoneMenuOpen = false">Pricing</a>
+        <a routerLink="/download" class="phone-menu-app" (click)="phoneMenuOpen = false">Get the Android app <span>Beta</span></a>
+      </div>
+    </div>
 
     <!-- App guest: Sign In -->
     <button class="sign-in-btn" *ngIf="!isLanding && !authService.isLoggedIn" (click)="onSignIn()">Sign In</button>
