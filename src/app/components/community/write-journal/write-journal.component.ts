@@ -47,6 +47,15 @@ export class WriteJournalComponent implements OnInit {
   journalTitle = '';
   journalBody = '';
   storyPhotos: { file: File; preview: string }[] = [];
+  /** Editing: the story's photos already saved (removing one takes effect on save). */
+  existingPhotos: { id: string; url: string }[] = [];
+  private removedPhotoIds: string[] = [];
+  /** Same as the app: up to 10 photos a story. */
+  readonly MAX_PHOTOS = 10;
+
+  get photoCount(): number {
+    return this.existingPhotos.length + this.storyPhotos.length;
+  }
 
   // Image validation
   readonly ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -134,6 +143,10 @@ export class WriteJournalComponent implements OnInit {
         this.visibility = (journal.visibility as 'public' | 'private') || 'public';
         this.proTips = journal.proTips || '';
         this.selectedVibes = journal.vibes || [];
+        this.existingPhotos = [...(journal.photos || [])]
+          .sort((a, b) => a.order - b.order)
+          .map(p => ({ id: p.id, url: p.url }));
+        this.removedPhotoIds = [];
 
         // Places
         this.places = (journal.places || []).map(p => ({
@@ -234,16 +247,31 @@ export class WriteJournalComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     if (!input.files) return;
 
-    Array.from(input.files).forEach(file => {
+    // Room left (photos still reading in are counted via `pending`).
+    let room = this.MAX_PHOTOS - this.photoCount - this.pendingPhotos;
+    const picked = Array.from(input.files);
+    if (picked.length > room) {
+      this.toastr.warning(
+        room > 0 ? `Only the first ${room} were added.` : 'Remove one to add another.',
+        `A story can have up to ${this.MAX_PHOTOS} photos`
+      );
+    }
+
+    picked.forEach(file => {
+      if (room <= 0) return;
       const error = this.validateImageFile(file);
       if (error) {
         this.addImageError(`${file.name}: ${error}`);
         return;
       }
+      room--;
+      this.pendingPhotos++;
       const reader = new FileReader();
       reader.onload = (e) => {
+        this.pendingPhotos--;
         this.storyPhotos.push({ file, preview: e.target?.result as string });
       };
+      reader.onerror = () => { this.pendingPhotos--; };
       reader.readAsDataURL(file);
     });
 
@@ -277,8 +305,15 @@ export class WriteJournalComponent implements OnInit {
     this.imageErrors = [];
   }
 
+  private pendingPhotos = 0;
+
   removeStoryPhoto(index: number): void {
     this.storyPhotos.splice(index, 1);
+  }
+
+  removeExistingPhoto(index: number): void {
+    const [photo] = this.existingPhotos.splice(index, 1);
+    if (photo) this.removedPhotoIds.push(photo.id);
   }
 
   // Places
@@ -450,6 +485,13 @@ export class WriteJournalComponent implements OnInit {
       next: (res) => {
         const journalId = res.id || this.editJournalId;
 
+        // Photos removed while editing go now (failures just leave them).
+        if (journalId) {
+          this.removedPhotoIds.forEach(photoId =>
+            this.journalService.deletePhoto(journalId, photoId).subscribe({ error: () => {} }));
+          this.removedPhotoIds = [];
+        }
+
         if (this.storyPhotos.length > 0 && journalId) {
           // Signal uploading state → navigate → upload in background
           this.uploadState.setUploading(journalId, this.journalTitle.trim());
@@ -457,7 +499,18 @@ export class WriteJournalComponent implements OnInit {
 
           const files = this.storyPhotos.map(p => p.file);
           this.journalService.uploadPhotos(journalId, files).subscribe({
-            next: () => this.uploadState.setDone(),
+            next: ({ failed }) => {
+              if (failed === 0) {
+                this.uploadState.setDone();
+                return;
+              }
+              this.uploadState.setError();
+              this.toastr.warning(
+                failed === files.length
+                  ? 'Story saved, but the photos didn\'t upload. Edit the story to try again.'
+                  : `Story saved, but ${failed} of ${files.length} photos didn't upload. Edit the story to try again.`
+              );
+            },
             error: () => {
               this.uploadState.setError();
               this.toastr.warning('Story saved, but some photos failed to upload');

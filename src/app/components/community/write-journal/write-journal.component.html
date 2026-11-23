@@ -130,7 +130,7 @@
 
       <!-- Story Photos -->
       <div class="wj-story-photos">
-        <label>Photos <span class="wj-photo-hint">JPG, PNG or WebP · max 5 MB each</span></label>
+        <label>Photos <span class="wj-photo-hint">{{ photoCount }}/{{ MAX_PHOTOS }} · JPG, PNG or WebP · max 5 MB each</span></label>
 
         <!-- Image error banner -->
         <div class="wj-image-errors" *ngIf="imageErrors.length > 0">
@@ -147,11 +147,15 @@
         </div>
 
         <div class="wj-photos-grid">
+          <div class="wj-photo-thumb" *ngFor="let photo of existingPhotos; let i = index">
+            <img [src]="photo.url" alt="Story photo">
+            <button class="wj-photo-remove" type="button" (click)="removeExistingPhoto(i)" aria-label="Remove photo">✕</button>
+          </div>
           <div class="wj-photo-thumb" *ngFor="let photo of storyPhotos; let i = index">
             <img [src]="photo.preview" alt="Story photo">
-            <button class="wj-photo-remove" (click)="removeStoryPhoto(i)">✕</button>
+            <button class="wj-photo-remove" type="button" (click)="removeStoryPhoto(i)" aria-label="Remove photo">✕</button>
           </div>
-          <div class="wj-photo-add" (click)="storyPhotoInput.click()">
+          <div class="wj-photo-add" *ngIf="photoCount < MAX_PHOTOS" (click)="storyPhotoInput.click()">
             <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
             </svg>

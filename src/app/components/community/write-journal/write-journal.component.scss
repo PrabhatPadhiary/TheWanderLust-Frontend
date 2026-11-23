@@ -539,6 +539,8 @@ $accent-hover: #1C2833;
   }
 
   &:hover .wj-photo-remove { opacity: 1; }
+  // Touch screens have no hover: always show it.
+  @media (hover: none) { .wj-photo-remove { opacity: 1; } }
 }
 
 .wj-photo-add {

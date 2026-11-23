@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, firstValueFrom } from 'rxjs';
 import { AuthService } from './auth.service';
 import { environment } from '../../environments/environment';
 
@@ -243,16 +243,43 @@ export class JournalService {
     });
   }
 
-  uploadPhotos(journalId: string, files: File[]): Observable<any> {
+  /**
+   * Upload a story's photos one at a time (one big request with several 5 MB
+   * photos goes over the server's request size limit, and the server takes at
+   * most 10 per request). Emits how many went up and how many failed.
+   */
+  uploadPhotos(journalId: string, files: File[]): Observable<{ uploaded: number; failed: number }> {
+    return new Observable(observer => {
+      (async () => {
+        let uploaded = 0;
+        let failed = 0;
+        for (const file of files) {
+          try {
+            // A fresh token each time: a long upload can outlast one.
+            const token = await this.authService.getFirebaseToken();
+            if (!token) throw new Error('Not authenticated');
+            const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+            const formData = new FormData();
+            formData.append('files', file, file.name);
+            await firstValueFrom(this.http.post<any>(`${environment.apiUrl}/Journals/${journalId}/photos`, formData, { headers }));
+            uploaded++;
+          } catch {
+            failed++;
+          }
+        }
+        observer.next({ uploaded, failed });
+        observer.complete();
+      })();
+    });
+  }
+
+  /** Remove one photo from your story. */
+  deletePhoto(journalId: string, photoId: string): Observable<any> {
     return new Observable(observer => {
       this.authService.getFirebaseToken().then(token => {
         if (!token) { observer.error('Not authenticated'); return; }
         const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
-        const formData = new FormData();
-        files.forEach(file => {
-          formData.append('files', file, file.name);
-        });
-        this.http.post<any>(`${environment.apiUrl}/Journals/${journalId}/photos`, formData, { headers })
+        this.http.delete<any>(`${environment.apiUrl}/Journals/${journalId}/photos/${photoId}`, { headers })
           .subscribe({
             next: (res) => { observer.next(res); observer.complete(); },
             error: (err) => observer.error(err)
