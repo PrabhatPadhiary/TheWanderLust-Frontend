@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
  * "Plan it together": a live trip board that fills up as you scroll.
  *
  * Friends join, Riya's cursor adds a desert safari, Meera's cursor votes on
- * dinner and the votes tick in, a comment gets a reply, and an invite link
+ * dinner and the votes tick in, you post an announcement, and an invite link
  * brings one more person in. The steps on the left light up as it goes.
  * Scrubbed, so it runs backwards too. The board is plain HTML (no images).
  */
@@ -51,7 +51,7 @@ export function planTogetherStory(section: HTMLElement, onTrigger: (t: ScrollTri
   gsap.set(q('.slot.new'), { autoAlpha: 0, x: 40 });
   gsap.set(qa('.poll .bar i'), { scaleX: 0, transformOrigin: '0 50%' });
   gsap.set(qa('.poll .won'), { autoAlpha: 0, scale: 0.6 });
-  gsap.set(qa('.bubble'), { autoAlpha: 0, scale: 0.6, y: 10 });
+  gsap.set(q('.board-note'), { autoAlpha: 0, scale: 0.9, y: 14 });
   gsap.set(qa('.cursor'), { autoAlpha: 0, x: () => board.clientWidth * 0.9, y: () => board.clientHeight * 0.95 });
   gsap.set(qa('.board-toast'), { autoAlpha: 0, y: 16 });
   gsap.set(q('.board-done'), { autoAlpha: 0, y: 20 });
@@ -101,10 +101,10 @@ export function planTogetherStory(section: HTMLElement, onTrigger: (t: ScrollTri
     .to(q('.poll .won'), { autoAlpha: 1, scale: 1, duration: 0.3, ease: 'back.out(2)' }, 5.3);
   moveTo('.cursor.riya', '.poll .opt.b', 4.3, 0.6, 0.5, 0.5);
 
-  // 4: a comment and a reply on the safari.
+  // 4: you post an announcement for the group.
   tl.to(qa('.cursor'), { autoAlpha: 0, duration: 0.3 }, 5.8);
-  tl.to(q('.bubble.ask'), { autoAlpha: 1, scale: 1, y: 0, duration: 0.3, ease: 'back.out(2)' }, 6.0)
-    .to(q('.bubble.reply'), { autoAlpha: 1, scale: 1, y: 0, duration: 0.3, ease: 'back.out(2)' }, 6.8);
+  tl.to(q('.board-note'), { autoAlpha: 1, scale: 1, y: 0, duration: 0.35, ease: 'back.out(1.8)' }, 6.0)
+    .to(q('.board-note'), { autoAlpha: 0, y: -10, duration: 0.25, ease: 'power2.in' }, 7.3);
 
   // 5: one more friend joins from the invite link, and everyone's on the same plan.
   tl.fromTo(q('.invite'), { boxShadow: '0 0 0 0 rgba(217,72,28,0.6)' }, { boxShadow: '0 0 0 10px rgba(217,72,28,0)', duration: 0.6, immediateRender: false }, 7.5);

@@ -17,7 +17,8 @@
   color: inherit;
   text-decoration: none;
   div { display: flex; flex-direction: column; }
-  strong { color: #fff; font-family: var(--font-body); font-size: 1.1rem; font-weight: 600; }
+  strong { color: #fff; font-family: var(--font-body); font-size: 1.1rem; font-weight: 700; letter-spacing: -0.03em; }
+  .brand-dot { color: var(--orange); }
   span { font-size: 0.82rem; }
   &:focus-visible { outline: 2px solid var(--orange); outline-offset: 4px; border-radius: 8px; }
 }

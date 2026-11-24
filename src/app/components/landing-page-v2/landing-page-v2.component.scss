@@ -1009,22 +1009,27 @@ picture { display: contents; }
   > div > span { font-size: 0.82rem; color: $ink-3; }
   &.new { background: #FFF4EF; }
 }
-.bubble {
+// An announcement from the trip's owner, pushed to everyone.
+.board-note {
   position: absolute;
-  right: 14px;
-  display: inline-flex; align-items: center; gap: 8px;
-  padding: 7px 12px 7px 7px;
-  border-radius: 16px 16px 16px 4px;
+  top: -24px; left: 50%;
+  translate: -50% 0;
+  z-index: 4;
+  width: min(360px, 88%);
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 14px 10px 10px;
+  border-radius: 18px;
   background: #fff;
-  box-shadow: 0 10px 24px rgba(28, 40, 51, 0.16);
-  font-size: 0.8rem; font-weight: 500; white-space: nowrap;
-  i {
-    width: 22px; height: 22px; border-radius: 50%;
+  box-shadow: 0 14px 34px rgba(28, 40, 51, 0.22);
+  font-size: 0.82rem; line-height: 1.35;
+  > i {
+    flex: none;
+    width: 26px; height: 26px; border-radius: 50%;
     display: inline-flex; align-items: center; justify-content: center;
-    font-style: normal; font-weight: 700; font-size: 0.66rem; color: #fff;
+    font-style: normal; font-weight: 700; font-size: 0.7rem; color: #fff;
   }
-  &.ask { top: -18px; }
-  &.reply { top: 22px; right: 30px; }
+  b { display: block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--orange-deep); }
+  span { color: $ink-2; }
 }
 .poll {
   .won { margin-left: 8px; font-style: normal; font-size: 0.75rem; font-weight: 700; color: var(--success); display: inline-block; }
@@ -1080,7 +1085,7 @@ picture { display: contents; }
 .together.static {
   height: auto;
   .together-sticky { position: static; height: auto; }
-  .board-toast { display: none; }
+  .board-toast, .board-note { display: none; }
   .cursor { display: none; }
   .poll .bar i { transform: none; }
   .opt.a .bar i { right: 25%; }
@@ -1340,7 +1345,7 @@ picture { display: contents; }
   .board-days { margin: 12px 0 8px; span { padding: 5px 10px; font-size: 0.7rem; } }
   .slot { gap: 10px; padding: 10px 12px; time { min-width: 38px; font-size: 0.72rem; } b { font-size: 0.88rem; } }
   .poll .opt { grid-template-columns: 96px 1fr 18px; font-size: 0.74rem; }
-  .bubble { font-size: 0.7rem; }
+  .board-note { font-size: 0.72rem; }
   .board-toast, .board-done { font-size: 0.74rem; }
 
   // Collage on phones: one story per screen.

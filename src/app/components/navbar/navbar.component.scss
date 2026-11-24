@@ -100,12 +100,17 @@
     object-fit: contain;
   }
 
+  // The wordmark: lowercase, bold, with an orange dot (same as the app).
   .brand-name {
     font-family: 'Poppins', sans-serif;
     font-size: 1.5rem;
-    color: #2B3F51;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: #1C2833;
     line-height: 1;
   }
+
+  .brand-dot { color: #D9481C; }
 }
 
 // ===== SECTION LINKS (landing mode) =====

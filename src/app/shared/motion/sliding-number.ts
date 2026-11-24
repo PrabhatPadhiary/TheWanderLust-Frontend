@@ -1,38 +1,39 @@
 /**
- * Sliding number (after Motion Primitives' Sliding Number): each digit is a
- * column of 0-9 that rolls to its value, like an odometer. Styles: `.sn-*` in
- * src/styles/_motion.scss. Screen readers read the plain number.
+ * Sliding number (after Motion Primitives' Sliding Number): when the value
+ * changes, the old number slides out and the new one slides in (up when it
+ * grows, down when it shrinks). The edges fade with a mask rather than being
+ * clipped, so tall display numerals are never cut off and the number keeps its
+ * natural width. Styles: `.sn*` in src/styles/_motion.scss. Screen readers read
+ * the plain number.
  */
 export function setSlidingNumber(el: HTMLElement, value: number): void {
   const text = String(Math.max(0, Math.round(value)));
   if (el.dataset['sn'] === text) return;
-  const digits = Math.max(2, text.length);
-  let cols = el.querySelector<HTMLElement>('.sn-cols');
-  if (!cols || cols.children.length !== digits) {
+  let box = el.querySelector<HTMLElement>('.sn');
+  if (!box) {
     el.textContent = '';
-    cols = document.createElement('span');
-    cols.className = 'sn-cols';
-    cols.setAttribute('aria-hidden', 'true');
-    for (let d = 0; d < digits; d++) {
-      const col = document.createElement('span');
-      col.className = 'sn-col';
-      const track = document.createElement('span');
-      track.className = 'sn-track';
-      track.innerHTML = Array.from({ length: 10 }, (_, k) => `<span>${k}</span>`).join('');
-      col.appendChild(track);
-      cols.appendChild(col);
-    }
+    box = document.createElement('span');
+    box.className = 'sn';
+    box.setAttribute('aria-hidden', 'true');
     const sr = document.createElement('span');
     sr.className = 'wl-sr-only';
-    el.append(cols, sr);
+    el.append(box, sr);
   }
-  const padded = text.padStart(digits, '0');
-  Array.from(cols.children).forEach((col, d) => {
-    const n = Number(padded[d]);
-    // Leading zeros fold away (the number is never shown as "09").
-    col.classList.toggle('lead', d < digits - text.length);
-    (col.firstElementChild as HTMLElement).style.transform = `translateY(${-n * 10}%)`;
-  });
+  const prev = box.querySelector<HTMLElement>('.sn-v:not(.sn-out-up):not(.sn-out-down)');
+  const next = document.createElement('span');
+  next.className = 'sn-v';
+  next.textContent = text;
+  if (prev) {
+    const up = Number(text) >= Number(prev.textContent);
+    next.classList.add(up ? 'sn-from-below' : 'sn-from-above');
+    box.appendChild(next);
+    next.getBoundingClientRect();   // start from there, then slide in
+    next.classList.remove('sn-from-below', 'sn-from-above');
+    prev.classList.add(up ? 'sn-out-up' : 'sn-out-down');
+    setTimeout(() => prev.remove(), 700);
+  } else {
+    box.appendChild(next);
+  }
   el.querySelector('.wl-sr-only')!.textContent = text;
   el.dataset['sn'] = text;
 }
