@@ -26,7 +26,8 @@
     <h2>2. What we collect</h2>
     <ul>
       <li>
-        <strong>Your account:</strong> your name, email address and profile photo. You sign in with
+        <strong>Your account:</strong> your name, email address and profile photo, and a short bio if
+        you write one. You sign in with
         Google or with an email and password. Sign-in is handled by Google Firebase
         Authentication; we never see your Google password.
       </li>
@@ -62,6 +63,12 @@
         technical details such as your IP address, device and app version, and errors. We use these
         to keep Wayraa secure (for example, to stop abuse) and to fix problems.
       </li>
+      <li>
+        <strong>Crash reports:</strong> if the app crashes or hits an error, it sends a report so we
+        can fix it: what went wrong and where in the app, your phone model, its operating system and
+        the app version. Crash reports don't include your name, email, IP address or what you've
+        written.
+      </li>
     </ul>
 
     <h2>3. How we use it</h2>
@@ -89,6 +96,19 @@
         <strong>Your name and photo</strong> are shown to people on your trips and next to the stories
         you publish.
       </li>
+      <li>
+        <strong>Your profile:</strong> anyone using Wayraa can open your profile from your stories and
+        comments. It shows your name, photo, bio, the month you joined, your traveller rank, and your
+        public stories with the places they're from (including on a map). Your rank is worked out
+        from what you do in Wayraa, such as stories you share and trips you've planned and taken, but
+        only its name is shown, never the trips themselves. Your trips, email, private stories and
+        drafts are never shown on your profile.
+      </li>
+      <li>
+        <strong>What you have in common:</strong> when you look at someone's profile, Wayraa may show
+        <em>you</em> how many trips you're both on and which places you've both been, based on your
+        own trips and stories and their public stories. This is shown only to the person looking.
+      </li>
     </ul>
 
     <h2>5. Services we use</h2>
@@ -105,6 +125,13 @@
         <strong>Expo</strong>, with <strong>Firebase Cloud Messaging</strong> (Android) and
         <strong>Apple Push Notification service</strong> (iPhone), to deliver notifications to your
         phone. They receive your push token and the text of each notification.
+      </li>
+      <li>
+        <strong>Sentry</strong> to receive crash reports from the app (servers in the United States).
+      </li>
+      <li>
+        <strong>Your phone's built-in map service</strong> (Apple Maps on iPhone, Google on Android) to
+        find places on a map by name, such as the places on a traveller's profile.
       </li>
       <li><strong>Render</strong> and <strong>Neon</strong> to host our servers and database.</li>
       <li><strong>Cloudflare</strong> to deliver our website.</li>
@@ -128,11 +155,11 @@
 
     <h2>7. Your choices</h2>
     <ul>
-      <li>See and edit your profile in the app at any time.</li>
+      <li>See and edit your profile in the app at any time, including your name, photo and bio.</li>
       <li>Make a story private, or delete it.</li>
       <li>Turn off location access in your phone's settings.</li>
       <li>Turn off notifications in your phone's settings.</li>
-      <li>Block or report people and content. Reports are anonymous to the person reported; our moderators see them so they can review the content.</li>
+      <li>Block or report people, profiles and content. Reports are anonymous to the person reported; our moderators see them so they can review them.</li>
       <li>
         Ask us for a copy of your information, to correct it, or to delete it, by emailing
         <a [href]="'mailto:' + SUPPORT_EMAIL">{{ SUPPORT_EMAIL }}</a>. Depending on where you live, you
@@ -188,9 +215,10 @@
 
     <h2>3. Your content</h2>
     <p>
-      Trips, stories, journals and photos you add stay yours. So that Wayraa can work, you allow us to
+      Trips, stories, journals, photos and your bio stay yours. So that Wayraa can work, you allow us to
       store, display and share your content as you choose: with the people on your trips, and with
-      everyone for stories you make public. Only add photos and text you have the right to share.
+      everyone for stories you make public and for your profile. Only add photos and text you have
+      the right to share.
     </p>
 
     <h2>4. Community rules</h2>
@@ -204,8 +232,8 @@
       <li>is spam, a scam, or pretends to be someone else.</li>
     </ul>
     <p>
-      You can report stories, comments and replies, and block people, in the app. We review reports
-      within 24 hours. We may remove content and suspend or close accounts that break these rules.
+      You can report stories, comments, replies and profiles, and block people, in the app. We review
+      reports within 24 hours. We may remove content and suspend or close accounts that break these rules.
       We have zero tolerance for child sexual abuse and exploitation: see our
       <a routerLink="/child-safety">Child Safety Standards</a>.
     </p>
@@ -285,7 +313,8 @@
     <ul>
       <li>
         <strong>In the app:</strong> on a story, tap <strong>⋯ → Report story</strong>; on a comment or
-        reply, tap <strong>⋯ → Report comment</strong>. You can also block the person.
+        reply, tap <strong>⋯ → Report comment</strong>; on someone's profile, tap
+        <strong>⋯ → Report</strong>. You can also block the person.
       </li>
       <li>
         <strong>By email:</strong> write to
